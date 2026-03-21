@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Main Toga application for PoGoQuiz.
+Main Toga application for GoBattleKit.
 """
 import os
 import toga
@@ -13,7 +13,7 @@ from .screens.type_quiz import TypeQuizScreen
 # Fix for locale.Error on iOS real devices
 os.environ["LANG"] = "en_US.UTF-8"
 
-class PoGoQuiz(toga.App):
+class GoBattleKit(toga.App):
     def startup(self):
         self.home_screen = HomeScreen(self)
         self.quiz_screen = QuizScreen(self)
@@ -36,5 +36,5 @@ class PoGoQuiz(toga.App):
 
 
 def main():
-    return PoGoQuiz("PoGoQuiz", "com.mglerner.pogoquiz")
+    return GoBattleKit("GoBattleKit", "com.mglerner.gobattlekit")
 

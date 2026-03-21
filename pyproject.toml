@@ -1,16 +1,16 @@
 # This project was generated with 0.4.1 using template: https://github.com/beeware/briefcase-template @ v0.4.1
 [tool.briefcase]
-project_name = "PoGoQuiz"
+project_name = "GoBattleKit"
 bundle = "com.mglerner"
 version = "0.0.1"
-url = "https://mglerner.com/pogoquiz"
+url = "https://mglerner.com/gobattlekit"
 license.file = "LICENSE"
 author = "Michael G. Lerner"
 author_email = "mglerner@protonmail.com"
 
 [tool.briefcase.app.pogoquiz]
-formal_name = "PoGoQuiz"
-description = "MGL's PoGo App"
+formal_name = "GoBattleKit"
+description = "MGL's GoBattleKit App"
 long_description = """More details about the app should go here.
 """
 icon = "src/pogoquiz/resources/icon"

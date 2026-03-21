@@ -18,7 +18,7 @@ class HomeScreen:
         container = toga.Box(style=Pack(direction=COLUMN, margin=20, flex=1))
 
         title = toga.Label(
-            "PoGoQuiz",
+            "GoBattleKit",
             style=Pack(font_size=32, font_weight="bold", margin_bottom=10,
                        text_align="center")
         )
