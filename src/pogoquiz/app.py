@@ -2,6 +2,7 @@
 """
 Main Toga application for PoGoQuiz.
 """
+import os
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
@@ -9,6 +10,8 @@ from .screens.home import HomeScreen
 from .screens.quiz import QuizScreen
 from .screens.type_quiz import TypeQuizScreen
 
+# Fix for locale.Error on iOS real devices
+os.environ["LANG"] = "en_US.UTF-8"
 
 class PoGoQuiz(toga.App):
     def startup(self):

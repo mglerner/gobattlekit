@@ -1,4 +1,7 @@
-from pogoquiz.app import main
+#!/usr/bin/env python
+import os
+os.environ["LANG"] = "en_US.UTF-8"
 
-if __name__ == "__main__":
-    main().main_loop()
+from pogoquiz.app import main
+main().main_loop()
+
