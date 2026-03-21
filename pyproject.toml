@@ -13,6 +13,9 @@ formal_name = "PoGoQuiz"
 description = "MGL's PoGo App"
 long_description = """More details about the app should go here.
 """
+icon = "src/pogoquiz/resources/icon"
+splash = "src/pogoquiz/resources/splash"
+splash_background_color = "#1a3a5c"
 sources = [
     "src/pogoquiz",
 ]
