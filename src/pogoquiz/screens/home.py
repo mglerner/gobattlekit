@@ -15,16 +15,16 @@ class HomeScreen:
 
     def build(self):
         """Build and return the home screen content."""
-        container = toga.Box(style=Pack(direction=COLUMN, padding=20, flex=1))
+        container = toga.Box(style=Pack(direction=COLUMN, margin=20, flex=1))
 
         title = toga.Label(
             "PoGoQuiz",
-            style=Pack(font_size=32, font_weight="bold", padding_bottom=10,
+            style=Pack(font_size=32, font_weight="bold", margin_bottom=10,
                        text_align="center")
         )
         subtitle = toga.Label(
             "Choose a quiz to begin",
-            style=Pack(font_size=16, padding_bottom=20, text_align="center")
+            style=Pack(font_size=16, margin_bottom=20, text_align="center")
         )
         container.add(title)
         container.add(subtitle)
@@ -32,7 +32,7 @@ class HomeScreen:
         # Move count quizzes by league
         league_label = toga.Label(
             "Move Counts",
-            style=Pack(font_size=14, padding_bottom=8, text_align="center")
+            style=Pack(font_size=14, margin_bottom=8, text_align="center")
         )
         container.add(league_label)
 
@@ -44,14 +44,14 @@ class HomeScreen:
             btn = toga.Button(
                 label,
                 on_press=self._make_league_handler(league),
-                style=Pack(padding_bottom=12, height=60, font_size=18)
+                style=Pack(margin_bottom=12, height=60, font_size=18)
             )
             container.add(btn)
 
         # Divider label
         type_label = toga.Label(
             "Type Effectiveness",
-            style=Pack(font_size=14, padding_top=16, padding_bottom=8,
+            style=Pack(font_size=14, margin_top=16, margin_bottom=8,
                        text_align="center")
         )
         container.add(type_label)
@@ -59,7 +59,7 @@ class HomeScreen:
         type_btn = toga.Button(
             "Type Quiz",
             on_press=self._start_type_quiz,
-            style=Pack(padding_bottom=12, height=60, font_size=18)
+            style=Pack(margin_bottom=12, height=60, font_size=18)
         )
         container.add(type_btn)
 

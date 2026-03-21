@@ -6,10 +6,8 @@ import random
 import asyncio
 import toga
 from toga.style import Pack
-from toga.style.pack import COLUMN, ROW
+from toga.style.pack import COLUMN
 from ..data.effectiveness import effectiveness, effectiveness_to_words
-
-MAX_ATTEMPTS = 1
 
 
 class TypeQuizScreen:
@@ -25,12 +23,12 @@ class TypeQuizScreen:
         self._load_question()
 
         # --- Outer container ---
-        self.container = toga.Box(style=Pack(direction=COLUMN, padding=20, flex=1))
+        self.container = toga.Box(style=Pack(direction=COLUMN, margin=20, flex=1))
 
         # Score bar
         self.score_label = toga.Label(
             self._score_text(),
-            style=Pack(font_size=14, padding_bottom=10, text_align="center")
+            style=Pack(font_size=14, margin_bottom=10, text_align="center")
         )
         self.container.add(self.score_label)
 
@@ -38,8 +36,8 @@ class TypeQuizScreen:
         self.question_label = toga.MultilineTextInput(
             value="",
             readonly=True,
-            style=Pack(font_size=18, padding_bottom=20,
-                       padding_left=10, padding_right=10,
+            style=Pack(font_size=18, margin_bottom=20,
+                       margin_left=10, margin_right=10,
                        height=80, flex=1)
         )
         self.container.add(self.question_label)
@@ -48,12 +46,12 @@ class TypeQuizScreen:
         # Feedback label
         self.feedback_label = toga.Label(
             "",
-            style=Pack(font_size=16, padding_bottom=16, text_align="center")
+            style=Pack(font_size=16, margin_bottom=16, text_align="center")
         )
         self.container.add(self.feedback_label)
 
         # Answer buttons — one per effectiveness category
-        self.button_box = toga.Box(style=Pack(direction=COLUMN, padding_bottom=10))
+        self.button_box = toga.Box(style=Pack(direction=COLUMN, margin_bottom=10))
         self._build_answer_buttons()
         self.container.add(self.button_box)
 
@@ -61,7 +59,7 @@ class TypeQuizScreen:
         end_btn = toga.Button(
             "End Quiz",
             on_press=self._end_quiz,
-            style=Pack(padding_top=30, height=44)
+            style=Pack(margin_top=30, height=44)
         )
         self.container.add(end_btn)
 
@@ -102,7 +100,7 @@ class TypeQuizScreen:
             btn = toga.Button(
                 answer.capitalize(),
                 on_press=self._make_answer_handler(answer),
-                style=Pack(padding_bottom=8, height=52, font_size=16)
+                style=Pack(margin_bottom=8, height=52, font_size=16)
             )
             self.answer_buttons[answer] = btn
             self.button_box.add(btn)
@@ -130,14 +128,14 @@ class TypeQuizScreen:
             self.feedback_label.text = (
                 f"❌ The answer was {self.right_answer}."
             )
-        self.app.add_background_task(self._advance_question)
+        asyncio.create_task(self._advance_question())
 
     def _disable_buttons(self):
         """Disable all answer buttons while waiting to advance."""
         for btn in self.answer_buttons.values():
             btn.enabled = False
 
-    async def _advance_question(self, widget):
+    async def _advance_question(self):
         """Pause briefly then load the next question."""
         await asyncio.sleep(1.5)
         self._load_question()
@@ -153,10 +151,12 @@ class TypeQuizScreen:
         """Format the running score display."""
         return f"Score: {self.score} / {self.total}"
 
-    def _end_quiz(self, widget):
+    async def _end_quiz(self, widget):
         """Show final score then return to home screen."""
-        self.app.main_window.info_dialog(
-            "Quiz Complete",
-            f"Type Effectiveness\nFinal score: {self.score} / {self.total}"
+        await self.app.main_window.dialog(
+            toga.InfoDialog(
+                "Quiz Complete",
+                f"Type Effectiveness\nFinal score: {self.score} / {self.total}"
+            )
         )
         self.app.show_home()
