@@ -1,0 +1,24 @@
+# Briefcase build artifacts
+build/
+logs/
+dist/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+
+# Briefcase support packages
+.briefcase/
+
+# Cache
+~/.pogoquiz_cache/
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# macOS
+.DS_Store
