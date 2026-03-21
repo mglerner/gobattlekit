@@ -22,8 +22,8 @@ sources = [
 test_sources = [
     "tests",
 ]
-
 requires = [
+    "certifi",
 ]
 test_requires = [
     "pytest",
@@ -192,11 +192,6 @@ build_gradle_dependencies = [
     # Needed for WebView
     # "androidx.webkit:webkit:1.15.0",
 ]
-
-# Needed for WebView
-# build_gradle_extra_content="""
-# chaquopy.defaultConfig.staticProxy("toga_android.widgets.internal.webview")
-# """
 
 # Web deployments
 [tool.briefcase.app.pogoquiz.web]

@@ -59,7 +59,7 @@ class QuizScreen:
         )
         self.container.add(self.feedback_label)
 
-        # Answer buttons: 1-14 + "more"
+        # Answer buttons: 1-20 + "more"
         self.button_box = toga.Box(style=Pack(direction=COLUMN))
         self._build_answer_buttons()
         self.container.add(self.button_box)
@@ -101,20 +101,20 @@ class QuizScreen:
         for child in list(self.button_box.children):
             self.button_box.remove(child)
 
-            self.answer_buttons = {}
-            answers = list(range(1, 21)) + ['more']
-            row = None
-            for i, val in enumerate(answers):
-                if i % 5 == 0:
-                    row = toga.Box(style=Pack(direction=ROW, margin_bottom=8))
-                    self.button_box.add(row)
-                    btn = toga.Button(
-                        str(val),
-                        on_press=self._make_answer_handler(val),
-                        style=Pack(flex=1, margin=4, height=52, font_size=16)
-                        )
-                    self.answer_buttons[val] = btn
-                    row.add(btn)
+        self.answer_buttons = {}
+        answers = list(range(1, 21)) + ['more']
+        row = None
+        for i, val in enumerate(answers):
+            if i % 5 == 0:
+                row = toga.Box(style=Pack(direction=ROW, margin_bottom=8))
+                self.button_box.add(row)
+            btn = toga.Button(
+                str(val),
+                on_press=self._make_answer_handler(val),
+                style=Pack(flex=1, margin=4, height=52, font_size=16)
+            )
+            self.answer_buttons[val] = btn
+            row.add(btn)
 
     def _make_answer_handler(self, value):
         """Return a button handler for the given answer value."""
@@ -180,7 +180,6 @@ class QuizScreen:
         """Format the running score display."""
         return f"Score: {self.score} / {self.max_score}"
 
-
     async def _end_quiz(self, widget):
         """Show final score then return to home screen."""
         league_name = self.league.capitalize()
@@ -191,3 +190,4 @@ class QuizScreen:
             )
         )
         self.app.show_home()
+        
