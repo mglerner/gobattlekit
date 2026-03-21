@@ -40,4 +40,4 @@ def counters_to_charge(fast_move, charged_move, fastmoves, chargedmoves):
     energy_per_fast = fastmoves[fast_move]['energyGain']
     energy_needed = chargedmoves[charged_move]['energy']
     result = int(math.ceil(energy_needed / energy_per_fast))
-    return result if result <= 14 else 'more'
+    return result if result <= 20 else 'more'

@@ -97,25 +97,24 @@ class QuizScreen:
     # ------------------------------------------------------------------
 
     def _build_answer_buttons(self):
-        """Build the 1-14 + more answer buttons in a grid."""
-        # Clear existing buttons
+        """Build the 1-20 + more answer buttons in a grid, 5 per row."""
         for child in list(self.button_box.children):
             self.button_box.remove(child)
 
-        self.answer_buttons = {}
-        answers = list(range(1, 15)) + ['more']
-        row = None
-        for i, val in enumerate(answers):
-            if i % 4 == 0:
-                row = toga.Box(style=Pack(direction=ROW, margin_bottom=8))
-                self.button_box.add(row)
-            btn = toga.Button(
-                str(val),
-                on_press=self._make_answer_handler(val),
-                style=Pack(flex=1, margin=4, height=52, font_size=16)
-            )
-            self.answer_buttons[val] = btn
-            row.add(btn)
+            self.answer_buttons = {}
+            answers = list(range(1, 21)) + ['more']
+            row = None
+            for i, val in enumerate(answers):
+                if i % 5 == 0:
+                    row = toga.Box(style=Pack(direction=ROW, margin_bottom=8))
+                    self.button_box.add(row)
+                    btn = toga.Button(
+                        str(val),
+                        on_press=self._make_answer_handler(val),
+                        style=Pack(flex=1, margin=4, height=52, font_size=16)
+                        )
+                    self.answer_buttons[val] = btn
+                    row.add(btn)
 
     def _make_answer_handler(self, value):
         """Return a button handler for the given answer value."""
