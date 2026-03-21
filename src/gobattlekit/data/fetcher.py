@@ -6,7 +6,7 @@ import time
 import ssl
 import certifi
 
-CACHE_DIR = pathlib.Path.home() / "Documents" / "pogoquiz_cache"
+CACHE_DIR = pathlib.Path.home() / "Documents" / "gobattlekit_cache"
 CACHE_TTL = 86400  # refresh once a day
 
 BASE_URL = "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data"

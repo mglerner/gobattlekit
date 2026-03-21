@@ -8,6 +8,6 @@ def _safe_setlocale(category, loc=None):
         return _original_setlocale(category, "C")
 locale.setlocale = _safe_setlocale
 
-from pogoquiz.app import main
+from gobattlekit.app import main
 main().main_loop()
 

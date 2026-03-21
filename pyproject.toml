@@ -8,16 +8,16 @@ license.file = "LICENSE"
 author = "Michael G. Lerner"
 author_email = "mglerner@protonmail.com"
 
-[tool.briefcase.app.pogoquiz]
+[tool.briefcase.app.gobattlekit]
 formal_name = "GoBattleKit"
 description = "MGL's GoBattleKit App"
 long_description = """More details about the app should go here.
 """
-icon = "src/pogoquiz/resources/icon"
-splash = "src/pogoquiz/resources/splash"
+icon = "src/gobattlekit/resources/icon"
+splash = "src/gobattlekit/resources/splash"
 splash_background_color = "#1a3a5c"
 sources = [
-    "src/pogoquiz",
+    "src/gobattlekit",
 ]
 test_sources = [
     "tests",
@@ -29,14 +29,14 @@ test_requires = [
     "pytest",
 ]
 
-[tool.briefcase.app.pogoquiz.macOS]
+[tool.briefcase.app.gobattlekit.macOS]
 universal_build = true
 requires = [
     "toga-cocoa~=0.5.0",
     "std-nslog~=1.0.3",
 ]
 
-[tool.briefcase.app.pogoquiz.linux]
+[tool.briefcase.app.gobattlekit.linux]
 requires = [
     "toga-gtk~=0.5.0",
     # PyGObject 3.52.1 enforces a requirement on libgirepository-2.0-dev. This library
@@ -45,7 +45,7 @@ requires = [
     "pygobject < 3.52.1",
 ]
 
-[tool.briefcase.app.pogoquiz.linux.system.debian]
+[tool.briefcase.app.gobattlekit.linux.system.debian]
 system_requires = [
     # Needed to compile pycairo wheel
     "libcairo2-dev",
@@ -71,7 +71,7 @@ system_runtime_requires = [
     # "gir1.2-webkit2-4.1",
 ]
 
-[tool.briefcase.app.pogoquiz.linux.system.rhel]
+[tool.briefcase.app.gobattlekit.linux.system.rhel]
 system_requires = [
     # Needed to compile pycairo wheel
     "cairo-gobject-devel",
@@ -90,7 +90,7 @@ system_runtime_requires = [
     # "webkit2gtk3",
 ]
 
-[tool.briefcase.app.pogoquiz.linux.system.suse]
+[tool.briefcase.app.gobattlekit.linux.system.suse]
 system_requires = [
     # Needed to compile pycairo wheel
     "cairo-devel",
@@ -109,7 +109,7 @@ system_runtime_requires = [
     # "libwebkit2gtk3", "typelib(WebKit2)",
 ]
 
-[tool.briefcase.app.pogoquiz.linux.system.arch]
+[tool.briefcase.app.gobattlekit.linux.system.arch]
 system_requires = [
     # Needed to compile pycairo wheel
     "cairo",
@@ -136,7 +136,7 @@ system_runtime_requires = [
     # "webkit2gtk",
 ]
 
-[tool.briefcase.app.pogoquiz.linux.appimage]
+[tool.briefcase.app.gobattlekit.linux.appimage]
 manylinux = "manylinux_2_28"
 
 system_requires = [
@@ -157,18 +157,18 @@ linuxdeploy_plugins = [
     "DEPLOY_GTK_VERSION=3 gtk",
 ]
 
-[tool.briefcase.app.pogoquiz.linux.flatpak]
+[tool.briefcase.app.gobattlekit.linux.flatpak]
 flatpak_runtime = "org.gnome.Platform"
 flatpak_runtime_version = "48"
 flatpak_sdk = "org.gnome.Sdk"
 
-[tool.briefcase.app.pogoquiz.windows]
+[tool.briefcase.app.gobattlekit.windows]
 requires = [
     "toga-winforms~=0.5.0",
 ]
 
 # Mobile deployments
-[tool.briefcase.app.pogoquiz.iOS]
+[tool.briefcase.app.gobattlekit.iOS]
 development_team = "6TV57R6ZCC"
 requires = [
     "toga-iOS~=0.5.0",
@@ -176,7 +176,7 @@ requires = [
     "certifi",
 ]
 
-[tool.briefcase.app.pogoquiz.android]
+[tool.briefcase.app.gobattlekit.android]
 requires = [
     "toga-android~=0.5.0",
 ]
@@ -194,7 +194,7 @@ build_gradle_dependencies = [
 ]
 
 # Web deployments
-[tool.briefcase.app.pogoquiz.web]
+[tool.briefcase.app.gobattlekit.web]
 requires = [
     "toga-web~=0.5.0",
 ]
