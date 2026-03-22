@@ -72,13 +72,8 @@ LEAGUE_CAPS = {
     'master': 999999.99,
 }
 
-# Max level caps
-MAX_LEVELS = {
-    'normal': 40,
-    'xl': 50,
-    'bb': 41,      # best buddy
-    'xl_bb': 51,   # XL best buddy
-}
+# Cache for stat product rankings: (species, league, max_level) -> {(atk, def, sta): rank}
+_rank_cache = {}
 
 
 def get_species_name(name, form, is_shadow):
@@ -137,6 +132,39 @@ def ivs_to_stats(atk_iv, def_iv, sta_iv, start_level, *,
     return best
 
 
+def compute_rank_table(species, base_atk, base_def, base_sta,
+                       max_level, max_cp):
+    """Compute stat product ranks for all 4096 IV combinations.
+
+    Returns a dict mapping (atk_iv, def_iv, sta_iv) -> rank (1=best).
+    Cached in _rank_cache by (species, max_level, max_cp).
+    """
+    cache_key = (species, max_level, max_cp)
+    if cache_key in _rank_cache:
+        return _rank_cache[cache_key]
+
+    print(f"Computing rank table for {species} (max_level={max_level})...")
+    combos = []
+    for a in range(16):
+        for d in range(16):
+            for s in range(16):
+                stats = ivs_to_stats(
+                    a, d, s, start_level=1,
+                    base_atk=base_atk, base_def=base_def, base_sta=base_sta,
+                    max_level=max_level, max_cp=max_cp,
+                )
+                sp = stats['stat_prod'] if stats is not None else 0
+                combos.append((sp, a, d, s))
+
+    combos.sort(reverse=True)
+    rank_table = {}
+    for rank, (sp, a, d, s) in enumerate(combos, start=1):
+        rank_table[(a, d, s)] = rank
+
+    _rank_cache[cache_key] = rank_table
+    return rank_table
+
+
 def parse_csv(csv_path):
     """Parse a PokeGenie CSV export.
 
@@ -178,12 +206,14 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
     results = {}
 
     # Build reverse lookup: pre-evolution -> final form
-    # e.g. 'Meditite' -> 'Medicham', 'Spheal' -> 'Walrein'
     pre_evo_to_final = {}
     if evolution_lines:
         for final, line in evolution_lines.items():
             for member in line:
                 pre_evo_to_final[member] = final
+
+    # Cache of rank tables needed this run: species -> rank_table
+    rank_tables = {}
 
     for mon in mons:
         csv_species = get_species_name(mon['name'], mon['form'], mon['is_shadow'])
@@ -196,7 +226,6 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
         else:
             continue
 
-        # Use final form's base stats for the calculation
         if final_species not in pokemon_index:
             continue
         if final_species not in thresholds:
@@ -217,10 +246,29 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
 
         matched = []
         for target_name, target in thresholds[final_species][league_label].items():
-            if (stats['attack'] >= target.get('attack', 0) and
+            # Check stat thresholds
+            if not (stats['attack'] >= target.get('attack', 0) and
                     stats['defense'] >= target.get('defense', 0) and
                     stats['stamina'] >= target.get('stamina', 0)):
-                matched.append(target_name)
+                continue
+
+            # Check onlytop if present
+            if 'onlytop' in target:
+                onlytop = target['onlytop']
+                # Compute rank table for this species/league if not yet done
+                rank_key = (final_species, max_level, max_cp)
+                if rank_key not in rank_tables:
+                    rank_tables[rank_key] = compute_rank_table(
+                        final_species,
+                        base['atk'], base['def'], base['hp'],
+                        max_level=max_level, max_cp=max_cp,
+                    )
+                rank = rank_tables[rank_key].get(
+                    (mon['atk_iv'], mon['def_iv'], mon['sta_iv']), 9999)
+                if rank > onlytop:
+                    continue
+
+            matched.append(target_name)
 
         if matched:
             if final_species not in results:

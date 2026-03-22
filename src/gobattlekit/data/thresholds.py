@@ -96,91 +96,91 @@ EVOLUTION_LINES = {
 DEFAULT_THRESHOLDS = {
     'Jumpluff': {
         'Great': {
-            'Top SP (157.31D)': {
+            'Top SP (157D)': {
                 'attack': 0, 'defense': 157.31, 'stamina': 0, 'onlytop': 12},
-            'Atk+Def (97.6A, 156.3D)': {
+            'Atk+Def (97.6A, 156D)': {
                 'attack': 97.6, 'defense': 156.3, 'stamina': 0},
-            'Atk+Bulk (97.6A, 150D, 151HP)': {
+            'Atk+Bulk (97.6A, 150D, 151S)': {
                 'attack': 97.6, 'defense': 150, 'stamina': 151},
         },
     },
     'Walrein': {
         'Great': {
-            'GOD TIER (114.46A, 114.75D, 148HP)': {
+            'GOD (114A, 114D, 148S)': {
                 'attack': 114.46, 'defense': 114.75, 'stamina': 148},
-            'Azu Slayer (112.06A, 114.75D, 151HP)': {
+            'Azu (112A, 114D, 151S)': {
                 'attack': 112.06, 'defense': 114.75, 'stamina': 151},
-            'All Atk BPs (114.46A, 113D, 148HP)': {
+            'All BPs (114A, 113D, 148S)': {
                 'attack': 114.46, 'defense': 113, 'stamina': 148},
         },
         'Ultra': {
-            'Mirror HP (145.28A, 145D, 201HP)': {
+            'Mirror HP (145A, 145D, 201S)': {
                 'attack': 145.28, 'defense': 145, 'stamina': 201},
-            'Mirror Def (145.28A, 147D, 199HP)': {
+            'Mirror Def (145A, 147D, 199S)': {
                 'attack': 145.28, 'defense': 147, 'stamina': 199},
-            'Best (147.45A, 145.3D, 197HP)': {
+            'Best (147A, 145D, 197S)': {
                 'attack': 147.45, 'defense': 145.3, 'stamina': 197},
         },
         'Master': {
-            'Best (15A, 15D, 15HP)': {
+            'Best (15/15/15)': {
                 'attack': 15, 'defense': 15, 'stamina': 15},
-            'Good (15A, 14D, 13HP)': {
+            'Good (15/14/13)': {
                 'attack': 15, 'defense': 14, 'stamina': 13},
-            'Min (13A, 12D, 12HP)': {
+            'Min (13/12/12)': {
                 'attack': 13, 'defense': 12, 'stamina': 12},
         },
     },
     'Deoxys (Defense)': {
         'Great': {
-            'Best (101.95A, 221D, 98HP)': {
+            'Best (102A, 221D, 98S)': {
                 'attack': 101.95, 'defense': 221, 'stamina': 98},
-            'Lanturn BPs (101.95A, 220.18D, 95HP)': {
+            'Lanturn (102A, 220D, 95S)': {
                 'attack': 101.95, 'defense': 220.18, 'stamina': 95},
-            'SwagMan+ (100.78A, 220.18D, 95HP)': {
+            'SwagMan (101A, 220D, 95S)': {
                 'attack': 100.78, 'defense': 220.18, 'stamina': 95},
-            'Mirror (100.78A, 98HP)': {
+            'Mirror (101A, 98S)': {
                 'attack': 100.78, 'defense': 0, 'stamina': 98},
         },
         'Ultra': {
-            'BB Umb (132.81A, 284D, 122HP)': {
+            'BB Umb (133A, 284D, 122S)': {
                 'attack': 132.81, 'defense': 284, 'stamina': 122},
-            'Regi+TF (132.28A, 126HP)': {
+            'Regi+TF (132A, 126S)': {
                 'attack': 132.28, 'defense': 0, 'stamina': 126},
-            'Umb+TF+Regi (131.8A, 126HP)': {
+            'Umb+TF (132A, 126S)': {
                 'attack': 131.8, 'defense': 0, 'stamina': 126},
-            'Atk BP (132.28A)': {
+            'Atk BP (132A)': {
                 'attack': 132.28, 'defense': 0, 'stamina': 0},
         },
     },
     'Venusaur': {
         'Great': {
-            'Fross Slay+Def (122.5A, 121.13D, 122HP)': {
+            'Fross+Def (122A, 121D, 122S)': {
                 'attack': 122.5, 'defense': 121.13, 'stamina': 122},
-            'Fross Slay+OKDef (122.5A, 117.88D, 122HP)': {
+            'Fross+OK (122A, 118D, 122S)': {
                 'attack': 122.5, 'defense': 117.88, 'stamina': 122},
-            'Big Bulk (121.13D, 123HP)': {
+            'Big Bulk (121D, 123S)': {
                 'attack': 0, 'defense': 121.13, 'stamina': 123},
-            'Shadow Bulk (120.46D, 122HP)': {
+            'S-Bulk (120D, 122S)': {
                 'attack': 0, 'defense': 120.46, 'stamina': 122},
         },
         'Ultra': {
-            'GFisk Slay (159.2A, 157.25D, 152HP)': {
+            'GFisk (159A, 157D, 152S)': {
                 'attack': 159.2, 'defense': 157.25, 'stamina': 152},
-            'Huge Def (160.82D, 156HP)': {
+            'Hi Def (161D, 156S)': {
                 'attack': 0, 'defense': 160.82, 'stamina': 156},
-            'R1 Bulk (158.05D, 156HP)': {
+            'R1 Bulk (158D, 156S)': {
                 'attack': 0, 'defense': 158.05, 'stamina': 156},
-            'Shadow Blend (161.59A, 155.28D, 153HP)': {
+            'S-Blend (162A, 155D, 153S)': {
                 'attack': 161.59, 'defense': 155.28, 'stamina': 153},
         },
     },
     'Dewgong': {
         'Great': {
-            'MaxDef Umb (102.89A, 131.7D)': {
+            'MaxDef (103A, 132D)': {
                 'attack': 102.89, 'defense': 131.7, 'stamina': 0},
-            'R1Umb Bulk (101.79A, 136.81D, 150HP)': {
+            'R1Umb (102A, 137D, 150S)': {
                 'attack': 101.79, 'defense': 136.81, 'stamina': 150},
-            'R1Umb+Def (101.79A, 138.28D, 150HP)': {
+            'R1+Def (102A, 138D, 150S)': {
                 'attack': 101.79, 'defense': 138.28, 'stamina': 150},
         },
     },
@@ -192,27 +192,27 @@ DEFAULT_THRESHOLDS = {
     },
     'Sandslash (Alolan)': {
         'Great': {
-            'Hi Atk (115.31A, 128.92D, 119HP)': {
+            'Hi Atk (115A, 129D, 119S)': {
                 'attack': 115.31, 'defense': 128.92, 'stamina': 119},
-            'Super Hi Atk (118.24A, 127.59D, 118HP)': {
+            'Max Atk (118A, 128D, 118S)': {
                 'attack': 118.24, 'defense': 127.59, 'stamina': 118},
         },
         'Ultra': {
-            'Def Focus (149.14A, 173.07D)': {
+            'Def (149A, 173D)': {
                 'attack': 149.14, 'defense': 173.07, 'stamina': 0},
-            'Atk Focus (154.26A, 168D)': {
+            'Atk (154A, 168D)': {
                 'attack': 154.26, 'defense': 168, 'stamina': 0},
         },
     },
     'Whimsicott': {
         'Great': {
-            'Mod Atk (121.26A, 132.25D)': {
+            'Mod Atk (121A, 132D)': {
                 'attack': 121.26, 'defense': 132.25, 'stamina': 0},
-            'Slight Atk (119.47A, 132.25D)': {
+            'Slight Atk (119A, 132D)': {
                 'attack': 119.47, 'defense': 132.25, 'stamina': 0},
-            'A9 Slay (121.87A, 132.25D)': {
+            'A9 (122A, 132D)': {
                 'attack': 121.87, 'defense': 132.25, 'stamina': 0},
-            'Licki Slay (122.81A, 132.25D)': {
+            'Licki (123A, 132D)': {
                 'attack': 122.81, 'defense': 132.25, 'stamina': 0},
         },
     },
@@ -220,63 +220,63 @@ DEFAULT_THRESHOLDS = {
         'Great': {
             'Def (110D)': {
                 'attack': 0, 'defense': 110, 'stamina': 0},
-            'Atk (121.6A, 108D)': {
+            'Atk (122A, 108D)': {
                 'attack': 121.6, 'defense': 108, 'stamina': 0},
         },
     },
     'Registeel': {
         'Great': {
-            'Raid Only (186.7D, 127HP)': {
+            'Raid (187D, 127S)': {
                 'attack': 0, 'defense': 186.7, 'stamina': 127},
-            'Trade (190.09D, 129HP)': {
+            'Trade (190D, 129S)': {
                 'attack': 0, 'defense': 190.09, 'stamina': 129},
-            'Trade+ (191.97D, 129HP)': {
+            'Trade+ (192D, 129S)': {
                 'attack': 0, 'defense': 191.97, 'stamina': 129},
         },
         'Ultra': {
-            'Raid Only (240.5D, 165HP)': {
+            'Raid (241D, 165S)': {
                 'attack': 0, 'defense': 240.5, 'stamina': 165},
-            'Trade (244.4D, 167HP)': {
+            'Trade (244D, 167S)': {
                 'attack': 0, 'defense': 244.4, 'stamina': 167},
         },
     },
     'Azumarill': {
         'Great': {
-            'Medi Wall (137.64D)': {
+            'Medi Wall (138D)': {
                 'attack': 0, 'defense': 137.64, 'stamina': 0},
-            'Min (135.78D, 192HP)': {
+            'Min (136D, 192S)': {
                 'attack': 0, 'defense': 135.78, 'stamina': 192},
-            'General (132.8D, 187HP)': {
+            'General (133D, 187S)': {
                 'attack': 0, 'defense': 132.8, 'stamina': 187},
-            'Slight Atk (92A, 132.8D, 187HP)': {
+            'Slight Atk (92A, 133D, 187S)': {
                 'attack': 92, 'defense': 132.8, 'stamina': 187},
         },
     },
     'Araquanid': {
         'Great': {
-            'S-Drap Atk (99.02A)': {
+            'S-Drap (99A)': {
                 'attack': 99.02, 'defense': 0, 'stamina': 0},
-            'Hi Viggy Atk (99.2A)': {
+            'Viggy (99.2A)': {
                 'attack': 99.2, 'defense': 0, 'stamina': 0},
-            'Best Walrus Atk (99.93A)': {
+            'Walrus (99.9A)': {
                 'attack': 99.93, 'defense': 0, 'stamina': 0},
-            'DD Def Min (163.77D)': {
+            'Def Min (164D)': {
                 'attack': 0, 'defense': 163.77, 'stamina': 0},
-            'DD Def Max (165.21D)': {
+            'Def Max (165D)': {
                 'attack': 0, 'defense': 165.21, 'stamina': 0},
-            'HP Min (134HP)': {
+            'HP Min (134S)': {
                 'attack': 0, 'defense': 0, 'stamina': 134},
-            'HP Max (136HP)': {
+            'HP Max (136S)': {
                 'attack': 0, 'defense': 0, 'stamina': 136},
-            'General (99.2A, 165.2D, 134HP)': {
+            'General (99A, 165D, 134S)': {
                 'attack': 99.2, 'defense': 165.2, 'stamina': 134},
         },
     },
     'Golem (Alolan)': {
         'Great': {
-            'General (124.79A)': {
+            'General (125A)': {
                 'attack': 124.79, 'defense': 0, 'stamina': 0},
-            'Min (123.93A)': {
+            'Min (124A)': {
                 'attack': 123.93, 'defense': 0, 'stamina': 0},
             'Best (126A, 118D)': {
                 'attack': 126, 'defense': 118, 'stamina': 0},
@@ -284,389 +284,389 @@ DEFAULT_THRESHOLDS = {
     },
     'Marowak (Alolan)': {
         'Great': {
-            'S-AWak MinAtk (110.5A, 141.49D)': {
+            'S-Min (111A, 141D)': {
                 'attack': 110.5, 'defense': 141.49, 'stamina': 0},
-            'S-AWak HiAtk (111.85A, 141.49D)': {
+            'S-Hi (112A, 141D)': {
                 'attack': 111.85, 'defense': 141.49, 'stamina': 0},
         },
     },
     'Linoone (Galarian)': {
         'Great': {
-            'Swamp/Cash (112.87A, 144HP)': {
+            'Swamp (113A, 144S)': {
                 'attack': 112.87, 'defense': 0, 'stamina': 144},
-            'Drap CMP (114A, 144HP)': {
+            'Drap (114A, 144S)': {
                 'attack': 114, 'defense': 0, 'stamina': 144},
-            'Diggers (110.11D, 144HP)': {
+            'Dig (110D, 144S)': {
                 'attack': 0, 'defense': 110.11, 'stamina': 144},
-            'SwagAtk (111.14D, 144HP)': {
+            'SwagAtk (111D, 144S)': {
                 'attack': 0, 'defense': 111.14, 'stamina': 144},
-            'Best (114A, 111.14D, 144HP)': {
+            'Best (114A, 111D, 144S)': {
                 'attack': 114, 'defense': 111.14, 'stamina': 144},
         },
     },
     'Obstagoon': {
         'Great': {
-            'S.Premium (115.5A, 123.56D, 137HP)': {
+            'S.Prem (116A, 124D, 137S)': {
                 'attack': 115.5, 'defense': 123.56, 'stamina': 137},
-            'Premium (115A, 123.3D, 135HP)': {
+            'Prem (115A, 123D, 135S)': {
                 'attack': 115, 'defense': 123.3, 'stamina': 135},
-            'Bulk (126D, 137HP)': {
+            'Bulk (126D, 137S)': {
                 'attack': 0, 'defense': 126, 'stamina': 137},
         },
         'Ultra': {
-            'Unicorn (148A, 166.8D, 172HP)': {
+            'Unicorn (148A, 167D, 172S)': {
                 'attack': 148, 'defense': 166.8, 'stamina': 172},
-            'Gen Atk (146.95A, 163.8D, 172HP)': {
+            'Gen (147A, 164D, 172S)': {
                 'attack': 146.95, 'defense': 163.8, 'stamina': 172},
-            'Gen Atk+ (147.89A, 163.8D, 172HP)': {
+            'Gen+ (148A, 164D, 172S)': {
                 'attack': 147.89, 'defense': 163.8, 'stamina': 172},
-            'Mirror (149.1A, 172D, 172HP)': {
+            'Mirror (149A, 172D, 172S)': {
                 'attack': 149.1, 'defense': 172, 'stamina': 172},
-            'Bulk (166.8D, 174HP)': {
+            'Bulk (167D, 174S)': {
                 'attack': 0, 'defense': 166.8, 'stamina': 174},
         },
     },
     'Medicham': {
         'Great': {
-            'The Good (105.38A, 138.6D, 140HP)': {
+            'Good (105A, 139D, 140S)': {
                 'attack': 105.38, 'defense': 138.6, 'stamina': 140},
-            'Premium (105.87A, 138.64D, 140HP)': {
+            'Prem (106A, 139D, 140S)': {
                 'attack': 105.87, 'defense': 138.64, 'stamina': 140},
-            'BB (105.38A, 140.3D, 142HP)': {
+            'BB (105A, 140D, 142S)': {
                 'attack': 105.38, 'defense': 140.3, 'stamina': 142},
-            'Mirror Slay (108A, 137.64D)': {
+            'Mirror (108A, 138D)': {
                 'attack': 108, 'defense': 137.64, 'stamina': 0},
         },
     },
     'Dedenne': {
         'Great': {
-            'Basic (123.17A, 109D, 133HP)': {
+            'Basic (123A, 109D, 133S)': {
                 'attack': 123.17, 'defense': 109, 'stamina': 133},
-            'Scrafty (123.17A, 109.86D, 133HP)': {
+            'Scrafty (123A, 110D, 133S)': {
                 'attack': 123.17, 'defense': 109.86, 'stamina': 133},
-            'Atk+ (124.59A, 109D, 133HP)': {
+            'Atk+ (125A, 109D, 133S)': {
                 'attack': 124.59, 'defense': 109, 'stamina': 133},
-            'Best (124.59A, 109.86D, 133HP)': {
+            'Best (125A, 110D, 133S)': {
                 'attack': 124.59, 'defense': 109.86, 'stamina': 133},
-            'Bulk (109.86D, 133HP)': {
+            'Bulk (110D, 133S)': {
                 'attack': 0, 'defense': 109.86, 'stamina': 133},
         },
     },
     'Dunsparce': {
         'Great': {
-            'Basic Bulk (110.63D, 185HP)': {
+            'Bulk (111D, 185S)': {
                 'attack': 0, 'defense': 110.63, 'stamina': 185},
-            'Premium Bulk (111.14D, 186HP)': {
+            'Prem Bulk (111D, 186S)': {
                 'attack': 0, 'defense': 111.14, 'stamina': 186},
         },
     },
     'Stunfisk (Galarian)': {
         'Great': {
-            'High Bulk (99A, 124.75D, 174HP)': {
+            'Hi Bulk (99A, 125D, 174S)': {
                 'attack': 99, 'defense': 124.75, 'stamina': 174},
-            'Mirror Slayer (101.79A, 127.34D)': {
+            'Mirror (102A, 127D)': {
                 'attack': 101.79, 'defense': 127.34, 'stamina': 0},
-            'Bulk Mirror (101.79A, 124.75D, 172HP)': {
+            'Bulk Mirror (102A, 125D, 172S)': {
                 'attack': 101.79, 'defense': 124.75, 'stamina': 172},
-            'Min Bulk (99A, 124.75D, 172HP)': {
+            'Min Bulk (99A, 125D, 172S)': {
                 'attack': 99, 'defense': 124.75, 'stamina': 172},
         },
     },
     'Lickitung': {
         'Great': {
-            'Good (96.36A, 125.94D, 183HP)': {
+            'Good (96A, 126D, 183S)': {
                 'attack': 96.36, 'defense': 125.94, 'stamina': 183},
-            'Atk (97.7A, 125.94D, 183HP)': {
+            'Atk (98A, 126D, 183S)': {
                 'attack': 97.7, 'defense': 125.94, 'stamina': 183},
-            'Budget (97A, 125.1D, 181HP)': {
+            'Budget (97A, 125D, 181S)': {
                 'attack': 97, 'defense': 125.1, 'stamina': 181},
         },
     },
     'Toxapex': {
         'Great': {
-            'Hi Bulk (226.73D, 118HP)': {
+            'Hi Bulk (227D, 118S)': {
                 'attack': 0, 'defense': 226.73, 'stamina': 118},
-            'Mirror/HP (219D, 121HP)': {
+            'Mirror (219D, 121S)': {
                 'attack': 0, 'defense': 219, 'stamina': 121},
-            'Licki Slay (93A, 118HP)': {
+            'Licki (93A, 118S)': {
                 'attack': 93, 'defense': 0, 'stamina': 118},
         },
     },
     'Toxicroak': {
         'Great': {
-            'General (136A, 92.51D, 131HP)': {
+            'General (136A, 93D, 131S)': {
                 'attack': 136, 'defense': 92.51, 'stamina': 131},
-            'Discord (136.6A, 88.57D, 134HP)': {
+            'Discord (137A, 89D, 134S)': {
                 'attack': 136.6, 'defense': 88.57, 'stamina': 134},
-            'Bork (136.6A, 82D, 134HP)': {
+            'Bork (137A, 82D, 134S)': {
                 'attack': 136.6, 'defense': 82, 'stamina': 134},
         },
     },
     'Trevenant': {
         'Great': {
-            'Best (124A, 105.8D, 128HP)': {
+            'Best (124A, 106D, 128S)': {
                 'attack': 124, 'defense': 105.8, 'stamina': 128},
-            'Next (124A, 105.8D, 125HP)': {
+            'Next (124A, 106D, 125S)': {
                 'attack': 124, 'defense': 105.8, 'stamina': 125},
         },
         'Ultra': {
-            'Atk (168.7A, 129D, 167HP)': {
+            'Atk (169A, 129D, 167S)': {
                 'attack': 168.7, 'defense': 129, 'stamina': 167},
         },
     },
     'Noctowl': {
         'Great': {
-            'Slight Atk (104.23A, 118.27D, 171HP)': {
+            'Slight Atk (104A, 118D, 171S)': {
                 'attack': 104.23, 'defense': 118.27, 'stamina': 171},
-            'Azu Slay (105.2A, 117.58D, 168HP)': {
+            'Azu (105A, 118D, 168S)': {
                 'attack': 105.2, 'defense': 117.58, 'stamina': 168},
-            'A9 Slay (106.36A, 172HP)': {
+            'A9 (106A, 172S)': {
                 'attack': 106.36, 'defense': 0, 'stamina': 172},
         },
     },
     'Chesnaught': {
         'Great': {
-            'Bulk (122.21D, 127HP)': {
+            'Bulk (122D, 127S)': {
                 'attack': 0, 'defense': 122.21, 'stamina': 127},
-            'Fross Slay (121.89A, 117.7D, 125HP)': {
+            'Fross (122A, 118D, 125S)': {
                 'attack': 121.89, 'defense': 117.7, 'stamina': 125},
-            'Fross Slay Def (121.89A, 122.21D, 122HP)': {
+            'Fross Def (122A, 122D, 122S)': {
                 'attack': 121.89, 'defense': 122.21, 'stamina': 122},
         },
     },
     'Altaria': {
         'Great': {
-            'Trev Slay (102.97A, 149.02D, 139HP)': {
+            'Trev (103A, 149D, 139S)': {
                 'attack': 102.97, 'defense': 149.02, 'stamina': 139},
-            'Bulk+Trev (101.95A, 151.63D, 139HP)': {
+            'Bulk+Trev (102A, 152D, 139S)': {
                 'attack': 101.95, 'defense': 151.63, 'stamina': 139},
-            'Bulk (153.95D, 139HP)': {
+            'Bulk (154D, 139S)': {
                 'attack': 0, 'defense': 153.95, 'stamina': 139},
         },
     },
     'Cofagrigus': {
         'Great': {
-            'General (109A, 162D, 106HP)': {
+            'General (109A, 162D, 106S)': {
                 'attack': 109, 'defense': 162, 'stamina': 106},
-            'Best (111.32A, 164.56D, 106HP)': {
+            'Best (111A, 165D, 106S)': {
                 'attack': 111.32, 'defense': 164.56, 'stamina': 106},
         },
         'Ultra': {
-            'General (145.21A, 208D, 138HP)': {
+            'General (145A, 208D, 138S)': {
                 'attack': 145.21, 'defense': 208, 'stamina': 138},
         },
     },
     'Runerigus': {
         'Great': {
-            'General (109A, 162D, 106HP)': {
+            'General (109A, 162D, 106S)': {
                 'attack': 109, 'defense': 162, 'stamina': 106},
-            'Best (111.32A, 164.56D, 106HP)': {
+            'Best (111A, 165D, 106S)': {
                 'attack': 111.32, 'defense': 164.56, 'stamina': 106},
         },
         'Ultra': {
-            'General (145.21A, 208D, 138HP)': {
+            'General (145A, 208D, 138S)': {
                 'attack': 145.21, 'defense': 208, 'stamina': 138},
         },
     },
     'Slowbro': {
         'Great': {
-            'Bulk (118.4D, 144HP)': {
+            'Bulk (118D, 144S)': {
                 'attack': 0, 'defense': 118.4, 'stamina': 144},
         },
     },
     'Slowbro (Galarian)': {
         'Great': {
-            'Mirror (118.48A, 108.83D, 144HP)': {
+            'Mirror (118A, 109D, 144S)': {
                 'attack': 118.48, 'defense': 108.83, 'stamina': 144},
-            'Bulk (109D, 146HP)': {
+            'Bulk (109D, 146S)': {
                 'attack': 0, 'defense': 109, 'stamina': 146},
-            'General (110A, 100D, 144HP)': {
+            'General (110A, 100D, 144S)': {
                 'attack': 110, 'defense': 100, 'stamina': 144},
         },
     },
     'Slowking (Galarian)': {
         'Great': {
-            'Mirror Slay (116.7A, 117.5D, 138HP)': {
+            'Mirror (117A, 118D, 138S)': {
                 'attack': 116.7, 'defense': 117.5, 'stamina': 138},
         },
     },
     'Tapu Fini': {
         'Great': {
-            'Beat Medi (153.91D, 110HP)': {
+            'Beat Medi (154D, 110S)': {
                 'attack': 0, 'defense': 153.91, 'stamina': 110},
-            'General (153.91D, 107HP)': {
+            'General (154D, 107S)': {
                 'attack': 0, 'defense': 153.91, 'stamina': 107},
-            'Thrift (153.91D, 105HP)': {
+            'Thrift (154D, 105S)': {
                 'attack': 0, 'defense': 153.91, 'stamina': 105},
         },
         'Ultra': {
-            'Hi HP (198.9D, 142HP)': {
+            'Hi HP (199D, 142S)': {
                 'attack': 0, 'defense': 198.9, 'stamina': 142},
-            'Poli+Auro (147.59A, 198.9D, 139HP)': {
+            'Poli (148A, 199D, 139S)': {
                 'attack': 147.59, 'defense': 198.9, 'stamina': 139},
-            'A9 Atk (149.39A, 198.9D, 139HP)': {
+            'A9 (149A, 199D, 139S)': {
                 'attack': 149.39, 'defense': 198.9, 'stamina': 139},
-            'General (198.9D, 139HP)': {
+            'General (199D, 139S)': {
                 'attack': 0, 'defense': 198.9, 'stamina': 139},
         },
     },
     'Greninja': {
         'Great': {
-            'Bulk (99.61D, 115HP)': {
+            'Bulk (100D, 115S)': {
                 'attack': 0, 'defense': 99.61, 'stamina': 115},
-            'Azu Slay (140.08A, 99.36D, 111HP)': {
+            'Azu (140A, 99D, 111S)': {
                 'attack': 140.08, 'defense': 99.36, 'stamina': 111},
-            'Hi Atk (139.04A)': {
+            'Hi Atk (139A)': {
                 'attack': 139.04, 'defense': 0, 'stamina': 0},
-            'V.Hi Atk (143.3A)': {
+            'V.Hi Atk (143A)': {
                 'attack': 143.3, 'defense': 0, 'stamina': 0},
-            'Max Atk (144.6A)': {
+            'Max Atk (145A)': {
                 'attack': 144.6, 'defense': 0, 'stamina': 0},
         },
         'Ultra': {
-            'Bulk (130.62D, 149HP)': {
+            'Bulk (131D, 149S)': {
                 'attack': 0, 'defense': 130.62, 'stamina': 149},
-            'Bulk+ (132.53D, 149HP)': {
+            'Bulk+ (133D, 149S)': {
                 'attack': 0, 'defense': 132.53, 'stamina': 149},
         },
     },
     'Dubwool': {
         'Great': {
-            'Hi Bulk (141.6D, 128HP)': {
+            'Hi Bulk (142D, 128S)': {
                 'attack': 0, 'defense': 141.6, 'stamina': 128},
         },
         'Ultra': {
-            'Nearly Hundo (178.3D, 160HP)': {
+            'Hundo (178D, 160S)': {
                 'attack': 0, 'defense': 178.3, 'stamina': 160},
         },
     },
     'Quagsire': {
         'Great': {
-            'Non-Shadow (112D, 163HP)': {
+            'Non-S (112D, 163S)': {
                 'attack': 0, 'defense': 112, 'stamina': 163},
-            'Shadow Bulk (112.68D, 163HP)': {
+            'S-Bulk (113D, 163S)': {
                 'attack': 0, 'defense': 112.68, 'stamina': 163},
-            'Shadow Atk (110A, 110.26D, 163HP)': {
+            'S-Atk (110A, 110D, 163S)': {
                 'attack': 110, 'defense': 110.26, 'stamina': 163},
-            'Carbink Slay (111.89A, 108D, 162HP)': {
+            'Carbink (112A, 108D, 162S)': {
                 'attack': 111.89, 'defense': 108, 'stamina': 162},
         },
     },
     'Clodsire': {
         'Great': {
-            'Bulk1 (119.51D, 212HP)': {
+            'Bulk1 (120D, 212S)': {
                 'attack': 0, 'defense': 119.51, 'stamina': 212},
-            'Bulk2 (121.23D, 210HP)': {
+            'Bulk2 (121D, 210S)': {
                 'attack': 0, 'defense': 121.23, 'stamina': 210},
-            'Atk (96.5A, 117D, 199HP)': {
+            'Atk (97A, 117D, 199S)': {
                 'attack': 96.5, 'defense': 117, 'stamina': 199},
-            'Top 20 (all stats)': {
+            'Top 20': {
                 'attack': 0, 'defense': 0, 'stamina': 0, 'onlytop': 20},
         },
     },
     'Charjabug': {
         'Great': {
-            'Mirror (116.27A, 136.09D, 120HP)': {
+            'Mirror (116A, 136D, 120S)': {
                 'attack': 116.27, 'defense': 136.09, 'stamina': 120},
-            'Mirror CMP (114.51A, 136.09D, 124HP)': {
+            'Mirror CMP (115A, 136D, 124S)': {
                 'attack': 114.51, 'defense': 136.09, 'stamina': 124},
         },
     },
     'Froslass': {
         'Great': {
-            'Premium CMP (121.6A, 113D, 131HP)': {
+            'CMP (122A, 113D, 131S)': {
                 'attack': 121.6, 'defense': 113, 'stamina': 131},
-            'General Bulk (113D, 131HP)': {
+            'Bulk (113D, 131S)': {
                 'attack': 0, 'defense': 113, 'stamina': 131},
-            'Hi Atk (123.12A, 113D, 127HP)': {
+            'Hi Atk (123A, 113D, 127S)': {
                 'attack': 123.12, 'defense': 113, 'stamina': 127},
         },
     },
     'Decidueye': {
         'Great': {
-            'General (115.29D, 118HP)': {
+            'Gen (115D, 118S)': {
                 'attack': 0, 'defense': 115.29, 'stamina': 118},
-            'General LoDef (113.7D, 120HP)': {
+            'Gen LoDef (114D, 120S)': {
                 'attack': 0, 'defense': 113.7, 'stamina': 120},
-            'Astonish (115.52D, 118HP)': {
+            'Astonish (116D, 118S)': {
                 'attack': 0, 'defense': 115.52, 'stamina': 118},
-            'Astonish HiAtk (127.61A, 115.52D, 118HP)': {
+            'Asto HiAtk (128A, 116D, 118S)': {
                 'attack': 127.61, 'defense': 115.52, 'stamina': 118},
-            'Astonish HiDef (116D, 118HP)': {
+            'Asto HiDef (116D, 118S)': {
                 'attack': 0, 'defense': 116, 'stamina': 118},
-            'Astonish HiHP (113.7D, 120HP)': {
+            'Asto HiHP (114D, 120S)': {
                 'attack': 0, 'defense': 113.7, 'stamina': 120},
-            'Leafage Atk (127.61A, 115.29D, 118HP)': {
+            'Leaf Atk (128A, 115D, 118S)': {
                 'attack': 127.61, 'defense': 115.29, 'stamina': 118},
-            'Leafage+Poli (127.61A, 115.29D, 119HP)': {
+            'Leaf+Poli (128A, 115D, 119S)': {
                 'attack': 127.61, 'defense': 115.29, 'stamina': 119},
-            'Leafage+Zong (127.61A, 113.7D, 118HP)': {
+            'Leaf+Zong (128A, 114D, 118S)': {
                 'attack': 127.61, 'defense': 113.7, 'stamina': 118},
-            'Leafage+Dnair (127.61A, 116.71D, 118HP)': {
+            'Leaf+Dnair (128A, 117D, 118S)': {
                 'attack': 127.61, 'defense': 116.71, 'stamina': 118},
         },
     },
     'Lanturn': {
         'Great': {
-            'General Bulk (105.5D, 196HP)': {
+            'General (106D, 196S)': {
                 'attack': 0, 'defense': 105.5, 'stamina': 196},
-            'Premium Bulk (106.04D, 192HP)': {
+            'Prem (106D, 192S)': {
                 'attack': 0, 'defense': 106.04, 'stamina': 192},
         },
     },
     'Annihilape': {
         'Great': {
-            'General (122.94A, 106.17D, 136HP)': {
+            'Gen (123A, 106D, 136S)': {
                 'attack': 122.94, 'defense': 106.17, 'stamina': 136},
-            'Licki Slay (127.23A, 102.26D, 132HP)': {
+            'Licki (127A, 102D, 132S)': {
                 'attack': 127.23, 'defense': 102.26, 'stamina': 132},
-            'Licki Slay Bulk (127.23A, 102.55D, 132HP)': {
+            'Licki+ (127A, 103D, 132S)': {
                 'attack': 127.23, 'defense': 102.55, 'stamina': 132},
         },
         'Ultra': {
-            'General (159.7A, 134.5D, 178HP)': {
+            'Gen (160A, 135D, 178S)': {
                 'attack': 159.7, 'defense': 134.5, 'stamina': 178},
         },
     },
     'Goodra': {
         'Great': {
-            'Swag (135.72D, 117HP)': {
+            'Swag (136D, 117S)': {
                 'attack': 0, 'defense': 135.72, 'stamina': 117},
-            'Swag Licki (122A, 125.2D, 115HP)': {
+            'Licki (122A, 125D, 115S)': {
                 'attack': 122, 'defense': 125.2, 'stamina': 115},
         },
     },
     'Carbink': {
         'Great': {
-            'Premium Bulk (81.38A, 247.67D, 128HP)': {
+            'Prem (81A, 248D, 128S)': {
                 'attack': 81.38, 'defense': 247.67, 'stamina': 128},
-            'Slight Atk (85.81A, 239.06D, 124HP)': {
+            'Atk (86A, 239D, 124S)': {
                 'attack': 85.81, 'defense': 239.06, 'stamina': 124},
-            'General (82.83A, 246D, 124HP)': {
+            'Gen (83A, 246D, 124S)': {
                 'attack': 82.83, 'defense': 246, 'stamina': 124},
         },
     },
     'Corviknight': {
         'Great': {
-            'Anni 1-1 (134.61D)': {
+            'Anni (135D)': {
                 'attack': 0, 'defense': 134.61, 'stamina': 0},
-            'Carbink (130.7D)': {
+            'Carbink (131D)': {
                 'attack': 0, 'defense': 130.7, 'stamina': 0},
-            'Cresselia (134.55D)': {
+            'Cress (135D)': {
                 'attack': 0, 'defense': 134.55, 'stamina': 0},
-            'G-Cors (130.34D)': {
+            'G-Cors (130D)': {
                 'attack': 0, 'defense': 130.34, 'stamina': 0},
-            'Mandi (132.17D)': {
+            'Mandi (132D)': {
                 'attack': 0, 'defense': 132.17, 'stamina': 0},
-            'Dig Atk (110A)': {
+            'Dig (110A)': {
                 'attack': 110, 'defense': 0, 'stamina': 0},
-            'Drap Atk (111.4A)': {
+            'Drap (111A)': {
                 'attack': 111.4, 'defense': 0, 'stamina': 0},
-            'S-ASlash Atk (124A)': {
+            'S-ASlash (124A)': {
                 'attack': 124, 'defense': 0, 'stamina': 0},
-            'Pex Atk (112.54A)': {
+            'Pex (113A)': {
                 'attack': 112.54, 'defense': 0, 'stamina': 0},
-            'Azu 1-1 Atk (108.75A)': {
+            'Azu (109A)': {
                 'attack': 108.75, 'defense': 0, 'stamina': 0},
         },
     },
