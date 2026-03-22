@@ -20,7 +20,8 @@ from .screens.home import HomeScreen
 from .screens.quiz import QuizScreen
 from .screens.type_quiz import TypeQuizScreen
 from .screens.iv_checker import IVCheckerScreen
-
+from .screens.user_iv_checker import UserIVCheckerScreen
+from .screens.edit_thresholds import EditThresholdsScreen
 
 class GoBattleKit(toga.App):
 
@@ -32,6 +33,8 @@ class GoBattleKit(toga.App):
             self.quiz_screen = QuizScreen(self)
             self.type_quiz_screen = TypeQuizScreen(self)
             self.iv_checker_screen = IVCheckerScreen(self)
+            self.user_iv_checker_screen = UserIVCheckerScreen(self)
+            self.edit_thresholds_screen = EditThresholdsScreen(self)
             self.main_window = toga.MainWindow(title=self.formal_name)
             self.main_window.content = self.home_screen.build()
             self.main_window.show()
@@ -94,6 +97,20 @@ class GoBattleKit(toga.App):
         from .data.fetcher import SAVED_CSV
         if not self.iv_checker_screen.csv_path and SAVED_CSV.exists():
             self.iv_checker_screen.load_csv(str(SAVED_CSV))
+
+    def show_user_iv_checker(self):
+        """Switch to the user IV checker screen."""
+        self.main_window.content = self.user_iv_checker_screen.build()
+        from .data.fetcher import SAVED_CSV
+        if not self.user_iv_checker_screen.csv_path and SAVED_CSV.exists():
+            self.user_iv_checker_screen.load_csv(str(SAVED_CSV))
+        elif self.user_iv_checker_screen.csv_path:
+            # Re-run check in case thresholds changed
+            self.user_iv_checker_screen._run_check()
+
+    def show_edit_thresholds(self):
+        """Switch to the edit thresholds screen."""
+        self.main_window.content = self.edit_thresholds_screen.build()            
 
     def show_home(self):
         """Switch back to the home screen."""
