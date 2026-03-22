@@ -18,6 +18,7 @@ SVG = """<svg width="1024" height="1024" viewBox="0 0 680 680" xmlns="http://www
   <clipPath id="bot-clip"><rect x="100" y="340" width="480" height="240"/></clipPath>
   <clipPath id="ball-clip"><circle cx="340" cy="340" r="220"/></clipPath>
 </defs>
+<rect x="0" y="0" width="680" height="680" fill="#1a3a5c"/>
 <rect x="40" y="40" width="600" height="600" rx="120" class="bg"/>
 <circle cx="340" cy="340" r="220" class="ball-top" clip-path="url(#top-clip)"/>
 <circle cx="340" cy="340" r="220" class="ball-bottom" clip-path="url(#bot-clip)"/>
@@ -68,7 +69,7 @@ SVG_TRANSPARENT = """<svg width="1024" height="1024" viewBox="0 0 680 680" xmlns
 </g>
 </svg>"""
 
-out_dir = pathlib.Path("src/pogoquiz/resources")
+out_dir = pathlib.Path("src/gobattlekit/resources")
 out_dir.mkdir(exist_ok=True)
 
 icon_bytes = SVG.encode("utf-8")

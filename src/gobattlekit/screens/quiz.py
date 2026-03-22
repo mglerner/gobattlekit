@@ -5,9 +5,12 @@ Quiz screen — move timing questions.
 import random
 import asyncio
 import toga
+import sys
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from ..data.gamemaster import get_moves, get_rankings, counters_to_charge
+
+ON_ANDROID = sys.platform == 'android' or 'android' in sys.platform
 
 MAX_ATTEMPTS = 3
 POINTS = {1: 3, 2: 2, 3: 1}  # points for correct on attempt N
@@ -40,13 +43,16 @@ class QuizScreen:
         self.container.add(self.score_label)
 
         # Question text — MultilineTextInput so text wraps properly
+
+        question_height = 160 if ON_ANDROID else 120
+
         self.question_label = toga.MultilineTextInput(
             value="",
             readonly=True,
             style=Pack(font_size=18, margin_bottom=20,
-                       margin_left=10, margin_right=10,
-                       height=120, flex=1)
-        )
+                           margin_left=10, margin_right=10,
+                           height=question_height, flex=1)
+            )
         self.container.add(self.question_label)
 
         # Set question text now that the widget exists
@@ -96,8 +102,9 @@ class QuizScreen:
     # Button construction
     # ------------------------------------------------------------------
 
+
     def _build_answer_buttons(self):
-        """Build the 1-20 + more answer buttons in a grid, 5 per row."""
+        """Build the 1-20 + more answer buttons in a grid, 4 per row."""
         for child in list(self.button_box.children):
             self.button_box.remove(child)
 
@@ -105,16 +112,16 @@ class QuizScreen:
         answers = list(range(1, 21)) + ['more']
         row = None
         for i, val in enumerate(answers):
-            if i % 5 == 0:
-                row = toga.Box(style=Pack(direction=ROW, margin_bottom=8))
+            if i % 4 == 0:
+                row = toga.Box(style=Pack(direction=ROW, margin_bottom=4))
                 self.button_box.add(row)
             btn = toga.Button(
                 str(val),
                 on_press=self._make_answer_handler(val),
-                style=Pack(flex=1, margin=4, height=52, font_size=16)
+                style=Pack(flex=1, margin=2, height=44, font_size=14)
             )
             self.answer_buttons[val] = btn
-            row.add(btn)
+            row.add(btn)        
 
     def _make_answer_handler(self, value):
         """Return a button handler for the given answer value."""
