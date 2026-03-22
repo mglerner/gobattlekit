@@ -35,7 +35,11 @@ class GoBattleKit(toga.App):
             self.main_window = toga.MainWindow(title=self.formal_name)
             self.main_window.content = self.home_screen.build()
             self.main_window.show()
-            self.add_background_task(self._poll_inbox)
+            self.on_running = lambda app: asyncio.create_task(self._poll_inbox(None))
+            ## # Auto-load saved CSV if available
+            ## from .data.fetcher import SAVED_CSV
+            ## if SAVED_CSV.exists():
+            ##     self.iv_checker_screen.load_csv(str(SAVED_CSV))
         except NoDataError as e:
             self.main_window = toga.MainWindow(title=self.formal_name)
             error_box = toga.Box(style=Pack(direction=COLUMN, margin=40))
@@ -86,6 +90,10 @@ class GoBattleKit(toga.App):
     def show_iv_checker(self):
         """Switch to the IV checker screen."""
         self.main_window.content = self.iv_checker_screen.build()
+        # Auto-load saved CSV if not already loaded
+        from .data.fetcher import SAVED_CSV
+        if not self.iv_checker_screen.csv_path and SAVED_CSV.exists():
+            self.iv_checker_screen.load_csv(str(SAVED_CSV))
 
     def show_home(self):
         """Switch back to the home screen."""

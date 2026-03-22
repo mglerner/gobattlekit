@@ -11,6 +11,7 @@ import certifi
 
 CACHE_DIR = pathlib.Path.home() / "Documents" / "gobattlekit_cache"
 CACHE_TTL = 86400  # refresh once a day
+SAVED_CSV = CACHE_DIR / "pokegenie_export.csv"
 
 BASE_URL = "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data"
 

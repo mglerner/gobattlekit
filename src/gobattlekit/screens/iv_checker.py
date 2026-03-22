@@ -3,6 +3,7 @@
 IV checker screen — import PokeGenie CSV and check against thresholds.
 """
 import sys
+import shutil
 import pathlib
 import toga
 from toga.style import Pack
@@ -57,13 +58,25 @@ class IVCheckerScreen:
             self.container.add(import_btn)
 
         # Status label
-        self.status_label = toga.MultilineTextInput(
-            value="No CSV loaded. Export from PokeGenie and share to GoBattleKit.",
-            readonly=True,
-            style=Pack(font_size=14, text_align="center", margin_bottom=16,
-                       flex=1, height=STATUS_HEIGHT)
+        initial_status = "No CSV loaded. Export from PokeGenie and share to GoBattleKit."
+        csv_name_line = pathlib.Path(self.csv_path).name if self.csv_path else ""
+        stats_line = ""
+        if self.csv_path:
+            species_count = len(self.results)
+            total = sum(len(hits) for hits in self.results.values())
+            stats_line = (f"{species_count} species, {total} hit{'s' if total != 1 else ''} "
+                          f"in {self.league.capitalize()} League")
+
+        self.status_label_file = toga.Label(
+            csv_name_line,
+            style=Pack(font_size=13, text_align="center", margin_bottom=2)
         )
-        self.container.add(self.status_label)
+        self.status_label_stats = toga.Label(
+            stats_line if stats_line else initial_status,
+            style=Pack(font_size=13, text_align="center", margin_bottom=16)
+        )
+        self.container.add(self.status_label_file)
+        self.container.add(self.status_label_stats)        
 
         # Results area — scrollable
         self.results_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
@@ -89,7 +102,17 @@ class IVCheckerScreen:
 
     def load_csv(self, path):
         """Load a CSV file from the given path and run the checker."""
+        import shutil
+        from ..data.fetcher import CACHE_DIR, SAVED_CSV
         self.csv_path = str(path).replace('file://', '')
+        # Save a copy to cache dir so it persists across restarts
+        try:
+            CACHE_DIR.mkdir(exist_ok=True, parents=True)
+            src = pathlib.Path(self.csv_path)
+            if src.resolve() != SAVED_CSV.resolve():
+                shutil.copy2(src, SAVED_CSV)
+        except Exception as e:
+            print(f"Could not save CSV to cache: {e}")
         self._run_check()
 
     async def _import_csv(self, widget):
@@ -103,7 +126,8 @@ class IVCheckerScreen:
                 self.csv_path = str(path)
                 self._run_check()
         except Exception as e:
-            self.status_label.value = f"Error opening file: {e}"
+            self.status_label_file.text = ""
+            self.status_label_stats.text = f"Error opening file: {e}"
 
     def _run_check(self):
         """Run the IV check against current thresholds and league."""
@@ -120,14 +144,16 @@ class IVCheckerScreen:
             csv_name = pathlib.Path(self.csv_path).name
             species_count = len(self.results)
             total = sum(len(hits) for hits in self.results.values())
-            self.status_label.value = (
-                f"{csv_name} — {species_count} species, "
-                f"{total} hit{'s' if total != 1 else ''} "
+
+            self.status_label_file.text = pathlib.Path(self.csv_path).name
+            self.status_label_stats.text = (
+                f"{species_count} species, {total} hit{'s' if total != 1 else ''} "
                 f"in {self.league.capitalize()} League"
             )
             self._display_species_list()
         except Exception as e:
-            self.status_label.value = f"Error reading CSV: {e}"
+            self.status_label_file.text = ""
+            self.status_label_stats.text = f"Error reading CSV: {e}"
 
     # ------------------------------------------------------------------
     # Species list view
@@ -211,32 +237,54 @@ class IVCheckerScreen:
             for t in all_targets
         ]
 
-        # Dropdown selector
-        self.target_selector = toga.Selection(
-            items=target_options,
-            on_change=lambda w: self._refresh_hits(species, hits),
-            style=Pack(margin_bottom=12)
-        )
-        self.results_box.add(self.target_selector)
+        # Target cycling — replaces dropdown
+        self._target_index = 0
+        self._target_options_raw = [None] + all_targets  # None = "All targets"
 
-        # Hits area — separate box so we can refresh just this part
+        def make_cycle_handler(direction):
+            def handler(widget):
+                self._target_index = (self._target_index + direction) % len(self._target_options_raw)
+                current = self._target_options_raw[self._target_index]
+                if current is None:
+                    count = len(hits)
+                    self.target_label.text = f"All targets ({count})"
+                else:
+                    count = targets_with_hits.get(current, 0)
+                    self.target_label.text = f"{current} ({count})"
+                self._refresh_hits(species, hits)
+            return handler
+
+        target_row = toga.Box(style=Pack(direction=ROW, margin_bottom=12))
+        prev_btn = toga.Button("◀", on_press=make_cycle_handler(-1),
+                               style=Pack(width=44, height=44))
+        self.target_label = toga.Label(
+            f"All targets ({len(hits)})",
+            style=Pack(flex=1, text_align="center", font_size=14)
+        )
+        next_btn = toga.Button("▶", on_press=make_cycle_handler(1),
+                               style=Pack(width=44, height=44))
+        target_row.add(prev_btn)
+        target_row.add(self.target_label)
+        target_row.add(next_btn)
+        self.results_box.add(target_row)
         self.hits_box = toga.Box(style=Pack(direction=COLUMN))
         self.results_box.add(self.hits_box)
 
         # Show all hits initially
         self._refresh_hits(species, hits)
 
+
+
+        
     def _refresh_hits(self, species, all_hits):
-        """Refresh the hits display based on the current dropdown selection."""
         for child in list(self.hits_box.children):
             self.hits_box.remove(child)
 
-        selected = self.target_selector.value
-        if selected.startswith("All targets"):
+        current = self._target_options_raw[self._target_index]
+        if current is None:
             hits = all_hits
         else:
-            target = selected.rsplit(" (", 1)[0]
-            hits = [h for h in all_hits if target in h['matched']]
+            hits = [h for h in all_hits if current in h['matched']]
 
         if not hits:
             self.hits_box.add(toga.Label(
@@ -254,7 +302,6 @@ class IVCheckerScreen:
                         f"Def:{s['defense']:.1f} "
                         f"Sta:{s['stamina']}")
             matched = ", ".join(hit['matched'])
-
             self.hits_box.add(toga.Label(
                 f"  {iv_str}",
                 style=Pack(font_size=14, font_weight="bold")
@@ -267,7 +314,6 @@ class IVCheckerScreen:
                 f"  ✅ {matched}",
                 style=Pack(font_size=12, margin_bottom=6)
             ))
-
     # ------------------------------------------------------------------
     # Show all results view
     # ------------------------------------------------------------------

@@ -77,109 +77,108 @@ EVOLUTION_LINES = {
 DEFAULT_THRESHOLDS = {
     'Medicham': {
         'Great': {
-            'The Good (105.38 Atk, 138.6 Def, 140 HP)': {
+            'The Good (105.38A, 138.6D, 140HP)': {
                 'attack': 105.38, 'defense': 138.6, 'stamina': 140},
-            'Premium Cut (105.87 Atk, 138.64 Def, 140 HP)': {
+            'Premium (105.87A, 138.64D, 140HP)': {
                 'attack': 105.87, 'defense': 138.64, 'stamina': 140},
-            'Mirror Slayer (108 Atk)': {
+            'Mirror Slayer (108A)': {
                 'attack': 108, 'defense': 0, 'stamina': 0},
         },
     },
     'Walrein': {
         'Great': {
-            'GOD TIER (114.46 Atk, 114.75 Def, 148 HP)': {
+            'GOD TIER (114.46A, 114.75D, 148HP)': {
                 'attack': 114.46, 'defense': 114.75, 'stamina': 148},
-            'Azu Slayer (112.06 Atk, 114.75 Def, 151 HP)': {
+            'Azu Slayer (112.06A, 114.75D, 151HP)': {
                 'attack': 112.06, 'defense': 114.75, 'stamina': 151},
         },
         'Ultra': {
-            'Mirror Slayer HP (145.28 Atk, 145 Def, 201 HP)': {
+            'Mirror HP (145.28A, 145D, 201HP)': {
                 'attack': 145.28, 'defense': 145, 'stamina': 201},
-            'Best of the Best (147.45 Atk, 145.3 Def, 197 HP)': {
+            'Best (147.45A, 145.3D, 197HP)': {
                 'attack': 147.45, 'defense': 145.3, 'stamina': 197},
         },
     },
     'Azumarill': {
         'Great': {
-            'Medicham Consistency (137.64 Def)': {
+            'Medi Wall (137.64D)': {
                 'attack': 0, 'defense': 137.64, 'stamina': 0},
-            'Hits the Min (135.78 Def, 192 HP)': {
+            'Min (135.78D, 192HP)': {
                 'attack': 0, 'defense': 135.78, 'stamina': 192},
-            'General (132.8 Def, 187 HP)': {
+            'General (132.8D, 187HP)': {
                 'attack': 0, 'defense': 132.8, 'stamina': 187},
         },
     },
     'Stunfisk (Galarian)': {
         'Great': {
-            'High Bulk (99 Atk, 124.75 Def, 174 HP)': {
+            'High Bulk (99A, 124.75D, 174HP)': {
                 'attack': 99, 'defense': 124.75, 'stamina': 174},
-            'Mirror Slayer (101.79 Atk, 127.34 Def)': {
+            'Mirror Slayer (101.79A, 127.34D)': {
                 'attack': 101.79, 'defense': 127.34, 'stamina': 0},
-            'Bulk Mirror Slayer (101.79 Atk, 124.75 Def, 172 HP)': {
+            'Bulk Mirror (101.79A, 124.75D, 172HP)': {
                 'attack': 101.79, 'defense': 124.75, 'stamina': 172},
         },
     },
     'Registeel': {
         'Great': {
-            'Raid Only (186.7 Def, 127 HP)': {
+            'Raid Only (186.7D, 127HP)': {
                 'attack': 0, 'defense': 186.7, 'stamina': 127},
-            'Trade Only (190.09 Def, 129 HP)': {
+            'Trade Only (190.09D, 129HP)': {
                 'attack': 0, 'defense': 190.09, 'stamina': 129},
         },
         'Ultra': {
-            'Raid Only (240.5 Def, 165 HP)': {
+            'Raid Only (240.5D, 165HP)': {
                 'attack': 0, 'defense': 240.5, 'stamina': 165},
-            'Trade Only (244.4 Def, 167 HP)': {
+            'Trade Only (244.4D, 167HP)': {
                 'attack': 0, 'defense': 244.4, 'stamina': 167},
         },
     },
     'Trevenant': {
         'Great': {
-            'Best (124 Atk, 105.8 Def, 128 HP)': {
+            'Best (124A, 105.8D, 128HP)': {
                 'attack': 124, 'defense': 105.8, 'stamina': 128},
-            'Next (124 Atk, 105.8 Def, 125 HP)': {
+            'Next (124A, 105.8D, 125HP)': {
                 'attack': 124, 'defense': 105.8, 'stamina': 125},
         },
         'Ultra': {
-            'Atk (168.7 Atk, 129 Def, 167 HP)': {
+            'Atk (168.7A, 129D, 167HP)': {
                 'attack': 168.7, 'defense': 129, 'stamina': 167},
         },
     },
     'Corviknight': {
         'Great': {
-            'Annihilape 1-1 (134.61 Def)': {
+            'Anni 1-1 (134.61D)': {
                 'attack': 0, 'defense': 134.61, 'stamina': 0},
-            'Cresselia (134.55 Def)': {
+            'Cresselia (134.55D)': {
                 'attack': 0, 'defense': 134.55, 'stamina': 0},
-            'Dig Atk (110 Atk)': {
+            'Dig Atk (110A)': {
                 'attack': 110, 'defense': 0, 'stamina': 0},
         },
     },
     'Lickitung': {
         'Great': {
-            'General Good (96.36 Atk, 125.94 Def, 183 HP)': {
+            'Good (96.36A, 125.94D, 183HP)': {
                 'attack': 96.36, 'defense': 125.94, 'stamina': 183},
-            'Atk Focus (97.7 Atk, 125.94 Def, 183 HP)': {
+            'Atk (97.7A, 125.94D, 183HP)': {
                 'attack': 97.7, 'defense': 125.94, 'stamina': 183},
-            'Budget (97 Atk, 125.1 Def, 181 HP)': {
+            'Budget (97A, 125.1D, 181HP)': {
                 'attack': 97, 'defense': 125.1, 'stamina': 181},
         },
     },
     'Obstagoon': {
         'Great': {
-            'Super Premium (115.5 Atk, 123.56 Def, 137 HP)': {
+            'S.Premium (115.5A, 123.56D, 137HP)': {
                 'attack': 115.5, 'defense': 123.56, 'stamina': 137},
-            'Premium (115 Atk, 123.3 Def, 135 HP)': {
+            'Premium (115A, 123.3D, 135HP)': {
                 'attack': 115, 'defense': 123.3, 'stamina': 135},
-            'Bulk Focus (126 Def, 137 HP)': {
+            'Bulk (126D, 137HP)': {
                 'attack': 0, 'defense': 126, 'stamina': 137},
         },
         'Ultra': {
-            'Unicorn (148 Atk, 166.8 Def, 172 HP)': {
+            'Unicorn (148A, 166.8D, 172HP)': {
                 'attack': 148, 'defense': 166.8, 'stamina': 172},
-            'General Atk (146.95 Atk, 163.8 Def, 172 HP)': {
+            'Gen Atk (146.95A, 163.8D, 172HP)': {
                 'attack': 146.95, 'defense': 163.8, 'stamina': 172},
         },
     },
 }
-    
