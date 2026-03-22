@@ -63,6 +63,20 @@ class HomeScreen:
         )
         container.add(type_btn)
 
+        iv_label = toga.Label(
+            "IV Analysis",
+            style=Pack(font_size=14, margin_top=16, margin_bottom=8,
+                text_align="center")
+            )
+        container.add(iv_label)
+
+        iv_btn = toga.Button(
+            "IV Checker",
+            on_press=self._start_iv_checker,
+            style=Pack(margin_bottom=12, height=60, font_size=18)
+            )
+        container.add(iv_btn)
+
         return container
 
     def _make_league_handler(self, league):
@@ -75,3 +89,6 @@ class HomeScreen:
         """Switch to the type effectiveness quiz screen."""
         self.app.show_type_quiz()
         
+    def _start_iv_checker(self, widget):
+        """Switch to the IV checker screen."""
+        self.app.show_iv_checker()

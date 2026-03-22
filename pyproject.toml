@@ -176,6 +176,10 @@ requires = [
     "certifi",
 ]
 
+info."CFBundleDocumentTypes" = [
+    {CFBundleTypeName = "CSV File", CFBundleTypeRole = "Viewer", LSHandlerRank = "Alternate", LSItemContentTypes = ["public.comma-separated-values-text"]}
+]
+
 [tool.briefcase.app.gobattlekit.android]
 requires = [
     "toga-android~=0.5.0",
