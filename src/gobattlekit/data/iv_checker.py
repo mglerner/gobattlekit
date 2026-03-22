@@ -163,38 +163,46 @@ def parse_csv(csv_path):
     return mons
 
 
-def check_thresholds(csv_path, thresholds, league='great', max_level=40):
+def check_thresholds(csv_path, thresholds, league='great', max_level=40,
+                     evolution_lines=None):
     """Check which mons from a CSV meet the given thresholds.
 
-    thresholds is a dict of:
-    {
-        'species_name': {  # gamemaster species name e.g. 'Medicham'
-            'league_label': {
-                'target_name': {
-                    'attack': float,  # minimum attack stat (0 = don't care)
-                    'defense': float,
-                    'stamina': int,
-                }
-            }
-        }
-    }
+    Also checks pre-evolutions using the final form's base stats,
+    so e.g. a Meditite will show up as a Medicham candidate.
 
-    Returns a dict of species_name -> list of (mon, stats, matched_targets)
-    where matched_targets is a list of target names the mon hits.
+    evolution_lines maps final form -> list of all forms in the line.
     """
     pokemon_index = get_pokemon_index()
     mons = parse_csv(csv_path)
     max_cp = LEAGUE_CAPS.get(league, 1500.99)
     results = {}
 
+    # Build reverse lookup: pre-evolution -> final form
+    # e.g. 'Meditite' -> 'Medicham', 'Spheal' -> 'Walrein'
+    pre_evo_to_final = {}
+    if evolution_lines:
+        for final, line in evolution_lines.items():
+            for member in line:
+                pre_evo_to_final[member] = final
+
     for mon in mons:
-        species = get_species_name(mon['name'], mon['form'], mon['is_shadow'])
-        if species not in pokemon_index:
-            continue
-        if species not in thresholds:
+        csv_species = get_species_name(mon['name'], mon['form'], mon['is_shadow'])
+
+        # Determine which final form to check thresholds against
+        if csv_species in thresholds:
+            final_species = csv_species
+        elif csv_species in pre_evo_to_final:
+            final_species = pre_evo_to_final[csv_species]
+        else:
             continue
 
-        base = pokemon_index[species]
+        # Use final form's base stats for the calculation
+        if final_species not in pokemon_index:
+            continue
+        if final_species not in thresholds:
+            continue
+
+        base = pokemon_index[final_species]
         stats = ivs_to_stats(
             mon['atk_iv'], mon['def_iv'], mon['sta_iv'], mon['level'],
             base_atk=base['atk'], base_def=base['def'], base_sta=base['hp'],
@@ -204,21 +212,24 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40):
             continue
 
         league_label = league.capitalize()
-        if league_label not in thresholds[species]:
+        if league_label not in thresholds[final_species]:
             continue
 
         matched = []
-        for target_name, target in thresholds[species][league_label].items():
+        for target_name, target in thresholds[final_species][league_label].items():
             if (stats['attack'] >= target.get('attack', 0) and
                     stats['defense'] >= target.get('defense', 0) and
                     stats['stamina'] >= target.get('stamina', 0)):
                 matched.append(target_name)
 
         if matched:
-            if species not in results:
-                results[species] = []
-            results[species].append({
+            if final_species not in results:
+                results[final_species] = []
+            results[final_species].append({
                 'mon': mon,
+                'csv_species': csv_species,
+                'final_species': final_species,
+                'is_pre_evo': csv_species != final_species,
                 'stats': stats,
                 'matched': matched,
             })
