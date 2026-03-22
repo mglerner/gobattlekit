@@ -2,12 +2,18 @@
 """
 IV checker screen — import PokeGenie CSV and check against thresholds.
 """
+import sys
 import pathlib
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from ..data.iv_checker import check_thresholds
 from ..data.thresholds import DEFAULT_THRESHOLDS, EVOLUTION_LINES
+
+ON_ANDROID = sys.platform == 'android' or 'android' in sys.platform
+ON_IOS = sys.platform == 'ios' or 'ios' in sys.platform
+
+STATUS_HEIGHT = 80 if ON_ANDROID else 60
 
 
 class IVCheckerScreen:
@@ -41,18 +47,21 @@ class IVCheckerScreen:
             league_box.add(btn)
         self.container.add(league_box)
 
-        # Import button
-        import_btn = toga.Button(
-            "Import PokeGenie CSV",
-            on_press=self._import_csv,
-            style=Pack(height=52, font_size=16, margin_bottom=16)
-        )
-        self.container.add(import_btn)
+        # Import button — not available on iOS
+        if not ON_IOS:
+            import_btn = toga.Button(
+                "Import PokeGenie CSV",
+                on_press=self._import_csv,
+                style=Pack(height=52, font_size=16, margin_bottom=16)
+            )
+            self.container.add(import_btn)
 
         # Status label
-        self.status_label = toga.Label(
-            "No CSV loaded. Export from PokeGenie and share to GoBattleKit.",
-            style=Pack(font_size=14, text_align="center", margin_bottom=16)
+        self.status_label = toga.MultilineTextInput(
+            value="No CSV loaded. Export from PokeGenie and share to GoBattleKit.",
+            readonly=True,
+            style=Pack(font_size=14, text_align="center", margin_bottom=16,
+                       flex=1, height=STATUS_HEIGHT)
         )
         self.container.add(self.status_label)
 
@@ -94,7 +103,7 @@ class IVCheckerScreen:
                 self.csv_path = str(path)
                 self._run_check()
         except Exception as e:
-            self.status_label.text = f"Error opening file: {e}"
+            self.status_label.value = f"Error opening file: {e}"
 
     def _run_check(self):
         """Run the IV check against current thresholds and league."""
@@ -111,14 +120,14 @@ class IVCheckerScreen:
             csv_name = pathlib.Path(self.csv_path).name
             species_count = len(self.results)
             total = sum(len(hits) for hits in self.results.values())
-            self.status_label.text = (
+            self.status_label.value = (
                 f"{csv_name} — {species_count} species, "
                 f"{total} hit{'s' if total != 1 else ''} "
                 f"in {self.league.capitalize()} League"
             )
             self._display_species_list()
         except Exception as e:
-            self.status_label.text = f"Error reading CSV: {e}"
+            self.status_label.value = f"Error reading CSV: {e}"
 
     # ------------------------------------------------------------------
     # Species list view
@@ -184,15 +193,7 @@ class IVCheckerScreen:
                        margin_bottom=8, text_align="center")
         ))
 
-        # Collect targets that have hits, sorted by hit count descending
-        targets_with_hits = {}
-        for hit in hits:
-            for target in hit['matched']:
-                targets_with_hits[target] = targets_with_hits.get(target, 0) + 1
-
-
         # Build target options from thresholds, not just hits
-        # This ensures all targets are shown even if no mons hit them
         league_label = self.league.capitalize()
         all_targets = []
         if species in DEFAULT_THRESHOLDS and league_label in DEFAULT_THRESHOLDS[species]:
@@ -210,7 +211,6 @@ class IVCheckerScreen:
             for t in all_targets
         ]
 
-
         # Dropdown selector
         self.target_selector = toga.Selection(
             items=target_options,
@@ -226,7 +226,6 @@ class IVCheckerScreen:
         # Show all hits initially
         self._refresh_hits(species, hits)
 
-
     def _refresh_hits(self, species, all_hits):
         """Refresh the hits display based on the current dropdown selection."""
         for child in list(self.hits_box.children):
@@ -236,10 +235,9 @@ class IVCheckerScreen:
         if selected.startswith("All targets"):
             hits = all_hits
         else:
-            # Strip the count suffix e.g. "General (132.8 Def, 187 HP) (3)" -> target name
             target = selected.rsplit(" (", 1)[0]
             hits = [h for h in all_hits if target in h['matched']]
-        
+
         if not hits:
             self.hits_box.add(toga.Label(
                 "No hits for this target.",

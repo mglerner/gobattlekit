@@ -3,6 +3,8 @@
 Main Toga application for GoBattleKit.
 """
 import locale
+import asyncio
+import pathlib
 _original_setlocale = locale.setlocale
 def _safe_setlocale(category, loc=None):
     try:
@@ -21,6 +23,7 @@ from .screens.iv_checker import IVCheckerScreen
 
 
 class GoBattleKit(toga.App):
+
     def startup(self):
         """Set up the application."""
         from .data.fetcher import NoDataError
@@ -32,6 +35,7 @@ class GoBattleKit(toga.App):
             self.main_window = toga.MainWindow(title=self.formal_name)
             self.main_window.content = self.home_screen.build()
             self.main_window.show()
+            self.add_background_task(self._poll_inbox)
         except NoDataError as e:
             self.main_window = toga.MainWindow(title=self.formal_name)
             error_box = toga.Box(style=Pack(direction=COLUMN, margin=40))
@@ -47,10 +51,29 @@ class GoBattleKit(toga.App):
             self.main_window.content = error_box
             self.main_window.show()
 
-    def on_open_document(self, url):
-        """Handle a CSV file opened from another app (e.g. PokeGenie)."""
-        self.iv_checker_screen.load_csv(url)
-        self.show_iv_checker()
+    async def _poll_inbox(self, widget):
+        """Poll the iOS inbox directory for CSV files shared from other apps."""
+        import asyncio
+        seen = set()
+        while True:
+            await asyncio.sleep(3)
+            try:
+                inbox = pathlib.Path.home() / 'Documents' / 'Inbox'
+                if inbox.exists():
+                    csvs = list(inbox.glob('*.csv'))
+                    new = [f for f in csvs if f not in seen]
+                    if new:
+                        latest = max(new, key=lambda p: p.stat().st_mtime)
+                        print("Inbox: new CSV found:", latest)
+                        # Delete all other CSVs, keep only the latest
+                        for f in csvs:
+                            if f != latest:
+                                f.unlink()
+                        seen = {latest}
+                        self.show_iv_checker()
+                        self.iv_checker_screen.load_csv(str(latest))
+            except Exception as e:
+                print("Inbox poll error:", e)            
 
     def show_quiz(self, league):
         """Switch to the move count quiz screen for the given league."""

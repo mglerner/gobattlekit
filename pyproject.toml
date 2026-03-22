@@ -176,8 +176,9 @@ requires = [
     "certifi",
 ]
 
+
 info."CFBundleDocumentTypes" = [
-    {CFBundleTypeName = "CSV File", CFBundleTypeRole = "Viewer", LSHandlerRank = "Alternate", LSItemContentTypes = ["public.comma-separated-values-text"]}
+    {CFBundleTypeName = "CSV File", CFBundleTypeRole = "Viewer", LSHandlerRank = "Owner", LSItemContentTypes = ["public.comma-separated-values-text"]}
 ]
 
 [tool.briefcase.app.gobattlekit.android]
