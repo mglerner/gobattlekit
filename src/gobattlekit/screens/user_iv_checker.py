@@ -61,7 +61,6 @@ class UserIVCheckerScreen(IVCheckerScreen):
         # Status label
         initial_status = "No CSV loaded. Export from PokeGenie and share to GoBattleKit."
         csv_name_line = pathlib.Path(self.csv_path).name if self.csv_path else ""
-        print(f"Dawg, my name line is {csv_name_line} and my path is {self.csv_path}")
         stats_line = ""
         if self.csv_path:
             species_count = len(self.results)

@@ -38,7 +38,8 @@ class EditThresholdsScreen:
         self._form_onlytop = self.FORM_DEFAULTS['onlytop']
         # stores (species, league, name) of entry being edited, or
         # None for new entry
-        self._editing_original = None 
+        self._editing_original = None
+        self._clear_all_pending = False
 
     def _ensure_species_list(self):
         if self._all_species is None:
@@ -156,9 +157,16 @@ class EditThresholdsScreen:
         return handler
 
     def _confirm_clear_all(self, widget):
-        clear_all_thresholds()
-        self._show_threshold_list()
- 
+        if not self._clear_all_pending:
+            self._clear_all_pending = True
+            widget.text = "Tap again to confirm"
+        else:
+            self._clear_all_pending = False
+            widget.text = "Clear All"
+            clear_all_thresholds()
+            self._show_threshold_list()
+
+        
     # ------------------------------------------------------------------
     # Threshold editing
     # ------------------------------------------------------------------

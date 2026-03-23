@@ -63,20 +63,6 @@ class HomeScreen:
         )
         container.add(type_btn)
 
-        ## iv_label = toga.Label(
-        ##     "IV Analysis",
-        ##     style=Pack(font_size=14, margin_top=16, margin_bottom=8,
-        ##         text_align="center")
-        ##     )
-        ## container.add(iv_label)
-
-        ## iv_btn = toga.Button(
-        ##     "IV Checker",
-        ##     on_press=self._start_iv_checker,
-        ##     style=Pack(margin_bottom=12, height=60, font_size=18)
-        ##     )
-        ## container.add(iv_btn)
-
         iv_label = toga.Label(
             "IV Analysis",
             style=Pack(font_size=14, margin_top=16, margin_bottom=8,
@@ -94,7 +80,13 @@ class HomeScreen:
             on_press=self._start_user_iv_checker,
             style=Pack(margin_bottom=12, height=60, font_size=18)
         )
-        container.add(my_iv_btn)        
+        container.add(my_iv_btn)
+
+        container.add(toga.Button(
+            "About",
+            on_press=lambda w: self.app.show_about(),
+            style=Pack(margin_top=16, height=44)
+        ))
 
         return container
 

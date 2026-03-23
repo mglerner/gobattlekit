@@ -28,7 +28,7 @@ class IVCheckerScreen:
 
     def build(self):
         """Build and return the IV checker screen content."""
-        self.container = toga.Box(style=Pack(direction=COLUMN, margin=20, flex=1))
+        self.container = toga.Box(style=Pack(direction=COLUMN, margin=10, flex=1))
 
         # Title
         self.container.add(toga.Label(

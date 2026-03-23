@@ -5,6 +5,7 @@ Main Toga application for GoBattleKit.
 import locale
 import asyncio
 import pathlib
+from .screens.about import AboutScreen
 _original_setlocale = locale.setlocale
 def _safe_setlocale(category, loc=None):
     try:
@@ -30,6 +31,7 @@ class GoBattleKit(toga.App):
         from .data.fetcher import NoDataError
         try:
             self.home_screen = HomeScreen(self)
+            self.about_screen = AboutScreen(self)
             self.quiz_screen = QuizScreen(self)
             self.type_quiz_screen = TypeQuizScreen(self)
             self.iv_checker_screen = IVCheckerScreen(self)
@@ -123,6 +125,9 @@ class GoBattleKit(toga.App):
     def show_home(self):
         """Switch back to the home screen."""
         self.main_window.content = self.home_screen.build()
+
+    def show_about(self):
+        self.main_window.content = self.about_screen.build()
 
 
 def main():
