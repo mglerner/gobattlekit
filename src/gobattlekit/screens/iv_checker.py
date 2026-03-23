@@ -308,26 +308,8 @@ class IVCheckerScreen:
             return
 
         for hit in hits:
-            m = hit['mon']
-            s = hit['stats']
-            pre = f" ({hit['csv_species']})" if hit['is_pre_evo'] else ""
-            iv_str = f"{m['atk_iv']}/{m['def_iv']}/{m['sta_iv']}{pre} (CP {m['cp']})"
-            stat_str = (f"Atk:{s['attack']:.1f} "
-                        f"Def:{s['defense']:.1f} "
-                        f"Sta:{s['stamina']}")
-            matched = ", ".join(hit['matched'])
-            self.hits_box.add(toga.Label(
-                f"  {iv_str}",
-                style=Pack(font_size=14, font_weight="bold")
-            ))
-            self.hits_box.add(toga.Label(
-                f"  {stat_str}",
-                style=Pack(font_size=12)
-            ))
-            self.hits_box.add(toga.Label(
-                f"  ✅ {matched}",
-                style=Pack(font_size=12, margin_bottom=6)
-            ))
+            self._add_hit_display(self.hits_box, hit)
+            
     # ------------------------------------------------------------------
     # Show all results view
     # ------------------------------------------------------------------
@@ -351,26 +333,7 @@ class IVCheckerScreen:
                            margin_top=12, margin_bottom=4)
             ))
             for hit in hits:
-                m = hit['mon']
-                s = hit['stats']
-                pre = f" ({hit['csv_species']})" if hit['is_pre_evo'] else ""
-                iv_str = f"{m['atk_iv']}/{m['def_iv']}/{m['sta_iv']}{pre} (CP {m['cp']})"
-                stat_str = (f"Atk:{s['attack']:.1f} "
-                            f"Def:{s['defense']:.1f} "
-                            f"Sta:{s['stamina']}")
-                matched = ", ".join(hit['matched'])
-                self.results_box.add(toga.Label(
-                    f"  {iv_str}",
-                    style=Pack(font_size=14, font_weight="bold")
-                ))
-                self.results_box.add(toga.Label(
-                    f"  {stat_str}",
-                    style=Pack(font_size=12)
-                ))
-                self.results_box.add(toga.Label(
-                    f"  ✅ {matched}",
-                    style=Pack(font_size=12, margin_bottom=6)
-                ))
+                self._add_hit_display(self.results_box, hit)
 
     # ------------------------------------------------------------------
     # League selection
@@ -405,3 +368,30 @@ class IVCheckerScreen:
         self.clear_csv_btn.enabled = False
         for child in list(self.results_box.children):
             self.results_box.remove(child)    
+
+    # ------------------------------------------------------------------
+    # Common code for hit display
+    # ------------------------------------------------------------------
+
+    def _add_hit_display(self, box, hit):
+        """Add labels displaying a single hit to the given box."""
+        m = hit['mon']
+        s = hit['stats']
+        pre = f" ({hit['csv_species']})" if hit['is_pre_evo'] else ""
+        iv_str = f"{m['atk_iv']}/{m['def_iv']}/{m['sta_iv']}{pre} (CP {m['cp']})"
+        stat_str = (f"Atk:{s['attack']:.1f} "
+                    f"Def:{s['defense']:.1f} "
+                    f"Sta:{s['stamina']}")
+        matched = ", ".join(hit['matched'])
+        box.add(toga.Label(
+            f"  {iv_str}",
+            style=Pack(font_size=14, font_weight="bold")
+        ))
+        box.add(toga.Label(
+            f"  {stat_str}",
+            style=Pack(font_size=12)
+        ))
+        box.add(toga.Label(
+            f"  ✅ {matched}",
+            style=Pack(font_size=12, margin_bottom=6)
+        ))    
