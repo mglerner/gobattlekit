@@ -4,10 +4,12 @@ User IV checker screen — same as IV checker but uses user-defined thresholds.
 """
 import toga
 import sys
+import pathlib
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from .iv_checker import IVCheckerScreen
 from ..data.user_thresholds import load_user_thresholds
+from ..data.iv_checker import check_thresholds
 from ..data.thresholds import EVOLUTION_LINES
 
 ON_ANDROID = sys.platform == 'android' or 'android' in sys.platform
@@ -56,30 +58,39 @@ class UserIVCheckerScreen(IVCheckerScreen):
             style=Pack(height=48, font_size=16, margin_bottom=12)
         ))
 
-        # Status labels
-        import pathlib
-        initial_file = ""
+        # Status label
         initial_status = "No CSV loaded. Export from PokeGenie and share to GoBattleKit."
+        csv_name_line = pathlib.Path(self.csv_path).name if self.csv_path else ""
+        print(f"Dawg, my name line is {csv_name_line} and my path is {self.csv_path}")
+        stats_line = ""
         if self.csv_path:
-            initial_file = pathlib.Path(self.csv_path).name
             species_count = len(self.results)
             total = sum(len(hits) for hits in self.results.values())
-            initial_status = (
-                f"{species_count} species, {total} hit{'s' if total != 1 else ''} "
-                f"in {self.league.capitalize()} League"
-            )
+            stats_line = (f"{species_count} species, {total} hit{'s' if total != 1 else ''} "
+                          f"in {self.league.capitalize()} League")
 
+        status_row = toga.Box(style=Pack(direction=ROW, margin_bottom=2))
         self.status_label_file = toga.Label(
-            initial_file,
-            style=Pack(font_size=13, text_align="center", margin_bottom=2)
+            csv_name_line,
+            style=Pack(flex=1, font_size=13, text_align="center")
         )
+        self.clear_csv_btn = toga.Button(
+            "✕",
+            on_press=self._clear_csv,
+            style=Pack(width=44, height=36)
+        )
+        self.clear_csv_btn.enabled = bool(self.csv_path)
+        status_row.add(self.status_label_file)
+        status_row.add(self.clear_csv_btn)
+        self.container.add(status_row)
+
         self.status_label_stats = toga.Label(
-            initial_status,
+            stats_line if stats_line else initial_status,
             style=Pack(font_size=13, text_align="center", margin_bottom=16)
         )
-        self.container.add(self.status_label_file)
         self.container.add(self.status_label_stats)
 
+        
         # Results area — scrollable
         self.results_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
         scroll = toga.ScrollContainer(content=self.results_box, style=Pack(flex=1))
@@ -101,17 +112,15 @@ class UserIVCheckerScreen(IVCheckerScreen):
         """Run the IV check against user thresholds."""
         if not self.csv_path:
             return
-        import pathlib
-        from ..data.iv_checker import check_thresholds
         try:
             user_thresholds = load_user_thresholds()
             if not user_thresholds:
                 self.status_label_file.text = ""
+                self.clear_csv_btn.enabled = False
                 self.status_label_stats.text = "No user thresholds defined. Tap 'Edit My Thresholds' to add some."
                 for child in list(self.results_box.children):
                     self.results_box.remove(child)
                 return
-
             self.results = check_thresholds(
                 self.csv_path,
                 user_thresholds,
@@ -120,6 +129,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
                 evolution_lines=EVOLUTION_LINES,
             )
             self.status_label_file.text = pathlib.Path(self.csv_path).name
+            self.clear_csv_btn.enabled = True
             species_count = len(self.results)
             total = sum(len(hits) for hits in self.results.values())
             self.status_label_stats.text = (
@@ -129,4 +139,5 @@ class UserIVCheckerScreen(IVCheckerScreen):
             self._display_species_list()
         except Exception as e:
             self.status_label_file.text = ""
-            self.status_label_stats.text = f"Exception Error: {e}"
+            self.clear_csv_btn.enabled = False
+            self.status_label_stats.text = f"Error: {e}"

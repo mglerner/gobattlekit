@@ -62,6 +62,14 @@ class GoBattleKit(toga.App):
         """Poll the iOS inbox directory for CSV files shared from other apps."""
         import asyncio
         seen = set()
+        # Pre-populate seen with any files already in inbox at startup
+        # so we don't re-triger on files that were there before we launched
+        try:
+            inbox = pathlib.Path.home() / 'Documents' / 'Inbox'
+            if inbox.exists():
+                seen = set(inbox.glob('*.csv'))
+        except Exception:
+            pass
         while True:
             await asyncio.sleep(3)
             try:

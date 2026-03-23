@@ -16,6 +16,14 @@ from ..data.thresholds import EVOLUTION_LINES
 class EditThresholdsScreen:
     """Screen for managing user-defined IV thresholds."""
 
+    FORM_DEFAULTS = {
+        'name': 'Default',
+        'atk': '0.0',
+        'def': '0.0',
+        'sta': '0',
+        'onlytop': '0',
+    }
+
     def __init__(self, app):
         self.app = app
         self._all_species = None
@@ -23,11 +31,14 @@ class EditThresholdsScreen:
         # Form state
         self._selected_species = None
         self._selected_league = "Great"
-        self._form_name = ""
-        self._form_atk = "0"
-        self._form_def = "0"
-        self._form_sta = "0"
-        self._form_onlytop = "0"
+        self._form_name = self.FORM_DEFAULTS['name']
+        self._form_atk = self.FORM_DEFAULTS['atk']
+        self._form_def = self.FORM_DEFAULTS['def']
+        self._form_sta = self.FORM_DEFAULTS['sta']
+        self._form_onlytop = self.FORM_DEFAULTS['onlytop']
+        # stores (species, league, name) of entry being edited, or
+        # None for new entry
+        self._editing_original = None 
 
     def _ensure_species_list(self):
         if self._all_species is None:
@@ -84,11 +95,12 @@ class EditThresholdsScreen:
 
         self._selected_species = None
         self._selected_league = "Great"
-        self._form_name = ""
-        self._form_atk = "0"
-        self._form_def = "0"
-        self._form_sta = "0"
-        self._form_onlytop = "0"
+        self._form_name = self.FORM_DEFAULTS['name']
+        self._form_atk = self.FORM_DEFAULTS['atk']
+        self._form_def = self.FORM_DEFAULTS['def']
+        self._form_sta = self.FORM_DEFAULTS['sta']
+        self._form_onlytop = self.FORM_DEFAULTS['onlytop']
+        self._editing_original = None
 
         thresholds = load_user_thresholds()
 
@@ -119,16 +131,22 @@ class EditThresholdsScreen:
                     if t.get('onlytop', 0): parts.append(f"top{t['onlytop']}")
                     stat_str = ', '.join(parts) if parts else 'any'
 
+
                     row = toga.Box(style=Pack(direction=ROW, margin_bottom=4))
                     row.add(toga.Label(
                         f"    {name} ({stat_str})",
                         style=Pack(flex=1, font_size=13)
-                    ))
+                        ))
+                    row.add(toga.Button(
+                        "✎",
+                        on_press=self._make_edit_handler(species, league_label, name, t),
+                        style=Pack(width=44, height=36)
+                        ))
                     row.add(toga.Button(
                         "✕",
                         on_press=self._make_delete_handler(species, league_label, name),
                         style=Pack(width=44, height=36)
-                    ))
+                        ))
                     self.content_box.add(row)
 
     def _make_delete_handler(self, species, league, name):
@@ -140,6 +158,27 @@ class EditThresholdsScreen:
     def _confirm_clear_all(self, widget):
         clear_all_thresholds()
         self._show_threshold_list()
+ 
+    # ------------------------------------------------------------------
+    # Threshold editing
+    # ------------------------------------------------------------------
+
+    def _make_edit_handler(self, species, league, name, t):
+        def handler(widget):
+            self._edit_threshold(species, league, name, t)
+        return handler
+
+    def _edit_threshold(self, species, league, name, t):
+        """Pre-fill form with existing threshold values for editing."""
+        self._editing_original = (species, league, name)
+        self._selected_species = species
+        self._selected_league = league.replace(" League", "")
+        self._form_name = name
+        self._form_atk = str(t.get('attack', 0))
+        self._form_def = str(t.get('defense', 0))
+        self._form_sta = str(t.get('stamina', 0))
+        self._form_onlytop = str(t.get('onlytop', 0))
+        self._show_add_form()
 
     # ------------------------------------------------------------------
     # Add threshold form
@@ -227,7 +266,7 @@ class EditThresholdsScreen:
         def handler(widget):
             self._selected_league = league
             # Update the league label directly without rebuilding whole form
-            self.league_value_label.text = league
+            self.league_value_label.text = f"Selected: {self._selected_league}"
         return handler
 
     # ------------------------------------------------------------------
@@ -253,8 +292,9 @@ class EditThresholdsScreen:
 
         self._entry_field = field
         current = getattr(self, f"_form_{field}", "")
+
         self._entry_input = toga.TextInput(
-            placeholder="0",
+            placeholder=self.FORM_DEFAULTS.get(field, '0'),
             style=Pack(font_size=18, margin_bottom=16)
         )
         self._entry_input.value = current
@@ -359,6 +399,18 @@ class EditThresholdsScreen:
             return
 
         league = self._selected_league
+
+        # If editing, delete the original entry first
+        if self._editing_original:
+            orig_species, orig_league, orig_name = self._editing_original
+            delete_threshold(orig_species, orig_league, orig_name)
+            # Also delete from pre-evos if applicable
+            for final, line in EVOLUTION_LINES.items():
+                if final == orig_species:
+                    for pre_evo in line[:-1]:
+                        delete_threshold(pre_evo, orig_league, orig_name)
+                    break
+            self._editing_original = None        
 
         add_threshold(self._selected_species, league, name,
                       attack, defense, stamina, onlytop)

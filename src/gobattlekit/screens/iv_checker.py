@@ -67,16 +67,26 @@ class IVCheckerScreen:
             stats_line = (f"{species_count} species, {total} hit{'s' if total != 1 else ''} "
                           f"in {self.league.capitalize()} League")
 
+        status_row = toga.Box(style=Pack(direction=ROW, margin_bottom=2))
         self.status_label_file = toga.Label(
             csv_name_line,
-            style=Pack(font_size=13, text_align="center", margin_bottom=2)
+            style=Pack(flex=1, font_size=13, text_align="center")
         )
+        self.clear_csv_btn = toga.Button(
+            "✕",
+            on_press=self._clear_csv,
+            style=Pack(width=44, height=36)
+        )
+        self.clear_csv_btn.enabled = bool(self.csv_path)
+        status_row.add(self.status_label_file)
+        status_row.add(self.clear_csv_btn)
+        self.container.add(status_row)
+
         self.status_label_stats = toga.Label(
             stats_line if stats_line else initial_status,
             style=Pack(font_size=13, text_align="center", margin_bottom=16)
         )
-        self.container.add(self.status_label_file)
-        self.container.add(self.status_label_stats)        
+        self.container.add(self.status_label_stats)
 
         # Results area — scrollable
         self.results_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
@@ -130,6 +140,7 @@ class IVCheckerScreen:
             print(traceback.format_exc())
             self.status_label_stats.text = f"Error opening file: {e}"
 
+
     def _run_check(self):
         """Run the IV check against current thresholds and league."""
         if not self.csv_path:
@@ -142,11 +153,10 @@ class IVCheckerScreen:
                 max_level=51,
                 evolution_lines=EVOLUTION_LINES,
             )
-            csv_name = pathlib.Path(self.csv_path).name
+            self.status_label_file.text = pathlib.Path(self.csv_path).name
+            self.clear_csv_btn.enabled = True
             species_count = len(self.results)
             total = sum(len(hits) for hits in self.results.values())
-
-            self.status_label_file.text = pathlib.Path(self.csv_path).name
             self.status_label_stats.text = (
                 f"{species_count} species, {total} hit{'s' if total != 1 else ''} "
                 f"in {self.league.capitalize()} League"
@@ -154,8 +164,10 @@ class IVCheckerScreen:
             self._display_species_list()
         except Exception as e:
             self.status_label_file.text = ""
-            self.status_label_stats.text = f"Error reading CSV: {e}"
+            self.clear_csv_btn.enabled = False
+            self.status_label_stats.text = f"Error reading CSV: {e}"            
 
+            
     # ------------------------------------------------------------------
     # Species list view
     # ------------------------------------------------------------------
@@ -220,12 +232,16 @@ class IVCheckerScreen:
                        margin_bottom=8, text_align="center")
         ))
 
-        # Build target options from thresholds, not just hits
+        # Build target options from the thresholds source used for this check
         league_label = self.league.capitalize()
-        all_targets = []
-        if species in DEFAULT_THRESHOLDS and league_label in DEFAULT_THRESHOLDS[species]:
-            all_targets = list(DEFAULT_THRESHOLDS[species][league_label].keys())
-
+        all_targets = list({
+            target
+            for hit in hits
+            for target in hit['matched']
+        })
+        # Preserve a consistent order
+        all_targets = sorted(all_targets)
+        
         # Count hits per target
         targets_with_hits = {}
         for hit in hits:
@@ -370,3 +386,25 @@ class IVCheckerScreen:
             if self.csv_path:
                 self._run_check()
         return handler
+
+    
+    # ------------------------------------------------------------------
+    # Deleting the CSV
+    # ------------------------------------------------------------------
+
+    def _clear_csv(self, widget):
+        """Clear the loaded CSV and delete the cached file."""
+        import shutil
+        from ..data.fetcher import SAVED_CSV
+        self.csv_path = None
+        self.results = {}
+        try:
+            if SAVED_CSV.exists():
+                SAVED_CSV.unlink()
+        except Exception as e:
+            print(f"Could not delete cached CSV: {e}")
+        self.status_label_file.text = ""
+        self.status_label_stats.text = "No CSV loaded. Export from PokeGenie and share to GoBattleKit."
+        self.clear_csv_btn.enabled = False
+        for child in list(self.results_box.children):
+            self.results_box.remove(child)    
