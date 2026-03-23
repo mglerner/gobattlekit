@@ -80,7 +80,7 @@ class AboutScreen:
 
         # Back
         container.add(toga.Button(
-            "Back to Home",
+            "← Back to Home",
             on_press=lambda w: self.app.show_home(),
             style=Pack(height=44, margin_top=8)
         ))

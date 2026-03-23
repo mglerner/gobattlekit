@@ -92,7 +92,7 @@ class IVCheckerScreen:
 
         # Back button
         self.container.add(toga.Button(
-            "Back to Home",
+            "← Back to Home",
             on_press=lambda w: self.app.show_home(),
             style=Pack(margin_top=10, height=44)
         ))

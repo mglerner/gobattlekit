@@ -67,7 +67,7 @@ class EditThresholdsScreen:
             style=Pack(flex=1, height=44, margin_right=4)
         ))
         top_row.add(toga.Button(
-            "Back",
+            "← My IV Checker",
             on_press=lambda w: self.app.show_user_iv_checker(),
             style=Pack(flex=1, height=44, margin_left=4)
         ))
@@ -548,10 +548,10 @@ class EditThresholdsScreen:
             value=text,
             readonly=True,
             style=Pack(flex=1, font_size=14)
-        ))    
+        ))
+
 
     def _show_import_screen(self, widget=None):
-        """Show a screen for pasting and importing a threshold."""
         for child in list(self.content_box.children):
             self.content_box.remove(child)
 
@@ -561,16 +561,11 @@ class EditThresholdsScreen:
             style=Pack(height=44, margin_bottom=12)
         ))
 
-        self.content_box.add(toga.Label(
-            "Paste a GoBattleKit threshold:",
-            style=Pack(font_size=14, margin_bottom=8)
+        self.content_box.add(toga.Button(
+            "Import",
+            on_press=self._do_import,
+            style=Pack(height=48, font_size=16, margin_bottom=8)
         ))
-
-        self._import_input = toga.MultilineTextInput(
-            placeholder="GoBattleKit Threshold v1\nSpecies: ...",
-            style=Pack(flex=1, font_size=14, margin_bottom=12)
-        )
-        self.content_box.add(self._import_input)
 
         self._import_error = toga.Label(
             "",
@@ -578,12 +573,17 @@ class EditThresholdsScreen:
         )
         self.content_box.add(self._import_error)
 
-        self.content_box.add(toga.Button(
-            "Import",
-            on_press=self._do_import,
-            style=Pack(height=48, font_size=16)
+        self.content_box.add(toga.Label(
+            "Paste a GoBattleKit threshold:",
+            style=Pack(font_size=14, margin_bottom=8)
         ))
 
+        self._import_input = toga.MultilineTextInput(
+            placeholder="GoBattleKit Threshold v1\nSpecies: ...",
+            style=Pack(flex=1, font_size=14, color="white")
+        )
+        self.content_box.add(self._import_input)
+        
     def _do_import(self, widget):
         """Validate and import a pasted threshold."""
         text = self._import_input.value.strip()
