@@ -2,7 +2,7 @@
 [tool.briefcase]
 project_name = "GoBattleKit"
 bundle = "com.mglerner"
-version = "0.0.3"
+version = "0.0.4"
 url = "https://mglerner.com/gobattlekit"
 license.file = "LICENSE"
 author = "Michael G. Lerner"
@@ -180,6 +180,7 @@ requires = [
 info."CFBundleDocumentTypes" = [
     {CFBundleTypeName = "CSV File", CFBundleTypeRole = "Viewer", LSHandlerRank = "Owner", LSItemContentTypes = ["public.comma-separated-values-text"]}
 ]
+info."LSSupportsOpeningDocumentsInPlace" = false
 
 [tool.briefcase.app.gobattlekit.android]
 requires = [
