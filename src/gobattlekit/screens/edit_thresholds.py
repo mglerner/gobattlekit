@@ -144,6 +144,11 @@ class EditThresholdsScreen:
                         style=Pack(width=44, height=36)
                         ))
                     row.add(toga.Button(
+                        "⧉",
+                        on_press=self._make_duplicate_handler(species, league_label, name, t),
+                        style=Pack(width=44, height=36)
+                    ))
+                    row.add(toga.Button(
                         "✕",
                         on_press=self._make_delete_handler(species, league_label, name),
                         style=Pack(width=44, height=36)
@@ -154,6 +159,19 @@ class EditThresholdsScreen:
         def handler(widget):
             delete_threshold(species, league, name)
             self._show_threshold_list()
+        return handler
+
+    def _make_duplicate_handler(self, species, league, name, t):
+        def handler(widget):
+            self._editing_original = None  # not editing, creating new
+            self._selected_species = species
+            self._selected_league = league.replace(" League", "")
+            self._form_name = self.FORM_DEFAULTS['name']  # force user to enter new name
+            self._form_atk = str(t.get('attack', 0))
+            self._form_def = str(t.get('defense', 0))
+            self._form_sta = str(t.get('stamina', 0))
+            self._form_onlytop = str(t.get('onlytop', 0))
+            self._show_add_form()
         return handler
 
     def _confirm_clear_all(self, widget):
