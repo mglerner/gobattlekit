@@ -533,7 +533,7 @@ class EditThresholdsScreen:
             self.content_box.remove(child)
 
         self.content_box.add(toga.Button(
-            "← Back",
+            "← Threshold List",
             on_press=lambda w: self._show_threshold_list(),
             style=Pack(height=44, margin_bottom=12)
         ))
@@ -556,7 +556,7 @@ class EditThresholdsScreen:
             self.content_box.remove(child)
 
         self.content_box.add(toga.Button(
-            "← Back",
+            "← Threshold List",
             on_press=lambda w: self._show_threshold_list(),
             style=Pack(height=44, margin_bottom=12)
         ))

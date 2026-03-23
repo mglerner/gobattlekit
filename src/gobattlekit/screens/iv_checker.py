@@ -306,7 +306,8 @@ class IVCheckerScreen:
                 style=Pack(font_size=14, text_align="center", margin_top=10)
             ))
             return
-
+        
+        hits = sorted(hits, key=lambda h: h['stats']['stat_prod'], reverse=True)
         for hit in hits:
             self._add_hit_display(self.hits_box, hit)
             
@@ -332,6 +333,7 @@ class IVCheckerScreen:
                 style=Pack(font_size=16, font_weight="bold",
                            margin_top=12, margin_bottom=4)
             ))
+            hits = sorted(hits, key=lambda h: h['stats']['stat_prod'], reverse=True)
             for hit in hits:
                 self._add_hit_display(self.results_box, hit)
 
@@ -381,7 +383,8 @@ class IVCheckerScreen:
         iv_str = f"{m['atk_iv']}/{m['def_iv']}/{m['sta_iv']}{pre} (CP {m['cp']})"
         stat_str = (f"Atk:{s['attack']:.1f} "
                     f"Def:{s['defense']:.1f} "
-                    f"Sta:{s['stamina']}")
+                    f"Sta:{s['stamina']} "
+                    f"SP:{s['stat_prod']}")
         matched = ", ".join(hit['matched'])
         box.add(toga.Label(
             f"  {iv_str}",
