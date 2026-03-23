@@ -79,6 +79,12 @@ class EditThresholdsScreen:
             style=Pack(height=48, font_size=16, margin_bottom=12)
         ))
 
+        self.container.add(toga.Button(
+            "Import from Text",
+            on_press=self._show_import_screen,
+            style=Pack(height=48, font_size=16, margin_bottom=8)
+        ))
+        
         self.content_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
         scroll = toga.ScrollContainer(content=self.content_box, style=Pack(flex=1))
         self.container.add(scroll)
@@ -149,6 +155,11 @@ class EditThresholdsScreen:
                         style=Pack(width=44, height=36)
                     ))
                     row.add(toga.Button(
+                        "📤",
+                        on_press=self._make_share_handler(species, league_label, name, t),
+                        style=Pack(width=44, height=36)
+                    ))
+                    row.add(toga.Button(
                         "✕",
                         on_press=self._make_delete_handler(species, league_label, name),
                         style=Pack(width=44, height=36)
@@ -173,6 +184,11 @@ class EditThresholdsScreen:
             self._form_onlytop = str(t.get('onlytop', 0))
             self._show_add_form()
         return handler
+
+    def _make_share_handler(self, species, league, name, t):
+        def handler(widget):
+            self._show_share_screen(species, league, name, t)
+        return handler    
 
     def _confirm_clear_all(self, widget):
         if not self._clear_all_pending:
@@ -442,3 +458,151 @@ class EditThresholdsScreen:
                       attack, defense, stamina, onlytop)
 
         self._show_threshold_list()
+
+    # ------------------------------------------------------------------
+    # Edit threshold
+    # ------------------------------------------------------------------
+
+    def _format_threshold(self, species, league, name, t):
+        """Format a threshold as human-readable shareable text."""
+        lines = [
+            "GoBattleKit Threshold v1",
+            f"Species: {species}",
+            f"League: {league.replace(' League', '')}",
+            f"Name: {name}",
+            f"Attack: {t.get('attack', 0)}",
+            f"Defense: {t.get('defense', 0)}",
+            f"Stamina: {t.get('stamina', 0)}",
+            f"OnlyTop: {t.get('onlytop', 0)}",
+        ]
+        return "\n".join(lines)
+
+    def _parse_threshold(self, text):
+        """Parse a threshold from human-readable text.
+
+        Returns (species, league, name, t) or raises ValueError with a message.
+        """
+        lines = [l.strip() for l in text.strip().splitlines()]
+        if not lines or lines[0] != "GoBattleKit Threshold v1":
+            raise ValueError("Not a valid GoBattleKit threshold.")
+
+        data = {}
+        for line in lines[1:]:
+            if ':' not in line:
+                continue
+            key, _, value = line.partition(':')
+            data[key.strip()] = value.strip()
+
+        required = ('Species', 'League', 'Name', 'Attack', 'Defense', 'Stamina', 'OnlyTop')
+        for field in required:
+            if field not in data:
+                raise ValueError(f"Missing field: {field}")
+
+        species = data['Species']
+        # Validate species exists in gamemaster
+        try:
+            from .iv_checker import get_pokemon_index
+            pokemon_index = get_pokemon_index()
+            if species not in pokemon_index:
+                raise ValueError(f"Unknown species: {species}")
+        except ImportError:
+            pass
+
+        league = data['League'].capitalize()
+        name = data['Name']
+        if not name:
+            raise ValueError("Name cannot be empty.")
+
+        try:
+            attack = float(data['Attack'])
+            defense = float(data['Defense'])
+            stamina = int(float(data['Stamina']))
+            onlytop = int(float(data['OnlyTop']))
+        except ValueError:
+            raise ValueError("Invalid stat values.")
+
+        t = {'attack': attack, 'defense': defense, 'stamina': stamina}
+        if onlytop > 0:
+            t['onlytop'] = onlytop
+
+        return species, league, name, t
+
+    def _show_share_screen(self, species, league, name, t):
+        """Show a screen with the threshold formatted as shareable text."""
+        for child in list(self.content_box.children):
+            self.content_box.remove(child)
+
+        self.content_box.add(toga.Button(
+            "← Back",
+            on_press=lambda w: self._show_threshold_list(),
+            style=Pack(height=44, margin_bottom=12)
+        ))
+
+        self.content_box.add(toga.Label(
+            "Long-press to select and copy:",
+            style=Pack(font_size=14, margin_bottom=8)
+        ))
+
+        text = self._format_threshold(species, league, name, t)
+        self.content_box.add(toga.MultilineTextInput(
+            value=text,
+            readonly=True,
+            style=Pack(flex=1, font_size=14)
+        ))    
+
+    def _show_import_screen(self, widget=None):
+        """Show a screen for pasting and importing a threshold."""
+        for child in list(self.content_box.children):
+            self.content_box.remove(child)
+
+        self.content_box.add(toga.Button(
+            "← Back",
+            on_press=lambda w: self._show_threshold_list(),
+            style=Pack(height=44, margin_bottom=12)
+        ))
+
+        self.content_box.add(toga.Label(
+            "Paste a GoBattleKit threshold:",
+            style=Pack(font_size=14, margin_bottom=8)
+        ))
+
+        self._import_input = toga.MultilineTextInput(
+            placeholder="GoBattleKit Threshold v1\nSpecies: ...",
+            style=Pack(flex=1, font_size=14, margin_bottom=12)
+        )
+        self.content_box.add(self._import_input)
+
+        self._import_error = toga.Label(
+            "",
+            style=Pack(font_size=13, text_align="center", margin_bottom=8)
+        )
+        self.content_box.add(self._import_error)
+
+        self.content_box.add(toga.Button(
+            "Import",
+            on_press=self._do_import,
+            style=Pack(height=48, font_size=16)
+        ))
+
+    def _do_import(self, widget):
+        """Validate and import a pasted threshold."""
+        text = self._import_input.value.strip()
+        if not text:
+            self._import_error.text = "Please paste a threshold first."
+            return
+        try:
+            species, league, name, t = self._parse_threshold(text)
+            add_threshold(species, league, name,
+                          t['attack'], t['defense'], t['stamina'],
+                          t.get('onlytop', 0))
+            # Auto-add pre-evolutions
+            for final, line in EVOLUTION_LINES.items():
+                if final == species:
+                    for pre_evo in line[:-1]:
+                        add_threshold(pre_evo, league, name,
+                                      t['attack'], t['defense'], t['stamina'],
+                                      t.get('onlytop', 0))
+                    break
+            self._show_threshold_list()
+        except ValueError as e:
+            self._import_error.text = str(e)    
