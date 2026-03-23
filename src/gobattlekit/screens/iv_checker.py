@@ -126,7 +126,6 @@ class IVCheckerScreen:
         """Let the user pick a CSV file manually."""
         from ..platform import ON_ANDROID
         if ON_ANDROID:
-            print("MG calling _import_csv_android")
             self._import_csv_android()
         else:
             try:
