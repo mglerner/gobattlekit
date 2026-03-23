@@ -10,7 +10,7 @@ from .iv_checker import IVCheckerScreen
 from ..data.user_thresholds import load_user_thresholds
 from ..data.iv_checker import check_thresholds
 from ..data.thresholds import EVOLUTION_LINES
-from ..platform import ON_ANDROID, ON_IOS
+from ..platform import ON_ANDROID, ON_IOS, ON_MOBILE
 
 class UserIVCheckerScreen(IVCheckerScreen):
     """IV checker screen using user-defined thresholds."""
@@ -37,7 +37,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
             league_box.add(btn)
         self.container.add(league_box)
 
-        # Import button — not available on iOS
+        # Import button — not available on iOS or Android
         if not ON_IOS:
             import_btn = toga.Button(
                 "Import PokeGenie CSV",

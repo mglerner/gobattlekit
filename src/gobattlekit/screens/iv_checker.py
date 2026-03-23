@@ -9,7 +9,7 @@ from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from ..data.iv_checker import check_thresholds
 from ..data.thresholds import DEFAULT_THRESHOLDS, EVOLUTION_LINES
-from ..platform import ON_ANDROID, ON_IOS
+from ..platform import ON_ANDROID, ON_IOS, ON_MOBILE
 
 STATUS_HEIGHT = 80 if ON_ANDROID else 60
 
@@ -45,7 +45,7 @@ class IVCheckerScreen:
             league_box.add(btn)
         self.container.add(league_box)
 
-        # Import button — not available on iOS
+        # Import button — not available on iOS or Android
         if not ON_IOS:
             import_btn = toga.Button(
                 "Import PokeGenie CSV",
@@ -124,20 +124,67 @@ class IVCheckerScreen:
 
     async def _import_csv(self, widget):
         """Let the user pick a CSV file manually."""
+        from ..platform import ON_ANDROID
+        if ON_ANDROID:
+            print("MG calling _import_csv_android")
+            self._import_csv_android()
+        else:
+            try:
+                path = await self.app.main_window.open_file_dialog(
+                    title="Select PokeGenie Export",
+                    file_types=["csv"],
+                )
+                if path:
+                    self.load_csv(str(path))
+            except Exception as e:
+                self.status_label_file.text = ""
+                self.status_label_stats.text = f"Error opening file: {e}"
+
+    def _import_csv_android(self):
+        """Use Android's file picker Intent to select a CSV."""
         try:
-            path = await self.app.main_window.open_file_dialog(
-                title="Select PokeGenie Export",
-                file_types=["csv"],
-            )
-            if path:
-                self.load_csv(str(path))
+            from java import jclass
+            Intent = jclass('android.content.Intent')
+            intent = Intent(Intent.ACTION_GET_CONTENT)
+            intent.setType("text/comma-separated-values")
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+
+            def on_complete(result_code, result):
+                try:
+                    if result and result.getData():
+                        uri = result.getData()
+                        from ..data.fetcher import CACHE_DIR
+                        CACHE_DIR.mkdir(exist_ok=True, parents=True)
+                        dest = CACHE_DIR / 'pokegenie_import.csv'
+                        ContentResolver = self.app._impl.native.getContentResolver()
+                        stream = ContentResolver.openInputStream(uri)
+                        ByteArrayOutputStream = jclass('java.io.ByteArrayOutputStream')
+                        baos = ByteArrayOutputStream()
+                        buf = bytearray(4096)
+                        while True:
+                            n = stream.read(buf)
+                            if n < 0:
+                                break
+                            baos.write(buf, 0, n)
+                        data = bytes(baos.toByteArray())
+                        #data = bytes(stream.read())
+                        dest.write_bytes(data)
+                        stream.close()
+
+                        self.load_csv(str(dest))
+                    else:
+                        print("Android file picker: no file selected")
+                except Exception as e:
+                    print(f"Android CSV import callback error: {e}")
+                    self.status_label_file.text = ""
+                    self.status_label_stats.text = f"Error importing: {e}"
+
+            self.app._impl.start_activity(intent, on_complete=on_complete)
+
         except Exception as e:
+            print(f"Android CSV import error: {e}")
             self.status_label_file.text = ""
-            import traceback
-            print(traceback.format_exc())
-            self.status_label_stats.text = f"Error opening file: {e}"
-
-
+            self.status_label_stats.text = f"Error importing: {e}"
     def _run_check(self):
         """Run the IV check against current thresholds and league."""
         if not self.csv_path:

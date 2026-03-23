@@ -6,6 +6,7 @@ import webbrowser
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN
+from ..platform import ON_ANDROID, ON_IOS, ON_MOBILE
 
 
 class AboutScreen:
@@ -38,7 +39,7 @@ class AboutScreen:
         ))
         container.add(toga.Button(
             "github.com/mglerner",
-            on_press=lambda w: webbrowser.open("https://github.com/mglerner"),
+            on_press=lambda w: self._open_url("https://github.com/mglerner"),
             style=Pack(height=40, margin_bottom=16)
         ))
 
@@ -54,7 +55,7 @@ class AboutScreen:
         ))
         container.add(toga.Button(
             "pvpoke.com",
-            on_press=lambda w: webbrowser.open("https://pvpoke.com"),
+            on_press=lambda w: self._open_url("https://pvpoke.com"),
             style=Pack(height=40, margin_bottom=12)
         ))
 
@@ -64,7 +65,7 @@ class AboutScreen:
         ))
         container.add(toga.Button(
             "YouTube: @SwagTips",
-            on_press=lambda w: webbrowser.open("https://www.youtube.com/@SwagTips"),
+            on_press=lambda w: self._open_url("https://www.youtube.com/@SwagTips"),
             style=Pack(height=40, margin_bottom=12)
         ))
 
@@ -73,8 +74,8 @@ class AboutScreen:
             style=Pack(font_size=14, margin_bottom=4)
         ))
         container.add(toga.Button(
-            "Discord link coming soon",
-            on_press=lambda w: None,
+            "Discord invite link",
+            on_press=lambda w: self._open_url("https://discord.gg/UkCdztFf2n"),
             style=Pack(height=40, margin_bottom=16)
         ))
 
@@ -86,3 +87,25 @@ class AboutScreen:
         ))
 
         return container
+
+    def _open_url(self, url):
+        """Open a URL, handling platform differences."""
+        print(f"MG Bout to open this URL: {url}")
+        if ON_ANDROID:
+            print("MG ON ANDROID")
+            try:
+                print("MG IN THE TRY")
+                from java import jclass
+                Intent = jclass('android.content.Intent')
+                Uri = jclass('android.net.Uri')
+                intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                activity = self.app._impl.native
+                activity.startActivity(intent)
+                ## from toga_android.app import App
+                ## print("MG about to start activity")
+                ## App.app.native.startActivity(intent)
+            except Exception as e:
+                print(f"Could not open URL on Android: {e}")
+        else:
+            import webbrowser
+            webbrowser.open(url)
