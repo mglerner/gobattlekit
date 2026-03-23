@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Generate all required iOS icon and splash screen sizes from the SVG source."""
+"""Generate all required iOS and Android icon and splash screen sizes from the SVG source."""
 import cairosvg
 import pathlib
 
@@ -73,7 +73,7 @@ out_dir.mkdir(exist_ok=True)
 icon_bytes = SVG.encode("utf-8")
 splash_bytes = SVG_TRANSPARENT.encode("utf-8")
 
-# iOS icon sizes required by briefcase
+# iOS icon sizes
 ICON_SIZES = [20, 29, 40, 58, 60, 76, 80, 87, 120, 152, 167, 180, 640, 1024, 1280, 1920]
 for size in ICON_SIZES:
     out_path = out_dir / f"icon-{size}.png"
@@ -81,7 +81,31 @@ for size in ICON_SIZES:
                      output_width=size, output_height=size)
     print(f"Generated {out_path} ({size}x{size})")
 
-# iOS splash sizes required by briefcase
+# Android round icon sizes
+ANDROID_ROUND_SIZES = [48, 72, 96, 144, 192]
+for size in ANDROID_ROUND_SIZES:
+    out_path = out_dir / f"icon-round-{size}.png"
+    cairosvg.svg2png(bytestring=icon_bytes, write_to=str(out_path),
+                     output_width=size, output_height=size)
+    print(f"Generated {out_path} ({size}x{size})")
+
+# Android square icon sizes
+ANDROID_SQUARE_SIZES = [48, 72, 96, 144, 192, 320, 480, 640, 960, 1280]
+for size in ANDROID_SQUARE_SIZES:
+    out_path = out_dir / f"icon-square-{size}.png"
+    cairosvg.svg2png(bytestring=icon_bytes, write_to=str(out_path),
+                     output_width=size, output_height=size)
+    print(f"Generated {out_path} ({size}x{size})")
+
+# Android adaptive icon sizes
+ANDROID_ADAPTIVE_SIZES = [108, 162, 216, 324, 432]
+for size in ANDROID_ADAPTIVE_SIZES:
+    out_path = out_dir / f"icon-adaptive-{size}.png"
+    cairosvg.svg2png(bytestring=icon_bytes, write_to=str(out_path),
+                     output_width=size, output_height=size)
+    print(f"Generated {out_path} ({size}x{size})")
+
+# iOS splash sizes
 SPLASH_SIZES = [640, 800, 1280, 1600, 1920, 2400]
 for size in SPLASH_SIZES:
     out_path = out_dir / f"splash-{size}.png"
