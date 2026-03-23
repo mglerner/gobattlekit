@@ -123,10 +123,11 @@ class IVCheckerScreen:
                 file_types=["csv"],
             )
             if path:
-                self.csv_path = str(path)
-                self._run_check()
+                self.load_csv(str(path))
         except Exception as e:
             self.status_label_file.text = ""
+            import traceback
+            print(traceback.format_exc())
             self.status_label_stats.text = f"Error opening file: {e}"
 
     def _run_check(self):

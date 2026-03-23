@@ -363,11 +363,4 @@ class EditThresholdsScreen:
         add_threshold(self._selected_species, league, name,
                       attack, defense, stamina, onlytop)
 
-        for final, line in EVOLUTION_LINES.items():
-            if final == self._selected_species:
-                for pre_evo in line[:-1]:
-                    add_threshold(pre_evo, league, name,
-                                  attack, defense, stamina, onlytop)
-                break
-
         self._show_threshold_list()

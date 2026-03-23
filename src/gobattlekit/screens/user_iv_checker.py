@@ -3,11 +3,15 @@
 User IV checker screen — same as IV checker but uses user-defined thresholds.
 """
 import toga
+import sys
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from .iv_checker import IVCheckerScreen
 from ..data.user_thresholds import load_user_thresholds
 from ..data.thresholds import EVOLUTION_LINES
+
+ON_ANDROID = sys.platform == 'android' or 'android' in sys.platform
+ON_IOS = sys.platform == 'ios' or 'ios' in sys.platform
 
 
 class UserIVCheckerScreen(IVCheckerScreen):
@@ -34,6 +38,16 @@ class UserIVCheckerScreen(IVCheckerScreen):
             )
             league_box.add(btn)
         self.container.add(league_box)
+
+        # Import button — not available on iOS
+        if not ON_IOS:
+            import_btn = toga.Button(
+                "Import PokeGenie CSV",
+                on_press=self._import_csv,
+                style=Pack(height=52, font_size=16, margin_bottom=8)
+            )
+            self.container.add(import_btn)
+        
 
         # Edit Thresholds button
         self.container.add(toga.Button(
@@ -115,4 +129,4 @@ class UserIVCheckerScreen(IVCheckerScreen):
             self._display_species_list()
         except Exception as e:
             self.status_label_file.text = ""
-            self.status_label_stats.text = f"Error: {e}"
+            self.status_label_stats.text = f"Exception Error: {e}"
