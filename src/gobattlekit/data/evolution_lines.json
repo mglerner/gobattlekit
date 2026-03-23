@@ -1,0 +1,2426 @@
+{
+  "Venusaur": [
+    "Bulbasaur",
+    "Ivysaur",
+    "Venusaur"
+  ],
+  "Venusaur (Shadow)": [
+    "Bulbasaur (Shadow)",
+    "Ivysaur (Shadow)",
+    "Venusaur (Shadow)"
+  ],
+  "Charizard": [
+    "Charmander",
+    "Charmeleon",
+    "Charizard"
+  ],
+  "Charizard (Shadow)": [
+    "Charmander (Shadow)",
+    "Charmeleon (Shadow)",
+    "Charizard (Shadow)"
+  ],
+  "Blastoise": [
+    "Squirtle",
+    "Wartortle",
+    "Blastoise"
+  ],
+  "Blastoise (Shadow)": [
+    "Squirtle (Shadow)",
+    "Wartortle (Shadow)",
+    "Blastoise (Shadow)"
+  ],
+  "Butterfree": [
+    "Caterpie",
+    "Metapod",
+    "Butterfree"
+  ],
+  "Butterfree (Shadow)": [
+    "Caterpie (Shadow)",
+    "Metapod (Shadow)",
+    "Butterfree (Shadow)"
+  ],
+  "Beedrill": [
+    "Weedle",
+    "Kakuna",
+    "Beedrill"
+  ],
+  "Beedrill (Shadow)": [
+    "Weedle (Shadow)",
+    "Kakuna (Shadow)",
+    "Beedrill (Shadow)"
+  ],
+  "Pidgeot": [
+    "Pidgey",
+    "Pidgeotto",
+    "Pidgeot"
+  ],
+  "Pidgeot (Shadow)": [
+    "Pidgey (Shadow)",
+    "Pidgeotto (Shadow)",
+    "Pidgeot (Shadow)"
+  ],
+  "Raticate": [
+    "Rattata",
+    "Raticate"
+  ],
+  "Raticate (Alolan)": [
+    "Rattata (Alolan)",
+    "Raticate (Alolan)"
+  ],
+  "Raticate (Alolan) (Shadow)": [
+    "Rattata (Alolan) (Shadow)",
+    "Raticate (Alolan) (Shadow)"
+  ],
+  "Raticate (Shadow)": [
+    "Rattata (Shadow)",
+    "Raticate (Shadow)"
+  ],
+  "Fearow": [
+    "Spearow",
+    "Fearow"
+  ],
+  "Arbok": [
+    "Ekans",
+    "Arbok"
+  ],
+  "Arbok (Shadow)": [
+    "Ekans (Shadow)",
+    "Arbok (Shadow)"
+  ],
+  "Raichu": [
+    "Pichu",
+    "Pikachu",
+    "Raichu"
+  ],
+  "Sandslash": [
+    "Sandshrew",
+    "Sandslash"
+  ],
+  "Sandslash (Alolan)": [
+    "Sandshrew (Alolan)",
+    "Sandslash (Alolan)"
+  ],
+  "Sandslash (Alolan) (Shadow)": [
+    "Sandshrew (Alolan) (Shadow)",
+    "Sandslash (Alolan) (Shadow)"
+  ],
+  "Sandslash (Shadow)": [
+    "Sandshrew (Shadow)",
+    "Sandslash (Shadow)"
+  ],
+  "Nidoqueen": [
+    "Nidoran Female",
+    "Nidorina",
+    "Nidoqueen"
+  ],
+  "Nidoqueen (Shadow)": [
+    "Nidoran Female (Shadow)",
+    "Nidorina (Shadow)",
+    "Nidoqueen (Shadow)"
+  ],
+  "Nidoking": [
+    "Nidoran Male",
+    "Nidorino",
+    "Nidoking"
+  ],
+  "Nidoking (Shadow)": [
+    "Nidoran Male (Shadow)",
+    "Nidorino (Shadow)",
+    "Nidoking (Shadow)"
+  ],
+  "Clefable": [
+    "Cleffa",
+    "Clefairy",
+    "Clefable"
+  ],
+  "Ninetales": [
+    "Vulpix",
+    "Ninetales"
+  ],
+  "Ninetales (Alolan)": [
+    "Vulpix (Alolan)",
+    "Ninetales (Alolan)"
+  ],
+  "Ninetales (Alolan) (Shadow)": [
+    "Vulpix (Alolan) (Shadow)",
+    "Ninetales (Alolan) (Shadow)"
+  ],
+  "Ninetales (Shadow)": [
+    "Vulpix (Shadow)",
+    "Ninetales (Shadow)"
+  ],
+  "Wigglytuff": [
+    "Igglybuff",
+    "Jigglypuff",
+    "Wigglytuff"
+  ],
+  "Crobat": [
+    "Zubat",
+    "Golbat",
+    "Crobat"
+  ],
+  "Crobat (Shadow)": [
+    "Zubat (Shadow)",
+    "Golbat (Shadow)",
+    "Crobat (Shadow)"
+  ],
+  "Vileplume": [
+    "Oddish",
+    "Gloom",
+    "Vileplume"
+  ],
+  "Bellossom": [
+    "Oddish",
+    "Gloom",
+    "Bellossom"
+  ],
+  "Vileplume (Shadow)": [
+    "Oddish (Shadow)",
+    "Gloom (Shadow)",
+    "Vileplume (Shadow)"
+  ],
+  "Bellossom (Shadow)": [
+    "Oddish (Shadow)",
+    "Gloom (Shadow)",
+    "Bellossom (Shadow)"
+  ],
+  "Parasect": [
+    "Paras",
+    "Parasect"
+  ],
+  "Venomoth": [
+    "Venonat",
+    "Venomoth"
+  ],
+  "Venomoth (Shadow)": [
+    "Venonat (Shadow)",
+    "Venomoth (Shadow)"
+  ],
+  "Dugtrio": [
+    "Diglett",
+    "Dugtrio"
+  ],
+  "Dugtrio (Alolan)": [
+    "Diglett (Alolan)",
+    "Dugtrio (Alolan)"
+  ],
+  "Dugtrio (Alolan) (Shadow)": [
+    "Diglett (Alolan) (Shadow)",
+    "Dugtrio (Alolan) (Shadow)"
+  ],
+  "Dugtrio (Shadow)": [
+    "Diglett (Shadow)",
+    "Dugtrio (Shadow)"
+  ],
+  "Persian": [
+    "Meowth",
+    "Persian"
+  ],
+  "Persian (Alolan)": [
+    "Meowth (Alolan)",
+    "Persian (Alolan)"
+  ],
+  "Perrserker": [
+    "Meowth (Galarian)",
+    "Perrserker"
+  ],
+  "Persian (Shadow)": [
+    "Meowth (Shadow)",
+    "Persian (Shadow)"
+  ],
+  "Golduck": [
+    "Psyduck",
+    "Golduck"
+  ],
+  "Golduck (Shadow)": [
+    "Psyduck (Shadow)",
+    "Golduck (Shadow)"
+  ],
+  "Annihilape": [
+    "Mankey",
+    "Primeape",
+    "Annihilape"
+  ],
+  "Annihilape (Shadow)": [
+    "Mankey (Shadow)",
+    "Primeape (Shadow)",
+    "Annihilape (Shadow)"
+  ],
+  "Arcanine": [
+    "Growlithe",
+    "Arcanine"
+  ],
+  "Arcanine (Hisuian)": [
+    "Growlithe (Hisuian)",
+    "Arcanine (Hisuian)"
+  ],
+  "Arcanine (Shadow)": [
+    "Growlithe (Shadow)",
+    "Arcanine (Shadow)"
+  ],
+  "Poliwrath": [
+    "Poliwag",
+    "Poliwhirl",
+    "Poliwrath"
+  ],
+  "Politoed": [
+    "Poliwag",
+    "Poliwhirl",
+    "Politoed"
+  ],
+  "Poliwrath (Shadow)": [
+    "Poliwag (Shadow)",
+    "Poliwhirl (Shadow)",
+    "Poliwrath (Shadow)"
+  ],
+  "Politoed (Shadow)": [
+    "Poliwag (Shadow)",
+    "Poliwhirl (Shadow)",
+    "Politoed (Shadow)"
+  ],
+  "Alakazam": [
+    "Abra",
+    "Kadabra",
+    "Alakazam"
+  ],
+  "Alakazam (Shadow)": [
+    "Abra (Shadow)",
+    "Kadabra (Shadow)",
+    "Alakazam (Shadow)"
+  ],
+  "Machamp": [
+    "Machop",
+    "Machoke",
+    "Machamp"
+  ],
+  "Machamp (Shadow)": [
+    "Machop (Shadow)",
+    "Machoke (Shadow)",
+    "Machamp (Shadow)"
+  ],
+  "Victreebel": [
+    "Bellsprout",
+    "Weepinbell",
+    "Victreebel"
+  ],
+  "Victreebel (Shadow)": [
+    "Bellsprout (Shadow)",
+    "Weepinbell (Shadow)",
+    "Victreebel (Shadow)"
+  ],
+  "Tentacruel": [
+    "Tentacool",
+    "Tentacruel"
+  ],
+  "Tentacruel (Shadow)": [
+    "Tentacool (Shadow)",
+    "Tentacruel (Shadow)"
+  ],
+  "Golem": [
+    "Geodude",
+    "Graveler",
+    "Golem"
+  ],
+  "Golem (Alolan)": [
+    "Geodude (Alolan)",
+    "Graveler (Alolan)",
+    "Golem (Alolan)"
+  ],
+  "Golem (Alolan) (Shadow)": [
+    "Geodude (Alolan) (Shadow)",
+    "Graveler (Alolan) (Shadow)",
+    "Golem (Alolan) (Shadow)"
+  ],
+  "Golem (Shadow)": [
+    "Geodude (Shadow)",
+    "Graveler (Shadow)",
+    "Golem (Shadow)"
+  ],
+  "Rapidash": [
+    "Ponyta",
+    "Rapidash"
+  ],
+  "Rapidash (Galarian)": [
+    "Ponyta (Galarian)",
+    "Rapidash (Galarian)"
+  ],
+  "Rapidash (Shadow)": [
+    "Ponyta (Shadow)",
+    "Rapidash (Shadow)"
+  ],
+  "Slowbro": [
+    "Slowpoke",
+    "Slowbro"
+  ],
+  "Slowking": [
+    "Slowpoke",
+    "Slowking"
+  ],
+  "Slowbro (Galarian)": [
+    "Slowpoke (Galarian)",
+    "Slowbro (Galarian)"
+  ],
+  "Slowking (Galarian)": [
+    "Slowpoke (Galarian)",
+    "Slowking (Galarian)"
+  ],
+  "Slowbro (Shadow)": [
+    "Slowpoke (Shadow)",
+    "Slowbro (Shadow)"
+  ],
+  "Slowking (Shadow)": [
+    "Slowpoke (Shadow)",
+    "Slowking (Shadow)"
+  ],
+  "Magnezone": [
+    "Magnemite",
+    "Magneton",
+    "Magnezone"
+  ],
+  "Magnezone (Shadow)": [
+    "Magnemite (Shadow)",
+    "Magneton (Shadow)",
+    "Magnezone (Shadow)"
+  ],
+  "Sirfetch'd": [
+    "Farfetch'd (Galarian)",
+    "Sirfetch'd"
+  ],
+  "Dodrio": [
+    "Doduo",
+    "Dodrio"
+  ],
+  "Dewgong": [
+    "Seel",
+    "Dewgong"
+  ],
+  "Muk": [
+    "Grimer",
+    "Muk"
+  ],
+  "Muk (Alolan)": [
+    "Grimer (Alolan)",
+    "Muk (Alolan)"
+  ],
+  "Muk (Alolan) (Shadow)": [
+    "Grimer (Alolan) (Shadow)",
+    "Muk (Alolan) (Shadow)"
+  ],
+  "Muk (Shadow)": [
+    "Grimer (Shadow)",
+    "Muk (Shadow)"
+  ],
+  "Cloyster": [
+    "Shellder",
+    "Cloyster"
+  ],
+  "Cloyster (Shadow)": [
+    "Shellder (Shadow)",
+    "Cloyster (Shadow)"
+  ],
+  "Gengar": [
+    "Gastly",
+    "Haunter",
+    "Gengar"
+  ],
+  "Gengar (Shadow)": [
+    "Gastly (Shadow)",
+    "Haunter (Shadow)",
+    "Gengar (Shadow)"
+  ],
+  "Steelix": [
+    "Onix",
+    "Steelix"
+  ],
+  "Steelix (Shadow)": [
+    "Onix (Shadow)",
+    "Steelix (Shadow)"
+  ],
+  "Hypno": [
+    "Drowzee",
+    "Hypno"
+  ],
+  "Hypno (Shadow)": [
+    "Drowzee (Shadow)",
+    "Hypno (Shadow)"
+  ],
+  "Kingler": [
+    "Krabby",
+    "Kingler"
+  ],
+  "Electrode": [
+    "Voltorb",
+    "Electrode"
+  ],
+  "Electrode (Hisuian)": [
+    "Voltorb (Hisuian)",
+    "Electrode (Hisuian)"
+  ],
+  "Electrode (Shadow)": [
+    "Voltorb (Shadow)",
+    "Electrode (Shadow)"
+  ],
+  "Exeggutor": [
+    "Exeggcute",
+    "Exeggutor"
+  ],
+  "Exeggutor (Shadow)": [
+    "Exeggcute (Shadow)",
+    "Exeggutor (Shadow)"
+  ],
+  "Marowak": [
+    "Cubone",
+    "Marowak"
+  ],
+  "Marowak (Alolan)": [
+    "Cubone",
+    "Marowak (Alolan)"
+  ],
+  "Marowak (Shadow)": [
+    "Cubone (Shadow)",
+    "Marowak (Shadow)"
+  ],
+  "Marowak (Alolan) (Shadow)": [
+    "Cubone (Shadow)",
+    "Marowak (Alolan) (Shadow)"
+  ],
+  "Hitmonlee": [
+    "Tyrogue",
+    "Hitmonlee"
+  ],
+  "Hitmonchan": [
+    "Tyrogue",
+    "Hitmonchan"
+  ],
+  "Hitmontop": [
+    "Tyrogue",
+    "Hitmontop"
+  ],
+  "Lickilicky": [
+    "Lickitung",
+    "Lickilicky"
+  ],
+  "Weezing": [
+    "Koffing",
+    "Weezing"
+  ],
+  "Weezing (Shadow)": [
+    "Koffing (Shadow)",
+    "Weezing (Shadow)"
+  ],
+  "Rhyperior": [
+    "Rhyhorn",
+    "Rhydon",
+    "Rhyperior"
+  ],
+  "Rhyperior (Shadow)": [
+    "Rhyhorn (Shadow)",
+    "Rhydon (Shadow)",
+    "Rhyperior (Shadow)"
+  ],
+  "Blissey": [
+    "Happiny",
+    "Chansey",
+    "Blissey"
+  ],
+  "Tangrowth": [
+    "Tangela",
+    "Tangrowth"
+  ],
+  "Tangrowth (Shadow)": [
+    "Tangela (Shadow)",
+    "Tangrowth (Shadow)"
+  ],
+  "Kingdra": [
+    "Horsea",
+    "Seadra",
+    "Kingdra"
+  ],
+  "Kingdra (Shadow)": [
+    "Horsea (Shadow)",
+    "Seadra (Shadow)",
+    "Kingdra (Shadow)"
+  ],
+  "Seaking": [
+    "Goldeen",
+    "Seaking"
+  ],
+  "Starmie": [
+    "Staryu",
+    "Starmie"
+  ],
+  "Starmie (Shadow)": [
+    "Staryu (Shadow)",
+    "Starmie (Shadow)"
+  ],
+  "Mr. Mime": [
+    "Mime (Jr)",
+    "Mr. Mime"
+  ],
+  "Scizor": [
+    "Scyther",
+    "Scizor"
+  ],
+  "Kleavor": [
+    "Scyther",
+    "Kleavor"
+  ],
+  "Scizor (Shadow)": [
+    "Scyther (Shadow)",
+    "Scizor (Shadow)"
+  ],
+  "Jynx": [
+    "Smoochum",
+    "Jynx"
+  ],
+  "Electivire": [
+    "Elekid",
+    "Electabuzz",
+    "Electivire"
+  ],
+  "Magmortar": [
+    "Magby",
+    "Magmar",
+    "Magmortar"
+  ],
+  "Gyarados": [
+    "Magikarp",
+    "Gyarados"
+  ],
+  "Gyarados (Shadow)": [
+    "Magikarp (Shadow)",
+    "Gyarados (Shadow)"
+  ],
+  "Vaporeon": [
+    "Eevee",
+    "Vaporeon"
+  ],
+  "Jolteon": [
+    "Eevee",
+    "Jolteon"
+  ],
+  "Flareon": [
+    "Eevee",
+    "Flareon"
+  ],
+  "Espeon": [
+    "Eevee",
+    "Espeon"
+  ],
+  "Umbreon": [
+    "Eevee",
+    "Umbreon"
+  ],
+  "Leafeon": [
+    "Eevee",
+    "Leafeon"
+  ],
+  "Glaceon": [
+    "Eevee",
+    "Glaceon"
+  ],
+  "Sylveon": [
+    "Eevee",
+    "Sylveon"
+  ],
+  "Porygon-Z": [
+    "Porygon",
+    "Porygon2",
+    "Porygon-Z"
+  ],
+  "Porygon-Z (Shadow)": [
+    "Porygon (Shadow)",
+    "Porygon2 (Shadow)",
+    "Porygon-Z (Shadow)"
+  ],
+  "Omastar": [
+    "Omanyte",
+    "Omastar"
+  ],
+  "Omastar (Shadow)": [
+    "Omanyte (Shadow)",
+    "Omastar (Shadow)"
+  ],
+  "Kabutops": [
+    "Kabuto",
+    "Kabutops"
+  ],
+  "Kabutops (Shadow)": [
+    "Kabuto (Shadow)",
+    "Kabutops (Shadow)"
+  ],
+  "Snorlax": [
+    "Munchlax",
+    "Snorlax"
+  ],
+  "Dragonite": [
+    "Dratini",
+    "Dragonair",
+    "Dragonite"
+  ],
+  "Dragonite (Shadow)": [
+    "Dratini (Shadow)",
+    "Dragonair (Shadow)",
+    "Dragonite (Shadow)"
+  ],
+  "Meganium": [
+    "Chikorita",
+    "Bayleef",
+    "Meganium"
+  ],
+  "Meganium (Shadow)": [
+    "Chikorita (Shadow)",
+    "Bayleef (Shadow)",
+    "Meganium (Shadow)"
+  ],
+  "Typhlosion": [
+    "Cyndaquil",
+    "Quilava",
+    "Typhlosion"
+  ],
+  "Typhlosion (Shadow)": [
+    "Cyndaquil (Shadow)",
+    "Quilava (Shadow)",
+    "Typhlosion (Shadow)"
+  ],
+  "Feraligatr": [
+    "Totodile",
+    "Croconaw",
+    "Feraligatr"
+  ],
+  "Feraligatr (Shadow)": [
+    "Totodile (Shadow)",
+    "Croconaw (Shadow)",
+    "Feraligatr (Shadow)"
+  ],
+  "Furret": [
+    "Sentret",
+    "Furret"
+  ],
+  "Noctowl": [
+    "Hoothoot",
+    "Noctowl"
+  ],
+  "Ledian": [
+    "Ledyba",
+    "Ledian"
+  ],
+  "Ledian (Shadow)": [
+    "Ledyba (Shadow)",
+    "Ledian (Shadow)"
+  ],
+  "Ariados": [
+    "Spinarak",
+    "Ariados"
+  ],
+  "Lanturn": [
+    "Chinchou",
+    "Lanturn"
+  ],
+  "Togekiss": [
+    "Togepi",
+    "Togetic",
+    "Togekiss"
+  ],
+  "Xatu": [
+    "Natu",
+    "Xatu"
+  ],
+  "Xatu (Shadow)": [
+    "Natu (Shadow)",
+    "Xatu (Shadow)"
+  ],
+  "Ampharos": [
+    "Mareep",
+    "Flaaffy",
+    "Ampharos"
+  ],
+  "Ampharos (Shadow)": [
+    "Mareep (Shadow)",
+    "Flaaffy (Shadow)",
+    "Ampharos (Shadow)"
+  ],
+  "Azumarill": [
+    "Azurill",
+    "Marill",
+    "Azumarill"
+  ],
+  "Sudowoodo": [
+    "Bonsly",
+    "Sudowoodo"
+  ],
+  "Jumpluff": [
+    "Hoppip",
+    "Skiploom",
+    "Jumpluff"
+  ],
+  "Jumpluff (Shadow)": [
+    "Hoppip (Shadow)",
+    "Skiploom (Shadow)",
+    "Jumpluff (Shadow)"
+  ],
+  "Ambipom": [
+    "Aipom",
+    "Ambipom"
+  ],
+  "Ambipom (Shadow)": [
+    "Aipom (Shadow)",
+    "Ambipom (Shadow)"
+  ],
+  "Sunflora": [
+    "Sunkern",
+    "Sunflora"
+  ],
+  "Yanmega": [
+    "Yanma",
+    "Yanmega"
+  ],
+  "Quagsire": [
+    "Wooper",
+    "Quagsire"
+  ],
+  "Quagsire (Shadow)": [
+    "Wooper (Shadow)",
+    "Quagsire (Shadow)"
+  ],
+  "Clodsire": [
+    "Wooper (Paldean)",
+    "Clodsire"
+  ],
+  "Honchkrow": [
+    "Murkrow",
+    "Honchkrow"
+  ],
+  "Honchkrow (Shadow)": [
+    "Murkrow (Shadow)",
+    "Honchkrow (Shadow)"
+  ],
+  "Mismagius": [
+    "Misdreavus",
+    "Mismagius"
+  ],
+  "Mismagius (Shadow)": [
+    "Misdreavus (Shadow)",
+    "Mismagius (Shadow)"
+  ],
+  "Wobbuffet": [
+    "Wynaut",
+    "Wobbuffet"
+  ],
+  "Farigiraf": [
+    "Girafarig",
+    "Farigiraf"
+  ],
+  "Forretress": [
+    "Pineco",
+    "Forretress"
+  ],
+  "Forretress (Shadow)": [
+    "Pineco (Shadow)",
+    "Forretress (Shadow)"
+  ],
+  "Dudunsparce": [
+    "Dunsparce",
+    "Dudunsparce"
+  ],
+  "Gliscor": [
+    "Gligar",
+    "Gliscor"
+  ],
+  "Gliscor (Shadow)": [
+    "Gligar (Shadow)",
+    "Gliscor (Shadow)"
+  ],
+  "Granbull": [
+    "Snubbull",
+    "Granbull"
+  ],
+  "Granbull (Shadow)": [
+    "Snubbull (Shadow)",
+    "Granbull (Shadow)"
+  ],
+  "Overqwil": [
+    "Qwilfish (Hisuian)",
+    "Overqwil"
+  ],
+  "Weavile": [
+    "Sneasel",
+    "Weavile"
+  ],
+  "Sneasler": [
+    "Sneasel (Hisuian)",
+    "Sneasler"
+  ],
+  "Sneasler (Shadow)": [
+    "Sneasel (Hisuian) (Shadow)",
+    "Sneasler (Shadow)"
+  ],
+  "Weavile (Shadow)": [
+    "Sneasel (Shadow)",
+    "Weavile (Shadow)"
+  ],
+  "Ursaluna": [
+    "Teddiursa",
+    "Ursaring",
+    "Ursaluna"
+  ],
+  "Ursaluna (Shadow)": [
+    "Teddiursa (Shadow)",
+    "Ursaring (Shadow)",
+    "Ursaluna (Shadow)"
+  ],
+  "Magcargo": [
+    "Slugma",
+    "Magcargo"
+  ],
+  "Mamoswine": [
+    "Swinub",
+    "Piloswine",
+    "Mamoswine"
+  ],
+  "Mamoswine (Shadow)": [
+    "Swinub (Shadow)",
+    "Piloswine (Shadow)",
+    "Mamoswine (Shadow)"
+  ],
+  "Octillery": [
+    "Remoraid",
+    "Octillery"
+  ],
+  "Mantine": [
+    "Mantyke",
+    "Mantine"
+  ],
+  "Houndoom": [
+    "Houndour",
+    "Houndoom"
+  ],
+  "Houndoom (Shadow)": [
+    "Houndour (Shadow)",
+    "Houndoom (Shadow)"
+  ],
+  "Donphan": [
+    "Phanpy",
+    "Donphan"
+  ],
+  "Donphan (Shadow)": [
+    "Phanpy (Shadow)",
+    "Donphan (Shadow)"
+  ],
+  "Wyrdeer": [
+    "Stantler",
+    "Wyrdeer"
+  ],
+  "Tyranitar": [
+    "Larvitar",
+    "Pupitar",
+    "Tyranitar"
+  ],
+  "Tyranitar (Shadow)": [
+    "Larvitar (Shadow)",
+    "Pupitar (Shadow)",
+    "Tyranitar (Shadow)"
+  ],
+  "Sceptile": [
+    "Treecko",
+    "Grovyle",
+    "Sceptile"
+  ],
+  "Sceptile (Shadow)": [
+    "Treecko (Shadow)",
+    "Grovyle (Shadow)",
+    "Sceptile (Shadow)"
+  ],
+  "Blaziken": [
+    "Torchic",
+    "Combusken",
+    "Blaziken"
+  ],
+  "Blaziken (Shadow)": [
+    "Torchic (Shadow)",
+    "Combusken (Shadow)",
+    "Blaziken (Shadow)"
+  ],
+  "Swampert": [
+    "Mudkip",
+    "Marshtomp",
+    "Swampert"
+  ],
+  "Swampert (Shadow)": [
+    "Mudkip (Shadow)",
+    "Marshtomp (Shadow)",
+    "Swampert (Shadow)"
+  ],
+  "Mightyena": [
+    "Poochyena",
+    "Mightyena"
+  ],
+  "Mightyena (Shadow)": [
+    "Poochyena (Shadow)",
+    "Mightyena (Shadow)"
+  ],
+  "Linoone": [
+    "Zigzagoon",
+    "Linoone"
+  ],
+  "Obstagoon": [
+    "Zigzagoon (Galarian)",
+    "Linoone (Galarian)",
+    "Obstagoon"
+  ],
+  "Obstagoon (Shadow)": [
+    "Zigzagoon (Galarian) (Shadow)",
+    "Linoone (Galarian) (Shadow)",
+    "Obstagoon (Shadow)"
+  ],
+  "Beautifly": [
+    "Wurmple",
+    "Silcoon",
+    "Beautifly"
+  ],
+  "Dustox": [
+    "Wurmple",
+    "Cascoon",
+    "Dustox"
+  ],
+  "Ludicolo": [
+    "Lotad",
+    "Lombre",
+    "Ludicolo"
+  ],
+  "Shiftry": [
+    "Seedot",
+    "Nuzleaf",
+    "Shiftry"
+  ],
+  "Shiftry (Shadow)": [
+    "Seedot (Shadow)",
+    "Nuzleaf (Shadow)",
+    "Shiftry (Shadow)"
+  ],
+  "Swellow": [
+    "Taillow",
+    "Swellow"
+  ],
+  "Swellow (Shadow)": [
+    "Taillow (Shadow)",
+    "Swellow (Shadow)"
+  ],
+  "Pelipper": [
+    "Wingull",
+    "Pelipper"
+  ],
+  "Gallade": [
+    "Ralts",
+    "Kirlia",
+    "Gallade"
+  ],
+  "Gardevoir": [
+    "Ralts",
+    "Kirlia",
+    "Gardevoir"
+  ],
+  "Gallade (Shadow)": [
+    "Ralts (Shadow)",
+    "Kirlia (Shadow)",
+    "Gallade (Shadow)"
+  ],
+  "Gardevoir (Shadow)": [
+    "Ralts (Shadow)",
+    "Kirlia (Shadow)",
+    "Gardevoir (Shadow)"
+  ],
+  "Masquerain": [
+    "Surskit",
+    "Masquerain"
+  ],
+  "Breloom": [
+    "Shroomish",
+    "Breloom"
+  ],
+  "Slaking": [
+    "Slakoth",
+    "Vigoroth",
+    "Slaking"
+  ],
+  "Slaking (Shadow)": [
+    "Slakoth (Shadow)",
+    "Vigoroth (Shadow)",
+    "Slaking (Shadow)"
+  ],
+  "Ninjask": [
+    "Nincada",
+    "Ninjask"
+  ],
+  "Exploud": [
+    "Whismur",
+    "Loudred",
+    "Exploud"
+  ],
+  "Exploud (Shadow)": [
+    "Whismur (Shadow)",
+    "Loudred (Shadow)",
+    "Exploud (Shadow)"
+  ],
+  "Hariyama": [
+    "Makuhita",
+    "Hariyama"
+  ],
+  "Hariyama (Shadow)": [
+    "Makuhita (Shadow)",
+    "Hariyama (Shadow)"
+  ],
+  "Probopass": [
+    "Nosepass",
+    "Probopass"
+  ],
+  "Probopass (Shadow)": [
+    "Nosepass (Shadow)",
+    "Probopass (Shadow)"
+  ],
+  "Delcatty": [
+    "Skitty",
+    "Delcatty"
+  ],
+  "Aggron": [
+    "Aron",
+    "Lairon",
+    "Aggron"
+  ],
+  "Aggron (Shadow)": [
+    "Aron (Shadow)",
+    "Lairon (Shadow)",
+    "Aggron (Shadow)"
+  ],
+  "Medicham": [
+    "Meditite",
+    "Medicham"
+  ],
+  "Manectric": [
+    "Electrike",
+    "Manectric"
+  ],
+  "Manectric (Shadow)": [
+    "Electrike (Shadow)",
+    "Manectric (Shadow)"
+  ],
+  "Roserade": [
+    "Budew",
+    "Roselia",
+    "Roserade"
+  ],
+  "Swalot": [
+    "Gulpin",
+    "Swalot"
+  ],
+  "Sharpedo": [
+    "Carvanha",
+    "Sharpedo"
+  ],
+  "Sharpedo (Shadow)": [
+    "Carvanha (Shadow)",
+    "Sharpedo (Shadow)"
+  ],
+  "Wailord": [
+    "Wailmer",
+    "Wailord"
+  ],
+  "Wailord (Shadow)": [
+    "Wailmer (Shadow)",
+    "Wailord (Shadow)"
+  ],
+  "Camerupt": [
+    "Numel",
+    "Camerupt"
+  ],
+  "Camerupt (Shadow)": [
+    "Numel (Shadow)",
+    "Camerupt (Shadow)"
+  ],
+  "Grumpig": [
+    "Spoink",
+    "Grumpig"
+  ],
+  "Grumpig (Shadow)": [
+    "Spoink (Shadow)",
+    "Grumpig (Shadow)"
+  ],
+  "Flygon": [
+    "Trapinch",
+    "Vibrava",
+    "Flygon"
+  ],
+  "Flygon (Shadow)": [
+    "Trapinch (Shadow)",
+    "Vibrava (Shadow)",
+    "Flygon (Shadow)"
+  ],
+  "Cacturne": [
+    "Cacnea",
+    "Cacturne"
+  ],
+  "Cacturne (Shadow)": [
+    "Cacnea (Shadow)",
+    "Cacturne (Shadow)"
+  ],
+  "Altaria": [
+    "Swablu",
+    "Altaria"
+  ],
+  "Altaria (Shadow)": [
+    "Swablu (Shadow)",
+    "Altaria (Shadow)"
+  ],
+  "Whiscash": [
+    "Barboach",
+    "Whiscash"
+  ],
+  "Whiscash (Shadow)": [
+    "Barboach (Shadow)",
+    "Whiscash (Shadow)"
+  ],
+  "Crawdaunt": [
+    "Corphish",
+    "Crawdaunt"
+  ],
+  "Crawdaunt (Shadow)": [
+    "Corphish (Shadow)",
+    "Crawdaunt (Shadow)"
+  ],
+  "Claydol": [
+    "Baltoy",
+    "Claydol"
+  ],
+  "Claydol (Shadow)": [
+    "Baltoy (Shadow)",
+    "Claydol (Shadow)"
+  ],
+  "Cradily": [
+    "Lileep",
+    "Cradily"
+  ],
+  "Cradily (Shadow)": [
+    "Lileep (Shadow)",
+    "Cradily (Shadow)"
+  ],
+  "Armaldo": [
+    "Anorith",
+    "Armaldo"
+  ],
+  "Armaldo (Shadow)": [
+    "Anorith (Shadow)",
+    "Armaldo (Shadow)"
+  ],
+  "Milotic": [
+    "Feebas",
+    "Milotic"
+  ],
+  "Milotic (Shadow)": [
+    "Feebas (Shadow)",
+    "Milotic (Shadow)"
+  ],
+  "Banette": [
+    "Shuppet",
+    "Banette"
+  ],
+  "Banette (Shadow)": [
+    "Shuppet (Shadow)",
+    "Banette (Shadow)"
+  ],
+  "Dusknoir": [
+    "Duskull",
+    "Dusclops",
+    "Dusknoir"
+  ],
+  "Dusknoir (Shadow)": [
+    "Duskull (Shadow)",
+    "Dusclops (Shadow)",
+    "Dusknoir (Shadow)"
+  ],
+  "Chimecho": [
+    "Chingling",
+    "Chimecho"
+  ],
+  "Froslass": [
+    "Snorunt",
+    "Froslass"
+  ],
+  "Glalie": [
+    "Snorunt",
+    "Glalie"
+  ],
+  "Froslass (Shadow)": [
+    "Snorunt (Shadow)",
+    "Froslass (Shadow)"
+  ],
+  "Glalie (Shadow)": [
+    "Snorunt (Shadow)",
+    "Glalie (Shadow)"
+  ],
+  "Walrein": [
+    "Spheal",
+    "Sealeo",
+    "Walrein"
+  ],
+  "Walrein (Shadow)": [
+    "Spheal (Shadow)",
+    "Sealeo (Shadow)",
+    "Walrein (Shadow)"
+  ],
+  "Huntail": [
+    "Clamperl",
+    "Huntail"
+  ],
+  "Gorebyss": [
+    "Clamperl",
+    "Gorebyss"
+  ],
+  "Salamence": [
+    "Bagon",
+    "Shelgon",
+    "Salamence"
+  ],
+  "Salamence (Shadow)": [
+    "Bagon (Shadow)",
+    "Shelgon (Shadow)",
+    "Salamence (Shadow)"
+  ],
+  "Metagross": [
+    "Beldum",
+    "Metang",
+    "Metagross"
+  ],
+  "Metagross (Shadow)": [
+    "Beldum (Shadow)",
+    "Metang (Shadow)",
+    "Metagross (Shadow)"
+  ],
+  "Torterra": [
+    "Turtwig",
+    "Grotle",
+    "Torterra"
+  ],
+  "Torterra (Shadow)": [
+    "Turtwig (Shadow)",
+    "Grotle (Shadow)",
+    "Torterra (Shadow)"
+  ],
+  "Infernape": [
+    "Chimchar",
+    "Monferno",
+    "Infernape"
+  ],
+  "Infernape (Shadow)": [
+    "Chimchar (Shadow)",
+    "Monferno (Shadow)",
+    "Infernape (Shadow)"
+  ],
+  "Empoleon": [
+    "Piplup",
+    "Prinplup",
+    "Empoleon"
+  ],
+  "Empoleon (Shadow)": [
+    "Piplup (Shadow)",
+    "Prinplup (Shadow)",
+    "Empoleon (Shadow)"
+  ],
+  "Staraptor": [
+    "Starly",
+    "Staravia",
+    "Staraptor"
+  ],
+  "Staraptor (Shadow)": [
+    "Starly (Shadow)",
+    "Staravia (Shadow)",
+    "Staraptor (Shadow)"
+  ],
+  "Bibarel": [
+    "Bidoof",
+    "Bibarel"
+  ],
+  "Bibarel (Shadow)": [
+    "Bidoof (Shadow)",
+    "Bibarel (Shadow)"
+  ],
+  "Kricketune": [
+    "Kricketot",
+    "Kricketune"
+  ],
+  "Luxray": [
+    "Shinx",
+    "Luxio",
+    "Luxray"
+  ],
+  "Luxray (Shadow)": [
+    "Shinx (Shadow)",
+    "Luxio (Shadow)",
+    "Luxray (Shadow)"
+  ],
+  "Rampardos": [
+    "Cranidos",
+    "Rampardos"
+  ],
+  "Rampardos (Shadow)": [
+    "Cranidos (Shadow)",
+    "Rampardos (Shadow)"
+  ],
+  "Bastiodon": [
+    "Shieldon",
+    "Bastiodon"
+  ],
+  "Bastiodon (Shadow)": [
+    "Shieldon (Shadow)",
+    "Bastiodon (Shadow)"
+  ],
+  "Wormadam (Plant)": [
+    "Burmy (Plant)",
+    "Wormadam (Plant)"
+  ],
+  "Mothim": [
+    "Burmy (Trash)",
+    "Mothim"
+  ],
+  "Wormadam (Sandy)": [
+    "Burmy (Sandy)",
+    "Wormadam (Sandy)"
+  ],
+  "Wormadam (Trash)": [
+    "Burmy (Trash)",
+    "Wormadam (Trash)"
+  ],
+  "Vespiquen": [
+    "Combee",
+    "Vespiquen"
+  ],
+  "Floatzel": [
+    "Buizel",
+    "Floatzel"
+  ],
+  "Cherrim (Overcast)": [
+    "Cherubi",
+    "Cherrim (Overcast)"
+  ],
+  "Cherrim (Sunshine)": [
+    "Cherubi",
+    "Cherrim (Sunshine)"
+  ],
+  "Drifblim": [
+    "Drifloon",
+    "Drifblim"
+  ],
+  "Drifblim (Shadow)": [
+    "Drifloon (Shadow)",
+    "Drifblim (Shadow)"
+  ],
+  "Lopunny": [
+    "Buneary",
+    "Lopunny"
+  ],
+  "Purugly": [
+    "Glameow",
+    "Purugly"
+  ],
+  "Purugly (Shadow)": [
+    "Glameow (Shadow)",
+    "Purugly (Shadow)"
+  ],
+  "Skuntank": [
+    "Stunky",
+    "Skuntank"
+  ],
+  "Skuntank (Shadow)": [
+    "Stunky (Shadow)",
+    "Skuntank (Shadow)"
+  ],
+  "Bronzong": [
+    "Bronzor",
+    "Bronzong"
+  ],
+  "Garchomp": [
+    "Gible",
+    "Gabite",
+    "Garchomp"
+  ],
+  "Garchomp (Shadow)": [
+    "Gible (Shadow)",
+    "Gabite (Shadow)",
+    "Garchomp (Shadow)"
+  ],
+  "Lucario": [
+    "Riolu",
+    "Lucario"
+  ],
+  "Hippowdon": [
+    "Hippopotas",
+    "Hippowdon"
+  ],
+  "Hippowdon (Shadow)": [
+    "Hippopotas (Shadow)",
+    "Hippowdon (Shadow)"
+  ],
+  "Drapion": [
+    "Skorupi",
+    "Drapion"
+  ],
+  "Drapion (Shadow)": [
+    "Skorupi (Shadow)",
+    "Drapion (Shadow)"
+  ],
+  "Toxicroak": [
+    "Croagunk",
+    "Toxicroak"
+  ],
+  "Toxicroak (Shadow)": [
+    "Croagunk (Shadow)",
+    "Toxicroak (Shadow)"
+  ],
+  "Lumineon": [
+    "Finneon",
+    "Lumineon"
+  ],
+  "Abomasnow": [
+    "Snover",
+    "Abomasnow"
+  ],
+  "Abomasnow (Shadow)": [
+    "Snover (Shadow)",
+    "Abomasnow (Shadow)"
+  ],
+  "Serperior": [
+    "Snivy",
+    "Servine",
+    "Serperior"
+  ],
+  "Serperior (Shadow)": [
+    "Snivy (Shadow)",
+    "Servine (Shadow)",
+    "Serperior (Shadow)"
+  ],
+  "Emboar": [
+    "Tepig",
+    "Pignite",
+    "Emboar"
+  ],
+  "Emboar (Shadow)": [
+    "Tepig (Shadow)",
+    "Pignite (Shadow)",
+    "Emboar (Shadow)"
+  ],
+  "Samurott": [
+    "Oshawott",
+    "Dewott",
+    "Samurott"
+  ],
+  "Samurott (Shadow)": [
+    "Oshawott (Shadow)",
+    "Dewott (Shadow)",
+    "Samurott (Shadow)"
+  ],
+  "Watchog": [
+    "Patrat",
+    "Watchog"
+  ],
+  "Watchog (Shadow)": [
+    "Patrat (Shadow)",
+    "Watchog (Shadow)"
+  ],
+  "Stoutland": [
+    "Lillipup",
+    "Herdier",
+    "Stoutland"
+  ],
+  "Liepard": [
+    "Purrloin",
+    "Liepard"
+  ],
+  "Liepard (Shadow)": [
+    "Purrloin (Shadow)",
+    "Liepard (Shadow)"
+  ],
+  "Simisage": [
+    "Pansage",
+    "Simisage"
+  ],
+  "Simisear": [
+    "Pansear",
+    "Simisear"
+  ],
+  "Simipour": [
+    "Panpour",
+    "Simipour"
+  ],
+  "Musharna": [
+    "Munna",
+    "Musharna"
+  ],
+  "Unfezant": [
+    "Pidove",
+    "Tranquill",
+    "Unfezant"
+  ],
+  "Unfezant (Shadow)": [
+    "Pidove (Shadow)",
+    "Tranquill (Shadow)",
+    "Unfezant (Shadow)"
+  ],
+  "Zebstrika": [
+    "Blitzle",
+    "Zebstrika"
+  ],
+  "Zebstrika (Shadow)": [
+    "Blitzle (Shadow)",
+    "Zebstrika (Shadow)"
+  ],
+  "Gigalith": [
+    "Roggenrola",
+    "Boldore",
+    "Gigalith"
+  ],
+  "Gigalith (Shadow)": [
+    "Roggenrola (Shadow)",
+    "Boldore (Shadow)",
+    "Gigalith (Shadow)"
+  ],
+  "Swoobat": [
+    "Woobat",
+    "Swoobat"
+  ],
+  "Excadrill": [
+    "Drilbur",
+    "Excadrill"
+  ],
+  "Excadrill (Shadow)": [
+    "Drilbur (Shadow)",
+    "Excadrill (Shadow)"
+  ],
+  "Conkeldurr": [
+    "Timburr",
+    "Gurdurr",
+    "Conkeldurr"
+  ],
+  "Conkeldurr (Shadow)": [
+    "Timburr (Shadow)",
+    "Gurdurr (Shadow)",
+    "Conkeldurr (Shadow)"
+  ],
+  "Seismitoad": [
+    "Tympole",
+    "Palpitoad",
+    "Seismitoad"
+  ],
+  "Leavanny": [
+    "Sewaddle",
+    "Swadloon",
+    "Leavanny"
+  ],
+  "Scolipede": [
+    "Venipede",
+    "Whirlipede",
+    "Scolipede"
+  ],
+  "Scolipede (Shadow)": [
+    "Venipede (Shadow)",
+    "Whirlipede (Shadow)",
+    "Scolipede (Shadow)"
+  ],
+  "Whimsicott": [
+    "Cottonee",
+    "Whimsicott"
+  ],
+  "Lilligant": [
+    "Petilil",
+    "Lilligant"
+  ],
+  "Basculegion (Female)": [
+    "Basculin",
+    "Basculegion (Female)"
+  ],
+  "Basculegion (Male)": [
+    "Basculin",
+    "Basculegion (Male)"
+  ],
+  "Krookodile": [
+    "Sandile",
+    "Krokorok",
+    "Krookodile"
+  ],
+  "Darmanitan (Standard)": [
+    "Darumaka",
+    "Darmanitan (Standard)"
+  ],
+  "Darmanitan (Galarian)": [
+    "Darumaka (Galarian)",
+    "Darmanitan (Galarian)"
+  ],
+  "Darmanitan (Standard) (Shadow)": [
+    "Darumaka (Shadow)",
+    "Darmanitan (Standard) (Shadow)"
+  ],
+  "Crustle": [
+    "Dwebble",
+    "Crustle"
+  ],
+  "Crustle (Shadow)": [
+    "Dwebble (Shadow)",
+    "Crustle (Shadow)"
+  ],
+  "Scrafty": [
+    "Scraggy",
+    "Scrafty"
+  ],
+  "Cofagrigus": [
+    "Yamask",
+    "Cofagrigus"
+  ],
+  "Runerigus": [
+    "Yamask (Galarian)",
+    "Runerigus"
+  ],
+  "Cofagrigus (Shadow)": [
+    "Yamask (Shadow)",
+    "Cofagrigus (Shadow)"
+  ],
+  "Carracosta": [
+    "Tirtouga",
+    "Carracosta"
+  ],
+  "Carracosta (Shadow)": [
+    "Tirtouga (Shadow)",
+    "Carracosta (Shadow)"
+  ],
+  "Archeops": [
+    "Archen",
+    "Archeops"
+  ],
+  "Archeops (Shadow)": [
+    "Archen (Shadow)",
+    "Archeops (Shadow)"
+  ],
+  "Garbodor": [
+    "Trubbish",
+    "Garbodor"
+  ],
+  "Garbodor (Shadow)": [
+    "Trubbish (Shadow)",
+    "Garbodor (Shadow)"
+  ],
+  "Zoroark": [
+    "Zorua",
+    "Zoroark"
+  ],
+  "Zoroark (Hisuian)": [
+    "Zorua (Hisuian)",
+    "Zoroark (Hisuian)"
+  ],
+  "Cinccino": [
+    "Minccino",
+    "Cinccino"
+  ],
+  "Gothitelle": [
+    "Gothita",
+    "Gothorita",
+    "Gothitelle"
+  ],
+  "Gothitelle (Shadow)": [
+    "Gothita (Shadow)",
+    "Gothorita (Shadow)",
+    "Gothitelle (Shadow)"
+  ],
+  "Reuniclus": [
+    "Solosis",
+    "Duosion",
+    "Reuniclus"
+  ],
+  "Reuniclus (Shadow)": [
+    "Solosis (Shadow)",
+    "Duosion (Shadow)",
+    "Reuniclus (Shadow)"
+  ],
+  "Swanna": [
+    "Ducklett",
+    "Swanna"
+  ],
+  "Swanna (Shadow)": [
+    "Ducklett (Shadow)",
+    "Swanna (Shadow)"
+  ],
+  "Vanilluxe": [
+    "Vanillite",
+    "Vanillish",
+    "Vanilluxe"
+  ],
+  "Sawsbuck": [
+    "Deerling",
+    "Sawsbuck"
+  ],
+  "Escavalier": [
+    "Karrablast",
+    "Escavalier"
+  ],
+  "Escavalier (Shadow)": [
+    "Karrablast (Shadow)",
+    "Escavalier (Shadow)"
+  ],
+  "Amoonguss": [
+    "Foongus",
+    "Amoonguss"
+  ],
+  "Amoonguss (Shadow)": [
+    "Foongus (Shadow)",
+    "Amoonguss (Shadow)"
+  ],
+  "Jellicent": [
+    "Frillish",
+    "Jellicent"
+  ],
+  "Galvantula": [
+    "Joltik",
+    "Galvantula"
+  ],
+  "Galvantula (Shadow)": [
+    "Joltik (Shadow)",
+    "Galvantula (Shadow)"
+  ],
+  "Ferrothorn": [
+    "Ferroseed",
+    "Ferrothorn"
+  ],
+  "Ferrothorn (Shadow)": [
+    "Ferroseed (Shadow)",
+    "Ferrothorn (Shadow)"
+  ],
+  "Klinklang": [
+    "Klink",
+    "Klang",
+    "Klinklang"
+  ],
+  "Eelektross": [
+    "Tynamo",
+    "Eelektrik",
+    "Eelektross"
+  ],
+  "Beheeyem": [
+    "Elgyem",
+    "Beheeyem"
+  ],
+  "Chandelure": [
+    "Litwick",
+    "Lampent",
+    "Chandelure"
+  ],
+  "Chandelure (Shadow)": [
+    "Litwick (Shadow)",
+    "Lampent (Shadow)",
+    "Chandelure (Shadow)"
+  ],
+  "Haxorus": [
+    "Axew",
+    "Fraxure",
+    "Haxorus"
+  ],
+  "Beartic": [
+    "Cubchoo",
+    "Beartic"
+  ],
+  "Accelgor": [
+    "Shelmet",
+    "Accelgor"
+  ],
+  "Accelgor (Shadow)": [
+    "Shelmet (Shadow)",
+    "Accelgor (Shadow)"
+  ],
+  "Mienshao": [
+    "Mienfoo",
+    "Mienshao"
+  ],
+  "Golurk": [
+    "Golett",
+    "Golurk"
+  ],
+  "Golurk (Shadow)": [
+    "Golett (Shadow)",
+    "Golurk (Shadow)"
+  ],
+  "Kingambit": [
+    "Pawniard",
+    "Bisharp",
+    "Kingambit"
+  ],
+  "Braviary": [
+    "Rufflet",
+    "Braviary"
+  ],
+  "Mandibuzz": [
+    "Vullaby",
+    "Mandibuzz"
+  ],
+  "Hydreigon": [
+    "Deino",
+    "Zweilous",
+    "Hydreigon"
+  ],
+  "Hydreigon (Shadow)": [
+    "Deino (Shadow)",
+    "Zweilous (Shadow)",
+    "Hydreigon (Shadow)"
+  ],
+  "Volcarona": [
+    "Larvesta",
+    "Volcarona"
+  ],
+  "Chesnaught": [
+    "Chespin",
+    "Quilladin",
+    "Chesnaught"
+  ],
+  "Chesnaught (Shadow)": [
+    "Chespin (Shadow)",
+    "Quilladin (Shadow)",
+    "Chesnaught (Shadow)"
+  ],
+  "Delphox": [
+    "Fennekin",
+    "Braixen",
+    "Delphox"
+  ],
+  "Delphox (Shadow)": [
+    "Fennekin (Shadow)",
+    "Braixen (Shadow)",
+    "Delphox (Shadow)"
+  ],
+  "Greninja": [
+    "Froakie",
+    "Frogadier",
+    "Greninja"
+  ],
+  "Greninja (Shadow)": [
+    "Froakie (Shadow)",
+    "Frogadier (Shadow)",
+    "Greninja (Shadow)"
+  ],
+  "Diggersby": [
+    "Bunnelby",
+    "Diggersby"
+  ],
+  "Diggersby (Shadow)": [
+    "Bunnelby (Shadow)",
+    "Diggersby (Shadow)"
+  ],
+  "Talonflame": [
+    "Fletchling",
+    "Fletchinder",
+    "Talonflame"
+  ],
+  "Talonflame (Shadow)": [
+    "Fletchling (Shadow)",
+    "Fletchinder (Shadow)",
+    "Talonflame (Shadow)"
+  ],
+  "Vivillon": [
+    "Scatterbug",
+    "Spewpa",
+    "Vivillon"
+  ],
+  "Pyroar": [
+    "Litleo",
+    "Pyroar"
+  ],
+  "Florges": [
+    "Flabebe",
+    "Floette",
+    "Florges"
+  ],
+  "Gogoat": [
+    "Skiddo",
+    "Gogoat"
+  ],
+  "Pangoro": [
+    "Pancham",
+    "Pangoro"
+  ],
+  "Meowstic (Male)": [
+    "Espurr",
+    "Meowstic (Male)"
+  ],
+  "Aegislash (Shield)": [
+    "Honedge",
+    "Doublade",
+    "Aegislash (Shield)"
+  ],
+  "Aromatisse": [
+    "Spritzee",
+    "Aromatisse"
+  ],
+  "Slurpuff": [
+    "Swirlix",
+    "Slurpuff"
+  ],
+  "Malamar": [
+    "Inkay",
+    "Malamar"
+  ],
+  "Malamar (Shadow)": [
+    "Inkay (Shadow)",
+    "Malamar (Shadow)"
+  ],
+  "Barbaracle": [
+    "Binacle",
+    "Barbaracle"
+  ],
+  "Dragalge": [
+    "Skrelp",
+    "Dragalge"
+  ],
+  "Clawitzer": [
+    "Clauncher",
+    "Clawitzer"
+  ],
+  "Heliolisk": [
+    "Helioptile",
+    "Heliolisk"
+  ],
+  "Tyrantrum": [
+    "Tyrunt",
+    "Tyrantrum"
+  ],
+  "Tyrantrum (Shadow)": [
+    "Tyrunt (Shadow)",
+    "Tyrantrum (Shadow)"
+  ],
+  "Aurorus": [
+    "Amaura",
+    "Aurorus"
+  ],
+  "Aurorus (Shadow)": [
+    "Amaura (Shadow)",
+    "Aurorus (Shadow)"
+  ],
+  "Goodra": [
+    "Goomy",
+    "Sliggoo",
+    "Goodra"
+  ],
+  "Trevenant": [
+    "Phantump",
+    "Trevenant"
+  ],
+  "Trevenant (Shadow)": [
+    "Phantump (Shadow)",
+    "Trevenant (Shadow)"
+  ],
+  "Gourgeist (Average)": [
+    "Pumpkaboo (Average)",
+    "Gourgeist (Average)"
+  ],
+  "Gourgeist (Large)": [
+    "Pumpkaboo (Large)",
+    "Gourgeist (Large)"
+  ],
+  "Gourgeist (Small)": [
+    "Pumpkaboo (Small)",
+    "Gourgeist (Small)"
+  ],
+  "Gourgeist (Super)": [
+    "Pumpkaboo (Super)",
+    "Gourgeist (Super)"
+  ],
+  "Avalugg": [
+    "Bergmite",
+    "Avalugg"
+  ],
+  "Noivern": [
+    "Noibat",
+    "Noivern"
+  ],
+  "Decidueye": [
+    "Rowlet",
+    "Dartrix",
+    "Decidueye"
+  ],
+  "Incineroar": [
+    "Litten",
+    "Torracat",
+    "Incineroar"
+  ],
+  "Primarina": [
+    "Popplio",
+    "Brionne",
+    "Primarina"
+  ],
+  "Toucannon": [
+    "Pikipek",
+    "Trumbeak",
+    "Toucannon"
+  ],
+  "Toucannon (Shadow)": [
+    "Pikipek (Shadow)",
+    "Trumbeak (Shadow)",
+    "Toucannon (Shadow)"
+  ],
+  "Gumshoos": [
+    "Yungoos",
+    "Gumshoos"
+  ],
+  "Vikavolt": [
+    "Grubbin",
+    "Charjabug",
+    "Vikavolt"
+  ],
+  "Vikavolt (Shadow)": [
+    "Grubbin (Shadow)",
+    "Charjabug (Shadow)",
+    "Vikavolt (Shadow)"
+  ],
+  "Crabominable": [
+    "Crabrawler",
+    "Crabominable"
+  ],
+  "Ribombee": [
+    "Cutiefly",
+    "Ribombee"
+  ],
+  "Lycanroc (Midnight)": [
+    "Rockruff",
+    "Lycanroc (Midnight)"
+  ],
+  "Lycanroc (Midday)": [
+    "Rockruff",
+    "Lycanroc (Midday)"
+  ],
+  "Toxapex": [
+    "Mareanie",
+    "Toxapex"
+  ],
+  "Mudsdale": [
+    "Mudbray",
+    "Mudsdale"
+  ],
+  "Araquanid": [
+    "Dewpider",
+    "Araquanid"
+  ],
+  "Lurantis": [
+    "Fomantis",
+    "Lurantis"
+  ],
+  "Shiinotic": [
+    "Morelull",
+    "Shiinotic"
+  ],
+  "Salazzle": [
+    "Salandit",
+    "Salazzle"
+  ],
+  "Bewear": [
+    "Stufful",
+    "Bewear"
+  ],
+  "Tsareena": [
+    "Bounsweet",
+    "Steenee",
+    "Tsareena"
+  ],
+  "Golisopod": [
+    "Wimpod",
+    "Golisopod"
+  ],
+  "Palossand": [
+    "Sandygast",
+    "Palossand"
+  ],
+  "Kommo-o": [
+    "Jangmo-o",
+    "Hakamo-o",
+    "Kommo-o"
+  ],
+  "Solgaleo": [
+    "Cosmog",
+    "Cosmoem",
+    "Solgaleo"
+  ],
+  "Lunala": [
+    "Cosmog",
+    "Cosmoem",
+    "Lunala"
+  ],
+  "Naganadel": [
+    "Poipole",
+    "Naganadel"
+  ],
+  "Melmetal": [
+    "Meltan",
+    "Melmetal"
+  ],
+  "Rillaboom": [
+    "Grookey",
+    "Thwackey",
+    "Rillaboom"
+  ],
+  "Cinderace": [
+    "Scorbunny",
+    "Raboot",
+    "Cinderace"
+  ],
+  "Inteleon": [
+    "Sobble",
+    "Drizzile",
+    "Inteleon"
+  ],
+  "Greedent": [
+    "Skwovet",
+    "Greedent"
+  ],
+  "Corviknight": [
+    "Rookidee",
+    "Corvisquire",
+    "Corviknight"
+  ],
+  "Orbeetle": [
+    "Blipbug",
+    "Dottler",
+    "Orbeetle"
+  ],
+  "Thievul": [
+    "Nickit",
+    "Thievul"
+  ],
+  "Eldegoss": [
+    "Gossifleur",
+    "Eldegoss"
+  ],
+  "Dubwool": [
+    "Wooloo",
+    "Dubwool"
+  ],
+  "Drednaw": [
+    "Chewtle",
+    "Drednaw"
+  ],
+  "Boltund": [
+    "Yamper",
+    "Boltund"
+  ],
+  "Coalossal": [
+    "Rolycoly",
+    "Carkol",
+    "Coalossal"
+  ],
+  "Flapple": [
+    "Applin",
+    "Flapple"
+  ],
+  "Appletun": [
+    "Applin",
+    "Appletun"
+  ],
+  "Hydrapple": [
+    "Applin",
+    "Dipplin",
+    "Hydrapple"
+  ],
+  "Sandaconda": [
+    "Silicobra",
+    "Sandaconda"
+  ],
+  "Barraskewda": [
+    "Arrokuda",
+    "Barraskewda"
+  ],
+  "Toxtricity (Amped)": [
+    "Toxel",
+    "Toxtricity (Amped)"
+  ],
+  "Toxtricity (Low Key)": [
+    "Toxel",
+    "Toxtricity (Low Key)"
+  ],
+  "Centiskorch": [
+    "Sizzlipede",
+    "Centiskorch"
+  ],
+  "Grapploct": [
+    "Clobbopus",
+    "Grapploct"
+  ],
+  "Polteageist": [
+    "Sinistea",
+    "Polteageist"
+  ],
+  "Hatterene": [
+    "Hatenna",
+    "Hattrem",
+    "Hatterene"
+  ],
+  "Grimmsnarl": [
+    "Impidimp",
+    "Morgrem",
+    "Grimmsnarl"
+  ],
+  "Alcremie": [
+    "Milcery",
+    "Alcremie"
+  ],
+  "Frosmoth": [
+    "Snom",
+    "Frosmoth"
+  ],
+  "Copperajah": [
+    "Cufant",
+    "Copperajah"
+  ],
+  "Archaludon": [
+    "Duraludon",
+    "Archaludon"
+  ],
+  "Dragapult": [
+    "Dreepy",
+    "Drakloak",
+    "Dragapult"
+  ],
+  "Urshifu (Rapid Strike)": [
+    "Kubfu",
+    "Urshifu (Rapid Strike)"
+  ],
+  "Urshifu (Single Strike)": [
+    "Kubfu",
+    "Urshifu (Single Strike)"
+  ],
+  "Meowscarada": [
+    "Sprigatito",
+    "Floragato",
+    "Meowscarada"
+  ],
+  "Skeledirge": [
+    "Fuecoco",
+    "Crocalor",
+    "Skeledirge"
+  ],
+  "Quaquaval": [
+    "Quaxly",
+    "Quaxwell",
+    "Quaquaval"
+  ],
+  "Oinkologne": [
+    "Lechonk",
+    "Oinkologne"
+  ],
+  "Spidops": [
+    "Tarountula",
+    "Spidops"
+  ],
+  "Lokix": [
+    "Nymble",
+    "Lokix"
+  ],
+  "Pawmot": [
+    "Pawmi",
+    "Pawmo",
+    "Pawmot"
+  ],
+  "Maushold": [
+    "Tandemaus",
+    "Maushold"
+  ],
+  "Dachsbun": [
+    "Fidough",
+    "Dachsbun"
+  ],
+  "Arboliva": [
+    "Smoliv",
+    "Dolliv",
+    "Arboliva"
+  ],
+  "Garganacl": [
+    "Nacli",
+    "Naclstack",
+    "Garganacl"
+  ],
+  "Armarouge": [
+    "Charcadet",
+    "Armarouge"
+  ],
+  "Ceruledge": [
+    "Charcadet",
+    "Ceruledge"
+  ],
+  "Bellibolt": [
+    "Tadbulb",
+    "Bellibolt"
+  ],
+  "Kilowattrel": [
+    "Wattrel",
+    "Kilowattrel"
+  ],
+  "Mabosstiff": [
+    "Maschiff",
+    "Mabosstiff"
+  ],
+  "Grafaiai": [
+    "Shroodle",
+    "Grafaiai"
+  ],
+  "Brambleghast": [
+    "Bramblin",
+    "Brambleghast"
+  ],
+  "Toedscruel": [
+    "Toedscool",
+    "Toedscruel"
+  ],
+  "Scovillain": [
+    "Capsakid",
+    "Scovillain"
+  ],
+  "Rabsca": [
+    "Rellor",
+    "Rabsca"
+  ],
+  "Espathra": [
+    "Flittle",
+    "Espathra"
+  ],
+  "Tinkaton": [
+    "Tinkatink",
+    "Tinkatuff",
+    "Tinkaton"
+  ],
+  "Wugtrio": [
+    "Wiglett",
+    "Wugtrio"
+  ],
+  "Palafin": [
+    "Finizen",
+    "Palafin"
+  ],
+  "Revavroom": [
+    "Varoom",
+    "Revavroom"
+  ],
+  "Glimmora": [
+    "Glimmet",
+    "Glimmora"
+  ],
+  "Houndstone": [
+    "Greavard",
+    "Houndstone"
+  ],
+  "Cetitan": [
+    "Cetoddle",
+    "Cetitan"
+  ],
+  "Baxcalibur": [
+    "Frigibax",
+    "Arctibax",
+    "Baxcalibur"
+  ],
+  "Gholdengo": [
+    "Gimmighoul",
+    "Gholdengo"
+  ],
+  "Poltchageist": [
+    "Sinistcha",
+    "Poltchageist"
+  ]
+}

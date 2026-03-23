@@ -19,79 +19,15 @@ Each entry is:
 A value of 0 means "don't care" for that stat.
 """
 
-EVOLUTION_LINES = {
-    # Single-stage or no pre-evos needed
-    'Registeel': ['Registeel'],
-    'Lickitung': ['Lickitung'],
-    'Stunfisk (Galarian)': ['Stunfisk (Galarian)'],
-    'Tapu Fini': ['Tapu Fini'],
-    'Deoxys (Defense)': ['Deoxys (Defense)'],
-    'Carbink': ['Carbink'],
-    'Dunsparce': ['Dunsparce'],
-    'Dedenne': ['Dedenne'],
+import json
+from pathlib import Path
 
-    # Two-stage
-    'Medicham': ['Meditite', 'Medicham'],
-    'Walrein': ['Spheal', 'Sealeo', 'Walrein'],
-    'Azumarill': ['Azurill', 'Marill', 'Azumarill'],
-    'Trevenant': ['Phantump', 'Trevenant'],
-    'Corviknight': ['Rookidee', 'Corvisquire', 'Corviknight'],
-    'Whimsicott': ['Cottonee', 'Whimsicott'],
-    'Dewgong': ['Seel', 'Dewgong'],
-    'Sandslash': ['Sandshrew', 'Sandslash'],
-    'Sandslash (Alolan)': ['Sandshrew', 'Sandslash (Alolan)'],
-    'Swampert': ['Mudkip', 'Marshtomp', 'Swampert'],
-    'Jumpluff': ['Hoppip', 'Skiploom', 'Jumpluff'],
-    'Altaria': ['Swablu', 'Altaria'],
-    'Toxapex': ['Mareanie', 'Toxapex'],
-    'Toxicroak': ['Croagunk', 'Toxicroak'],
-    'Araquanid': ['Dewpider', 'Araquanid'],
-    'Quagsire': ['Wooper', 'Quagsire'],
-    'Clodsire': ['Wooper (Paldean)', 'Clodsire'],
-    'Noctowl': ['Hoothoot', 'Noctowl'],
-    'Lanturn': ['Chinchou', 'Lanturn'],
-    'Froslass': ['Snorunt', 'Froslass'],
-    'Dubwool': ['Wooloo', 'Dubwool'],
-    'Goodra': ['Goomy', 'Sliggoo', 'Goodra'],
-    'Marowak (Alolan)': ['Cubone', 'Marowak (Alolan)'],
-    'Cofagrigus': ['Yamask', 'Cofagrigus'],
-    'Runerigus': ['Yamask (Galarian)', 'Runerigus'],
-    'Slowbro': ['Slowpoke', 'Slowbro'],
-    'Slowking': ['Slowpoke', 'Slowking'],
-    'Slowbro (Galarian)': ['Slowpoke (Galarian)', 'Slowbro (Galarian)'],
-    'Slowking (Galarian)': ['Slowpoke (Galarian)', 'Slowking (Galarian)'],
-    'Charjabug': ['Grubbin', 'Charjabug'],
-    'Vikavolt': ['Grubbin', 'Charjabug', 'Vikavolt'],
+def _load_evolution_lines():
+    json_path = Path(__file__).parent / 'evolution_lines.json'
+    return json.loads(json_path.read_text())
 
-    # Three-stage
-    'Venusaur': ['Bulbasaur', 'Ivysaur', 'Venusaur'],
-    'Chesnaught': ['Chespin', 'Quilladin', 'Chesnaught'],
-    'Greninja': ['Froakie', 'Frogadier', 'Greninja'],
-    'Obstagoon': ['Zigzagoon (Galarian)', 'Linoone (Galarian)', 'Obstagoon'],
-    'Decidueye': ['Rowlet', 'Dartrix', 'Decidueye'],
-    'Annihilape': ['Mankey', 'Primeape', 'Annihilape'],
-    'Golem (Alolan)': ['Geodude (Alolan)', 'Graveler (Alolan)', 'Golem (Alolan)'],
-    'Corviknight': ['Rookidee', 'Corvisquire', 'Corviknight'],
+EVOLUTION_LINES = _load_evolution_lines()
 
-    # New from RS_INFO
-    'Noctowl': ['Hoothoot', 'Noctowl'],
-    'Chesnaught': ['Chespin', 'Quilladin', 'Chesnaught'],
-    'Greninja': ['Froakie', 'Frogadier', 'Greninja'],
-    'Toxapex': ['Mareanie', 'Toxapex'],
-    'Toxicroak': ['Croagunk', 'Toxicroak'],
-    'Froslass': ['Snorunt', 'Froslass'],
-    'Decidueye': ['Rowlet', 'Dartrix', 'Decidueye'],
-    'Annihilape': ['Mankey', 'Primeape', 'Annihilape'],
-    'Tapu Fini': ['Tapu Fini'],
-    'Slowbro': ['Slowpoke', 'Slowbro'],
-    'Slowbro (Galarian)': ['Slowpoke (Galarian)', 'Slowbro (Galarian)'],
-    'Slowking (Galarian)': ['Slowpoke (Galarian)', 'Slowking (Galarian)'],
-    'Deoxys (Defense)': ['Deoxys (Defense)'],
-    'Linoone (Galarian)': ['Zigzagoon (Galarian)', 'Linoone (Galarian)'],
-    'Marowak (Alolan)': ['Cubone', 'Marowak (Alolan)'],
-    'Sandslash (Alolan)': ['Sandshrew (Alolan)', 'Sandslash (Alolan)'],
-    'Golem (Alolan)': ['Geodude (Alolan)', 'Graveler (Alolan)', 'Golem (Alolan)'],
-}
 
 DEFAULT_THRESHOLDS = {
     'Jumpluff': {
