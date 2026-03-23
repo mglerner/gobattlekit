@@ -3,7 +3,6 @@
 User IV checker screen — same as IV checker but uses user-defined thresholds.
 """
 import toga
-import sys
 import pathlib
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
@@ -11,10 +10,7 @@ from .iv_checker import IVCheckerScreen
 from ..data.user_thresholds import load_user_thresholds
 from ..data.iv_checker import check_thresholds
 from ..data.thresholds import EVOLUTION_LINES
-
-ON_ANDROID = sys.platform == 'android' or 'android' in sys.platform
-ON_IOS = sys.platform == 'ios' or 'ios' in sys.platform
-
+from ..platform import ON_ANDROID, ON_IOS
 
 class UserIVCheckerScreen(IVCheckerScreen):
     """IV checker screen using user-defined thresholds."""

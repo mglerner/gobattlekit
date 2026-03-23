@@ -21,12 +21,9 @@ A value of 0 means "don't care" for that stat.
 
 import json
 from pathlib import Path
+from .evolution_lines import load_evolution_lines
 
-def _load_evolution_lines():
-    json_path = Path(__file__).parent / 'evolution_lines.json'
-    return json.loads(json_path.read_text())
-
-EVOLUTION_LINES = _load_evolution_lines()
+EVOLUTION_LINES = load_evolution_lines()
 
 
 DEFAULT_THRESHOLDS = {

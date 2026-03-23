@@ -5,12 +5,10 @@ Quiz screen — move timing questions.
 import random
 import asyncio
 import toga
-import sys
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from ..data.gamemaster import get_moves, get_rankings, counters_to_charge
-
-ON_ANDROID = sys.platform == 'android' or 'android' in sys.platform
+from ..platform import ON_ANDROID, ON_IOS
 
 MAX_ATTEMPTS = 3
 POINTS = {1: 3, 2: 2, 3: 1}  # points for correct on attempt N

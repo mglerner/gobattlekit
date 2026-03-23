@@ -48,6 +48,17 @@ def _fetch_json(key):
         with urllib.request.urlopen(URLS[key], context=ssl_context) as r:
             data = json.loads(r.read().decode())
         cache_file.write_text(json.dumps(data))
+
+        # If this is the gamemaster, regenerate evolution lines
+        if key == 'gamemaster':
+            try:
+                from .evolution_lines import generate_evolution_lines, save_evolution_lines
+                evo_lines = generate_evolution_lines(data)
+                save_evolution_lines(evo_lines)
+            except Exception as e:
+                print(f"Could not regenerate evolution lines: {e}")
+        return data        
+        
         return data
     except Exception:
         pass

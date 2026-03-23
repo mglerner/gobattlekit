@@ -2,7 +2,6 @@
 """
 IV checker screen — import PokeGenie CSV and check against thresholds.
 """
-import sys
 import shutil
 import pathlib
 import toga
@@ -10,9 +9,7 @@ from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from ..data.iv_checker import check_thresholds
 from ..data.thresholds import DEFAULT_THRESHOLDS, EVOLUTION_LINES
-
-ON_ANDROID = sys.platform == 'android' or 'android' in sys.platform
-ON_IOS = sys.platform == 'ios' or 'ios' in sys.platform
+from ..platform import ON_ANDROID, ON_IOS
 
 STATUS_HEIGHT = 80 if ON_ANDROID else 60
 
