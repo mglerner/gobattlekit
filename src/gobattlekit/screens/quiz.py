@@ -9,9 +9,13 @@ from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from ..data.gamemaster import get_moves, get_rankings, counters_to_charge
 from ..platform import ON_ANDROID, ON_IOS
+from ..theme import (
+    CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
+    btn_primary, btn_secondary, btn_nav
+)
 
 MAX_ATTEMPTS = 3
-POINTS = {1: 3, 2: 2, 3: 1}  # points for correct on attempt N
+POINTS = {1: 3, 2: 2, 3: 1}
 
 
 class QuizScreen:
@@ -22,7 +26,6 @@ class QuizScreen:
         self.fastmoves, self.chargedmoves = get_moves()
 
     def build(self, league):
-        """Build and return the quiz screen content for the given league."""
         self.league = league
         self.mons = get_rankings(league)
         self.score = 0
@@ -30,60 +33,51 @@ class QuizScreen:
         self.attempts = 0
         self._load_question()
 
-        # --- Outer container ---
-        self.container = toga.Box(style=Pack(direction=COLUMN, margin=20, flex=1))
+        self.container = toga.Box(style=CONTAINER)
 
         # Score bar
         self.score_label = toga.Label(
             self._score_text(),
-            style=Pack(font_size=14, margin_bottom=10, text_align="center")
+            style=Pack(font_size=14, margin_bottom=10, text_align="center",
+                       color=COLOR_YELLOW)
         )
         self.container.add(self.score_label)
 
-        # Question text — MultilineTextInput so text wraps properly
-
+        # Question text
         question_height = 160 if ON_ANDROID else 120
-
         self.question_label = toga.MultilineTextInput(
             value="",
             readonly=True,
             style=Pack(font_size=18, margin_bottom=20,
-                           margin_left=10, margin_right=10,
-                           height=question_height, flex=1)
-            )
+                       margin_left=10, margin_right=10,
+                       height=question_height, flex=1)
+        )
         self.container.add(self.question_label)
-
-        # Set question text now that the widget exists
         self._set_question_text(self.mon_name, self.fast_name, self.charged_name)
 
-        # Feedback label (hidden until answered)
+        # Feedback label
         self.feedback_label = toga.Label(
             "",
-            style=Pack(font_size=16, margin_bottom=16, text_align="center")
+            style=Pack(font_size=16, margin_bottom=16, text_align="center",
+                       color=COLOR_TEXT_LIGHT)
         )
         self.container.add(self.feedback_label)
 
-        # Answer buttons: 1-20 + "more"
+        # Answer buttons
         self.button_box = toga.Box(style=Pack(direction=COLUMN))
         self._build_answer_buttons()
         self.container.add(self.button_box)
 
         # End quiz button
-        end_btn = toga.Button(
+        self.container.add(toga.Button(
             "End Quiz",
             on_press=self._end_quiz,
-            style=Pack(margin_top=30, height=44)
-        )
-        self.container.add(end_btn)
+            style=btn_nav(height=44)
+        ))
 
         return self.container
 
-    # ------------------------------------------------------------------
-    # Question loading
-    # ------------------------------------------------------------------
-
     def _load_question(self):
-        """Pick a random mon and moveset, compute the right answer."""
         mon = random.choice(self.mons)
         self.fast_id = mon['moveset'][0]
         self.charged_id = random.choice(mon['moveset'][1:])
@@ -96,13 +90,7 @@ class QuizScreen:
         self.mon_name = mon['speciesName']
         self.attempts = 0
 
-    # ------------------------------------------------------------------
-    # Button construction
-    # ------------------------------------------------------------------
-
-
     def _build_answer_buttons(self):
-        """Build the 1-20 + more answer buttons in a grid, 4 per row."""
         for child in list(self.button_box.children):
             self.button_box.remove(child)
 
@@ -119,20 +107,14 @@ class QuizScreen:
                 style=Pack(flex=1, margin=2, height=44, font_size=14)
             )
             self.answer_buttons[val] = btn
-            row.add(btn)        
+            row.add(btn)
 
     def _make_answer_handler(self, value):
-        """Return a button handler for the given answer value."""
         def handler(widget):
             self._check_answer(value)
         return handler
 
-    # ------------------------------------------------------------------
-    # Answer checking and feedback
-    # ------------------------------------------------------------------
-
     def _check_answer(self, chosen):
-        """Handle a user's answer choice."""
         self.attempts += 1
         if chosen == self.right_answer:
             pts = POINTS.get(self.attempts, 1)
@@ -146,9 +128,7 @@ class QuizScreen:
             if self.attempts >= MAX_ATTEMPTS:
                 self.max_score += 3
                 self.score_label.text = self._score_text()
-                self.feedback_label.text = (
-                    f"❌ The answer was {self.right_answer}."
-                )
+                self.feedback_label.text = f"❌ The answer was {self.right_answer}."
                 self._disable_buttons()
                 asyncio.create_task(self._advance_question())
             else:
@@ -158,35 +138,26 @@ class QuizScreen:
                 )
 
     def _set_question_text(self, mon_name, fast_name, charged_name):
-        """Set question text — MultilineTextInput handles wrapping automatically."""
         self.question_label.value = (
             f"How many {fast_name}s does it take "
             f"{mon_name} to charge {charged_name}?"
         )
 
     def _disable_buttons(self):
-        """Disable all answer buttons while waiting to advance."""
         for btn in self.answer_buttons.values():
             btn.enabled = False
 
     async def _advance_question(self):
-        """Pause briefly then load the next question."""
         await asyncio.sleep(1.5)
         self._load_question()
         self._set_question_text(self.mon_name, self.fast_name, self.charged_name)
         self.feedback_label.text = ""
         self._build_answer_buttons()
 
-    # ------------------------------------------------------------------
-    # Score and navigation
-    # ------------------------------------------------------------------
-
     def _score_text(self):
-        """Format the running score display."""
         return f"Score: {self.score} / {self.max_score}"
 
     async def _end_quiz(self, widget):
-        """Show final score then return to home screen."""
         league_name = self.league.capitalize()
         await self.app.main_window.dialog(
             toga.InfoDialog(
@@ -195,4 +166,3 @@ class QuizScreen:
             )
         )
         self.app.show_home()
-        

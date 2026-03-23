@@ -11,50 +11,54 @@ from ..data.user_thresholds import load_user_thresholds
 from ..data.iv_checker import check_thresholds
 from ..data.thresholds import EVOLUTION_LINES
 from ..platform import ON_ANDROID, ON_IOS, ON_MOBILE
+from ..theme import (
+    CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT,
+    btn_primary, btn_secondary, btn_back, btn_nav, btn_league, btn_icon,
+    btn_destructive
+)
+
 
 class UserIVCheckerScreen(IVCheckerScreen):
     """IV checker screen using user-defined thresholds."""
 
     def build(self):
         """Build and return the user IV checker screen content."""
-        self.container = toga.Box(style=Pack(direction=COLUMN, margin=20, flex=1))
+        self.container = toga.Box(style=CONTAINER)
 
         # Title
         self.container.add(toga.Label(
             "My IV Checker",
             style=Pack(font_size=24, font_weight="bold",
-                       text_align="center", margin_bottom=10)
+                       text_align="center", margin_bottom=10,
+                       color=COLOR_ACCENT)
         ))
 
         # League selector row
         league_box = toga.Box(style=Pack(direction=ROW, margin_bottom=16))
         for league, label in (('great', 'Great'), ('ultra', 'Ultra'), ('master', 'Master')):
-            btn = toga.Button(
+            league_box.add(toga.Button(
                 label,
                 on_press=self._make_league_handler(league),
-                style=Pack(flex=1, margin=4, height=40)
-            )
-            league_box.add(btn)
+                style=btn_league()
+            ))
         self.container.add(league_box)
 
-        # Import button — not available on iOS or Android
+        # Import button — not available on iOS
         if not ON_IOS:
-            import_btn = toga.Button(
+            self.container.add(toga.Button(
                 "Import PokeGenie CSV",
                 on_press=self._import_csv,
-                style=Pack(height=52, font_size=16, margin_bottom=8)
-            )
-            self.container.add(import_btn)
-        
+                style=btn_primary(height=52, font_size=16)
+            ))
 
         # Edit Thresholds button
         self.container.add(toga.Button(
             "Edit My Thresholds",
             on_press=lambda w: self.app.show_edit_thresholds(),
-            style=Pack(height=48, font_size=16, margin_bottom=12)
+            style=btn_primary(height=48, font_size=16)
         ))
 
-        # Status label
+        # Status labels
         initial_status = "No CSV loaded. Export from PokeGenie and share to GoBattleKit."
         csv_name_line = pathlib.Path(self.csv_path).name if self.csv_path else ""
         stats_line = ""
@@ -67,12 +71,13 @@ class UserIVCheckerScreen(IVCheckerScreen):
         status_row = toga.Box(style=Pack(direction=ROW, margin_bottom=2))
         self.status_label_file = toga.Label(
             csv_name_line,
-            style=Pack(flex=1, font_size=13, text_align="center")
+            style=Pack(flex=1, font_size=13, text_align="center",
+                       color=COLOR_TEXT_LIGHT)
         )
         self.clear_csv_btn = toga.Button(
             "✕",
             on_press=self._clear_csv,
-            style=Pack(width=44, height=36)
+            style=btn_destructive(height=36, margin_bottom=0)
         )
         self.clear_csv_btn.enabled = bool(self.csv_path)
         status_row.add(self.status_label_file)
@@ -81,11 +86,11 @@ class UserIVCheckerScreen(IVCheckerScreen):
 
         self.status_label_stats = toga.Label(
             stats_line if stats_line else initial_status,
-            style=Pack(font_size=13, text_align="center", margin_bottom=16)
+            style=Pack(font_size=13, text_align="center", margin_bottom=16,
+                       color=COLOR_TEXT_LIGHT)
         )
         self.container.add(self.status_label_stats)
 
-        
         # Results area — scrollable
         self.results_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
         scroll = toga.ScrollContainer(content=self.results_box, style=Pack(flex=1))
@@ -95,7 +100,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
         self.container.add(toga.Button(
             "← Back to Home",
             on_press=lambda w: self.app.show_home(),
-            style=Pack(margin_top=10, height=44)
+            style=btn_nav(height=44)
         ))
 
         if self.results:
