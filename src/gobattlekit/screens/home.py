@@ -22,17 +22,17 @@ class HomeScreen:
             style=Pack(font_size=32, font_weight="bold", margin_bottom=10,
                        text_align="center")
         )
-        subtitle = toga.Label(
-            "Choose a quiz to begin",
-            style=Pack(font_size=16, margin_bottom=20, text_align="center")
-        )
         container.add(title)
-        container.add(subtitle)
+        ## subtitle = toga.Label(
+        ##     "Choose a quiz to begin",
+        ##     style=Pack(font_size=16, margin_bottom=20, text_align="center")
+        ## )
+        ## container.add(subtitle)
 
         # Move count quizzes by league
         league_label = toga.Label(
-            "Move Counts",
-            style=Pack(font_size=14, margin_bottom=8, text_align="center")
+            "Move Count Quizzes",
+            style=Pack(font_size=22, margin_bottom=8, text_align="center")
         )
         container.add(league_label)
 
@@ -50,8 +50,8 @@ class HomeScreen:
 
         # Divider label
         type_label = toga.Label(
-            "Type Effectiveness",
-            style=Pack(font_size=14, margin_top=16, margin_bottom=8,
+            "Type Effectiveness Quiz",
+            style=Pack(font_size=22, margin_top=16, margin_bottom=8,
                        text_align="center")
         )
         container.add(type_label)
@@ -65,7 +65,7 @@ class HomeScreen:
 
         iv_label = toga.Label(
             "IV Analysis",
-            style=Pack(font_size=14, margin_top=16, margin_bottom=8,
+            style=Pack(font_size=22, margin_top=16, margin_bottom=8,
                        text_align="center")
         )
         container.add(iv_label)
