@@ -7,16 +7,18 @@ import asyncio
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
-from ..data.gamemaster import get_moves, get_rankings, counters_to_charge
+from ..data.gamemaster import get_moves, get_rankings, counters_to_charge, charge_sequence
 from ..platform import ON_ANDROID, ON_IOS
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
-    COLOR_SECONDARY_BTN,
-    btn_primary, btn_secondary, btn_nav, btn_quiz_answer
+    COLOR_SECONDARY_BTN, btn_primary, btn_secondary, btn_nav, btn_quiz_answer
 )
 
 MAX_ATTEMPTS = 3
 POINTS = {1: 3, 2: 2, 3: 1}
+
+QUESTION_TYPE_FIRST = 'first'
+QUESTION_TYPE_SEQUENCE = 'sequence'
 
 
 class QuizScreen:
@@ -36,7 +38,6 @@ class QuizScreen:
 
         self.container = toga.Box(style=CONTAINER)
 
-        # Score bar
         self.score_label = toga.Label(
             self._score_text(),
             style=Pack(font_size=14, margin_bottom=10, text_align="center",
@@ -44,7 +45,6 @@ class QuizScreen:
         )
         self.container.add(self.score_label)
 
-        # Question text
         question_height = 160 if ON_ANDROID else 120
         self.question_label = toga.MultilineTextInput(
             value="",
@@ -55,9 +55,8 @@ class QuizScreen:
                        color=COLOR_TEXT_LIGHT)
         )
         self.container.add(self.question_label)
-        self._set_question_text(self.mon_name, self.fast_name, self.charged_name)
+        self._set_question_text()
 
-        # Feedback label
         self.feedback_label = toga.Label(
             "",
             style=Pack(font_size=16, margin_bottom=16, text_align="center",
@@ -65,12 +64,10 @@ class QuizScreen:
         )
         self.container.add(self.feedback_label)
 
-        # Answer buttons
         self.button_box = toga.Box(style=Pack(direction=COLUMN))
         self._build_answer_buttons()
         self.container.add(self.button_box)
 
-        # End quiz button
         self.container.add(toga.Button(
             "End Quiz",
             on_press=self._end_quiz,
@@ -79,42 +76,103 @@ class QuizScreen:
 
         return self.container
 
+    # ------------------------------------------------------------------
+    # Question loading
+    # ------------------------------------------------------------------
+
     def _load_question(self):
+        """Pick a random mon, moveset, and question type."""
         mon = random.choice(self.mons)
         self.fast_id = mon['moveset'][0]
         self.charged_id = random.choice(mon['moveset'][1:])
-        self.right_answer = counters_to_charge(
-            self.fast_id, self.charged_id,
-            self.fastmoves, self.chargedmoves
-        )
         self.fast_name = self.fastmoves[self.fast_id]['name']
         self.charged_name = self.chargedmoves[self.charged_id]['name']
         self.mon_name = mon['speciesName']
         self.attempts = 0
+
+        # Randomly pick question type — 50/50
+        self.question_type = random.choice([QUESTION_TYPE_FIRST, QUESTION_TYPE_SEQUENCE])
+
+        if self.question_type == QUESTION_TYPE_FIRST:
+            self.right_answer = counters_to_charge(
+                self.fast_id, self.charged_id,
+                self.fastmoves, self.chargedmoves
+            )
+        else:
+            self.sequence = charge_sequence(
+                self.fast_id, self.charged_id,
+                self.fastmoves, self.chargedmoves,
+                num_charges=4
+            )
+            self.right_answer = tuple(self.sequence)
+            # Generate all 8 wrong answers: first number fixed, rest vary ±1
+            n = self.sequence[0]
+            self.sequence_choices = []
+            for b1 in (n, n-1):
+                for b2 in (n, n-1):
+                    for b3 in (n, n-1):
+                        self.sequence_choices.append((n, b1, b2, b3))
+            # Deduplicate and shuffle
+            self.sequence_choices = list(set(self.sequence_choices))
+            random.shuffle(self.sequence_choices)
+
+    # ------------------------------------------------------------------
+    # Button construction
+    # ------------------------------------------------------------------
 
     def _build_answer_buttons(self):
         for child in list(self.button_box.children):
             self.button_box.remove(child)
 
         self.answer_buttons = {}
-        answers = list(range(1, 21)) + ['more']
-        row = None
-        for i, val in enumerate(answers):
-            if i % 4 == 0:
-                row = toga.Box(style=Pack(direction=ROW, margin_bottom=4))
-                self.button_box.add(row)
-            btn = toga.Button(
-                str(val),
-                on_press=self._make_answer_handler(val),
-                style=btn_quiz_answer(),
-            )
-            self.answer_buttons[val] = btn
-            row.add(btn)
+
+        if self.question_type == QUESTION_TYPE_FIRST:
+            # Original number grid
+            answers = list(range(1, 21)) + ['more']
+            row = None
+            for i, val in enumerate(answers):
+                if i % 4 == 0:
+                    row = toga.Box(style=Pack(direction=ROW, margin_bottom=4))
+                    self.button_box.add(row)
+                btn = toga.Button(
+                    str(val),
+                    on_press=self._make_answer_handler(val),
+                    style=btn_quiz_answer()
+                )
+                self.answer_buttons[val] = btn
+                row.add(btn)
+        else:
+            # Sequence question — 2 columns of 4
+            left_col = toga.Box(style=Pack(direction=COLUMN, flex=1, margin_right=4))
+            right_col = toga.Box(style=Pack(direction=COLUMN, flex=1, margin_left=4))
+            cols_row = toga.Box(style=Pack(direction=ROW, margin_bottom=4))
+            cols_row.add(left_col)
+            cols_row.add(right_col)
+            self.button_box.add(cols_row)
+
+            for i, choice in enumerate(self.sequence_choices):
+                label = ", ".join(str(x) for x in choice)
+                btn = toga.Button(
+                    label,
+                    on_press=self._make_answer_handler(choice),
+                    style=Pack(height=48, font_size=14, margin_bottom=4,
+                               background_color=COLOR_SECONDARY_BTN,
+                               color=COLOR_TEXT_LIGHT)
+                )
+                self.answer_buttons[choice] = btn
+                if i % 2 == 0:
+                    left_col.add(btn)
+                else:
+                    right_col.add(btn)
 
     def _make_answer_handler(self, value):
         def handler(widget):
             self._check_answer(value)
         return handler
+
+    # ------------------------------------------------------------------
+    # Answer checking
+    # ------------------------------------------------------------------
 
     def _check_answer(self, chosen):
         self.attempts += 1
@@ -130,21 +188,31 @@ class QuizScreen:
             if self.attempts >= MAX_ATTEMPTS:
                 self.max_score += 3
                 self.score_label.text = self._score_text()
-                self.feedback_label.text = f"❌ The answer was {self.right_answer}."
+                if self.question_type == QUESTION_TYPE_SEQUENCE:
+                    correct = ", ".join(str(x) for x in self.right_answer)
+                else:
+                    correct = str(self.right_answer)
+                self.feedback_label.text = f"❌ The answer was {correct}."
                 self._disable_buttons()
                 asyncio.create_task(self._advance_question())
             else:
                 remaining = MAX_ATTEMPTS - self.attempts
                 self.feedback_label.text = (
                     f"❌ Try again! {remaining} attempt{'s' if remaining != 1 else ''} left."
-                )
+                )    
 
-    def _set_question_text(self, mon_name, fast_name, charged_name):
+    def _set_question_text(self):
         turns = self.fastmoves[self.fast_id].get('turns', '?')
-        self.question_label.value = (
-            f"How many {fast_name}s ({turns} turn) does it take "
-            f"{mon_name} to charge {charged_name}?"
-        )
+        if self.question_type == QUESTION_TYPE_FIRST:
+            self.question_label.value = (
+                f"How many {self.fast_name}s ({turns} turn) does it take "
+                f"{self.mon_name} to charge {self.charged_name}?"
+            )
+        else:
+            self.question_label.value = (
+                f"How many {self.fast_name}s ({turns} turn) does it take "
+                f"{self.mon_name} to reach the first 4 {self.charged_name}s?"
+            )
 
     def _disable_buttons(self):
         for btn in self.answer_buttons.values():
@@ -153,9 +221,13 @@ class QuizScreen:
     async def _advance_question(self):
         await asyncio.sleep(1.5)
         self._load_question()
-        self._set_question_text(self.mon_name, self.fast_name, self.charged_name)
+        self._set_question_text()
         self.feedback_label.text = ""
         self._build_answer_buttons()
+
+    # ------------------------------------------------------------------
+    # Score and navigation
+    # ------------------------------------------------------------------
 
     def _score_text(self):
         return f"Score: {self.score} / {self.max_score}"
