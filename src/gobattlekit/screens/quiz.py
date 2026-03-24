@@ -142,7 +142,7 @@ class QuizScreen:
     def _set_question_text(self, mon_name, fast_name, charged_name):
         turns = self.fastmoves[self.fast_id].get('turns', '?')
         self.question_label.value = (
-            f"How many {fast_name}s [{turns}] does it take "
+            f"How many {fast_name}s ({turns} turn) does it take "
             f"{mon_name} to charge {charged_name}?"
         )
 
