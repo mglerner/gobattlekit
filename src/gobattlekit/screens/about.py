@@ -83,11 +83,31 @@ class AboutScreen:
             style=btn_secondary(height=40, margin_bottom=16)
         ))
 
-        container.add(toga.Button(
-            "← Back to Home",
-            on_press=lambda w: self.app.show_home(),
-            style=btn_nav(height=44)
+
+        # Support
+        container.add(toga.Label(
+            "Support Development",
+            style=Pack(font_size=16, font_weight="bold", margin_top=16, margin_bottom=4,
+                       color=COLOR_YELLOW)
         ))
+        if ON_ANDROID:
+            container.add(toga.Button(
+                "Tip jar — Venmo @mglerner",
+                on_press=lambda w: self._open_url("https://venmo.com/u/mglerner"),
+                style=btn_secondary(height=40, margin_bottom=16)
+            ))
+        else:
+            container.add(toga.Button(
+                "Support via mglerner.com",
+                on_press=lambda w: self._open_url("http://mglerner.com/support.html"),
+                style=btn_secondary(height=40, margin_bottom=16)
+            ))        
+
+            container.add(toga.Button(
+                "← Back to Home",
+                on_press=lambda w: self.app.show_home(),
+                style=btn_nav(height=44)
+            ))
 
         return container
 
