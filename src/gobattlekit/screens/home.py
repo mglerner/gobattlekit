@@ -6,7 +6,7 @@ import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN
 from ..theme import (
-    CONTAINER, LABEL_TITLE, LABEL_SECTION,
+    CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT,
     btn_primary, btn_secondary, btn_league
 )
 
@@ -22,10 +22,15 @@ class HomeScreen:
             "GoBattleKit",
             style=Pack(font_size=32, font_weight="bold",
                        margin_bottom=20, text_align="center",
-                       color="#00BCD4")
+                       color=COLOR_ACCENT)
         ))
 
-        container.add(toga.Label("Move Count Quizzes", style=LABEL_SECTION))
+        container.add(toga.Label(
+            "Move Count Quizzes",
+            style=Pack(font_size=22, font_weight="bold",
+                       text_align="center", margin_bottom=8,
+                       color=COLOR_TEXT_LIGHT)
+        ))
         for league, label in (
             ("great",  "Great League (1500 CP)"),
             ("ultra",  "Ultra League (2500 CP)"),
@@ -40,7 +45,8 @@ class HomeScreen:
         container.add(toga.Label(
             "Type Effectiveness Quiz",
             style=Pack(font_size=22, font_weight="bold",
-                text_align="center", margin_bottom=8, margin_top=16)
+                       text_align="center", margin_bottom=8, margin_top=16,
+                       color=COLOR_TEXT_LIGHT)
         ))
         container.add(toga.Button(
             "Type Quiz",
@@ -51,7 +57,8 @@ class HomeScreen:
         container.add(toga.Label(
             "IV Analysis",
             style=Pack(font_size=22, font_weight="bold",
-                text_align="center", margin_bottom=8, margin_top=16)
+                       text_align="center", margin_bottom=8, margin_top=16,
+                       color=COLOR_TEXT_LIGHT)
         ))
         container.add(toga.Button(
             "IV Checker",

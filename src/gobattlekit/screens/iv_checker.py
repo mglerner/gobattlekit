@@ -11,9 +11,9 @@ from ..data.iv_checker import check_thresholds
 from ..data.thresholds import DEFAULT_THRESHOLDS, EVOLUTION_LINES
 from ..platform import ON_ANDROID, ON_IOS, ON_MOBILE
 from ..theme import (
-    CONTAINER, LABEL_TITLE, COLOR_ACCENT, COLOR_TEXT_LIGHT,
+    CONTAINER, LABEL_TITLE, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_BG,
     btn_primary, btn_secondary, btn_back, btn_league, btn_icon, card_box,
-    btn_nav, btn_destructive
+    btn_nav, btn_destructive, btn_destructive_icon
 )
 
 
@@ -67,7 +67,7 @@ class IVCheckerScreen:
             stats_line = (f"{species_count} species, {total} hit{'s' if total != 1 else ''} "
                           f"in {self.league.capitalize()} League")
 
-        status_row = toga.Box(style=Pack(direction=ROW, margin_bottom=2))
+        status_row = toga.Box(style=Pack(direction=ROW, margin_bottom=2, height=36))
         self.status_label_file = toga.Label(
             csv_name_line,
             style=Pack(flex=1, font_size=13, text_align="center",
@@ -76,7 +76,7 @@ class IVCheckerScreen:
         self.clear_csv_btn = toga.Button(
             "✕",
             on_press=self._clear_csv,
-            style=btn_destructive(height=36, margin_bottom=0)
+            style=btn_destructive_icon()
         )
         self.clear_csv_btn.enabled = bool(self.csv_path)
         status_row.add(self.status_label_file)
@@ -91,8 +91,11 @@ class IVCheckerScreen:
         self.container.add(self.status_label_stats)
 
         # Results area — scrollable
-        self.results_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
-        scroll = toga.ScrollContainer(content=self.results_box, style=Pack(flex=1))
+        self.results_box = toga.Box(
+            style=Pack(direction=COLUMN, flex=1, background_color=COLOR_BG))
+        scroll = toga.ScrollContainer(content=self.results_box,
+                                          style=Pack(flex=1, background_color=COLOR_BG))
+        
         self.container.add(scroll)
 
         # Back button

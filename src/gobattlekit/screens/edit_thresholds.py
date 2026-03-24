@@ -67,7 +67,7 @@ class EditThresholdsScreen:
         self._clear_all_btn = toga.Button(
             "Clear All",
             on_press=self._confirm_clear_all,
-            style=btn_destructive(height=44, margin_bottom=0)
+            style=btn_destructive_icon()
         )
         top_row.add(self._clear_all_btn)
         top_row.add(toga.Button(
@@ -168,7 +168,7 @@ class EditThresholdsScreen:
                     row.add(toga.Button(
                         "✕",
                         on_press=self._make_delete_handler(species, league_label, name),
-                        style=btn_destructive(height=36, margin_bottom=0)
+                        style=btn_destructive_icon()
                     ))
                     self.content_box.add(row)
 

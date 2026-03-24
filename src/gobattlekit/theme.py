@@ -10,6 +10,7 @@ from toga.style.pack import COLUMN, ROW
 # Colors
 # ------------------------------------------------------------------
 COLOR_PRIMARY = "#1a3a5c"       # dark navy — background, primary text
+COLOR_BG = "#000000"            # black background .. maybe a bad idea for light mode
 COLOR_ACCENT = "#00BCD4"        # teal — primary action buttons
 COLOR_ACCENT_DARK = "#0097A7"   # darker teal — pressed/secondary accent
 COLOR_YELLOW = "#FFCC00"        # yellow — highlights, scores
@@ -50,6 +51,15 @@ def btn_destructive(height=44, font_size=14, margin_bottom=8):
         height=height,
         font_size=font_size,
         margin_bottom=margin_bottom,
+        background_color=COLOR_DESTRUCTIVE,
+        color=COLOR_TEXT_LIGHT,
+    )
+
+def btn_destructive_icon(width=44, height=32):
+    """Small destructive icon button (✕)."""
+    return Pack(
+        width=width,
+        height=height,
         background_color=COLOR_DESTRUCTIVE,
         color=COLOR_TEXT_LIGHT,
     )
@@ -134,4 +144,4 @@ def card_box(margin_bottom=8):
 # Container styles
 # ------------------------------------------------------------------
 
-CONTAINER = Pack(direction=COLUMN, margin=20, flex=1)
+CONTAINER = Pack(direction=COLUMN, margin=20, flex=1, background_color=COLOR_BG)

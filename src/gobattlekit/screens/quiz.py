@@ -50,7 +50,8 @@ class QuizScreen:
             readonly=True,
             style=Pack(font_size=18, margin_bottom=20,
                        margin_left=10, margin_right=10,
-                       height=question_height, flex=1)
+                       height=question_height, flex=1,
+                       color=COLOR_TEXT_LIGHT)
         )
         self.container.add(self.question_label)
         self._set_question_text(self.mon_name, self.fast_name, self.charged_name)
@@ -104,7 +105,7 @@ class QuizScreen:
             btn = toga.Button(
                 str(val),
                 on_press=self._make_answer_handler(val),
-                style=Pack(flex=1, margin=2, height=44, font_size=14)
+                style=btn_secondary(height=44, font_size=14, margin_bottom=0)
             )
             self.answer_buttons[val] = btn
             row.add(btn)

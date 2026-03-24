@@ -12,9 +12,9 @@ from ..data.iv_checker import check_thresholds
 from ..data.thresholds import EVOLUTION_LINES
 from ..platform import ON_ANDROID, ON_IOS, ON_MOBILE
 from ..theme import (
-    CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT,
+    CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_BG,
     btn_primary, btn_secondary, btn_back, btn_nav, btn_league, btn_icon,
-    btn_destructive
+    btn_destructive, btn_destructive_icon
 )
 
 
@@ -77,7 +77,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
         self.clear_csv_btn = toga.Button(
             "✕",
             on_press=self._clear_csv,
-            style=btn_destructive(height=36, margin_bottom=0)
+            style=btn_destructive_icon()
         )
         self.clear_csv_btn.enabled = bool(self.csv_path)
         status_row.add(self.status_label_file)
@@ -92,8 +92,10 @@ class UserIVCheckerScreen(IVCheckerScreen):
         self.container.add(self.status_label_stats)
 
         # Results area — scrollable
-        self.results_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
-        scroll = toga.ScrollContainer(content=self.results_box, style=Pack(flex=1))
+        self.results_box = toga.Box(
+            style=Pack(direction=COLUMN, flex=1, background_color=COLOR_BG))
+        scroll = toga.ScrollContainer(content=self.results_box,
+                                          style=Pack(flex=1, background_color=COLOR_BG))
         self.container.add(scroll)
 
         # Back button

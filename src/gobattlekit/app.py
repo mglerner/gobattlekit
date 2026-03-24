@@ -24,6 +24,8 @@ from .screens.iv_checker import IVCheckerScreen
 from .screens.user_iv_checker import UserIVCheckerScreen
 from .screens.edit_thresholds import EditThresholdsScreen
 
+from .theme import COLOR_BG
+
 class GoBattleKit(toga.App):
 
     def startup(self):

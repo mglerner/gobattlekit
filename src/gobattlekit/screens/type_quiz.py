@@ -41,7 +41,8 @@ class TypeQuizScreen:
             readonly=True,
             style=Pack(font_size=18, margin_bottom=20,
                        margin_left=10, margin_right=10,
-                       height=80, flex=1)
+                       height=80, flex=1,
+                       color=COLOR_TEXT_LIGHT)
         )
         self.container.add(self.question_label)
         self._set_question_text()
