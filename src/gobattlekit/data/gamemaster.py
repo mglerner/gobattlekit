@@ -59,3 +59,73 @@ def charge_sequence(fast_move, charged_move, fastmoves, chargedmoves, num_charge
         leftover = (count * energy_per_fast + leftover) - energy_needed
         sequence.append(count)
     return sequence
+
+# ------------------------------------------------------------------
+# Timing info
+# ------------------------------------------------------------------
+
+
+# Optimal timing lookup: (your_fast_turns, their_fast_turns) -> (start, step) or None
+# None means timing doesn't matter
+OPTIMAL_TIMING = {
+    (1, 1): None,
+    (1, 2): (1, 2),
+    (1, 3): (2, 3),
+    (1, 4): (3, 4),
+    (1, 5): (4, 5),
+    (2, 1): None,
+    (2, 2): None,
+    (2, 3): (1, 3),
+    (2, 4): (1, 2),
+    (2, 5): (2, 5),
+    (3, 1): None,
+    (3, 2): (1, 2),
+    (3, 3): None,
+    (3, 4): (1, 4),
+    (3, 5): (3, 5),
+    (4, 1): None,
+    (4, 2): None,
+    (4, 3): (2, 3),
+    (4, 4): None,
+    (4, 5): (1, 5),
+    (5, 1): None,
+    (5, 2): (1, 2),
+    (5, 3): (1, 3),
+    (5, 4): (3, None),
+    (5, 5): None,
+}
+
+# All distinct patterns for use as wrong answers
+ALL_TIMING_PATTERNS = [
+    None,        # timing doesn't matter
+    (1, 2),      # 1, 3, 5, 7, ...
+    (1, 3),      # 1, 4, 7, 10, ...
+    (1, 4),      # 1, 5, 9, 13, ...
+    (1, 5),      # 1, 6, ...
+    (2, 3),      # 2, 5, 8, ...
+    (2, 5),      # 2, 7, 12, ...
+    (3, 4),      # 3, 7, 11, ...
+    (4, 5),      # 4, 9, 14, ...
+    (3, None),   # 3, ...
+]
+
+
+def format_timing_pattern(pattern, num_terms=4):
+    """Format a (start, step) timing pattern as a display string."""
+    if pattern is None:
+        return "Timing doesn't matter"
+    start, step = pattern
+    if step is None:
+        return f"{start}, ..."
+    terms = [start + i * step for i in range(num_terms)]
+    return ", ".join(str(t) for t in terms) + ", ..."
+
+
+def get_fast_moves_for_ranked_mons(rankings_by_league):
+    """Return set of fast move IDs that appear on ranked mons across all leagues."""
+    move_ids = set()
+    for mons in rankings_by_league:
+        for mon in mons:
+            if mon.get('moveset'):
+                move_ids.add(mon['moveset'][0])
+    return move_ids

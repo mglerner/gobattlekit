@@ -19,6 +19,7 @@ from toga.style import Pack
 from toga.style.pack import COLUMN
 from .screens.home import HomeScreen
 from .screens.quiz import QuizScreen
+from .screens.timing_quiz import TimingQuizScreen
 from .screens.type_quiz import TypeQuizScreen
 from .screens.iv_checker import IVCheckerScreen
 from .screens.user_iv_checker import UserIVCheckerScreen
@@ -35,6 +36,7 @@ class GoBattleKit(toga.App):
             self.home_screen = HomeScreen(self)
             self.about_screen = AboutScreen(self)
             self.quiz_screen = QuizScreen(self)
+            self.timing_quiz_screen = TimingQuizScreen(self)
             self.type_quiz_screen = TypeQuizScreen(self)
             self.iv_checker_screen = IVCheckerScreen(self)
             self.user_iv_checker_screen = UserIVCheckerScreen(self)
@@ -97,6 +99,10 @@ class GoBattleKit(toga.App):
     def show_quiz(self, league):
         """Switch to the move count quiz screen for the given league."""
         self.main_window.content = self.quiz_screen.build(league)
+
+    def show_timing_quiz(self):
+        """Switch to the move timing quiz screen."""
+        self.main_window.content = self.timing_quiz_screen.build()    
 
     def show_type_quiz(self):
         """Switch to the type effectiveness quiz screen."""

@@ -7,7 +7,7 @@ from toga.style import Pack
 from toga.style.pack import COLUMN
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT,
-    btn_primary, btn_secondary, btn_league
+    btn_primary, btn_secondary, label_section
 )
 
 
@@ -26,49 +26,45 @@ class HomeScreen:
         ))
 
         container.add(toga.Label(
-            "Move Count Quizzes",
-            style=Pack(font_size=22, font_weight="bold",
-                       text_align="center", margin_bottom=8,
-                       color=COLOR_TEXT_LIGHT)
+            "Quizzes",
+            style=label_section(margin_top=0)
         ))
         for league, label in (
-            ("great",  "Great League (1500 CP)"),
-            ("ultra",  "Ultra League (2500 CP)"),
-            ("master", "Master League"),
+            ("great",  "Great League Move Counts"),
+            ("ultra",  "Ultra League Move Counts"),
+            ("master", "Master League Move Counts"),
         ):
             container.add(toga.Button(
                 label,
                 on_press=self._make_league_handler(league),
-                style=btn_primary(height=60, font_size=18)
+                style=btn_primary()
             ))
 
-        container.add(toga.Label(
-            "Type Effectiveness Quiz",
-            style=Pack(font_size=22, font_weight="bold",
-                       text_align="center", margin_bottom=8, margin_top=16,
-                       color=COLOR_TEXT_LIGHT)
-        ))
         container.add(toga.Button(
-            "Type Quiz",
+            "Optimal Move Timing",
+            on_press=lambda w: self.app.show_timing_quiz(),
+            style=btn_primary()
+        ))
+
+        container.add(toga.Button(
+            "Type Effectiveness",
             on_press=self._start_type_quiz,
-            style=btn_primary(height=60, font_size=18)
+            style=btn_primary()
         ))
 
         container.add(toga.Label(
             "IV Analysis",
-            style=Pack(font_size=22, font_weight="bold",
-                       text_align="center", margin_bottom=8, margin_top=16,
-                       color=COLOR_TEXT_LIGHT)
+            style=label_section()
         ))
         container.add(toga.Button(
             "IV Checker",
             on_press=self._start_iv_checker,
-            style=btn_primary(height=60, font_size=18, margin_bottom=8)
+            style=btn_primary()
         ))
         container.add(toga.Button(
             "My IV Checker",
             on_press=self._start_user_iv_checker,
-            style=btn_primary(height=60, font_size=18)
+            style=btn_primary()
         ))
 
         container.add(toga.Button(

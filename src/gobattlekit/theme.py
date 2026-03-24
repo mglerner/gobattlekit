@@ -25,7 +25,7 @@ COLOR_NAV = "#0d5c4a"           # dark teal-green — navigation buttons
 # Button styles
 # ------------------------------------------------------------------
 
-def btn_primary(height=52, font_size=16, margin_bottom=12):
+def btn_primary(height=50, font_size=16, margin_bottom=18):
     """Primary action button — teal background."""
     return Pack(
         height=height,
@@ -138,6 +138,17 @@ LABEL_BODY = Pack(font_size=14)
 LABEL_SMALL = Pack(font_size=12)
 
 LABEL_STATUS = Pack(font_size=13, text_align="center", margin_bottom=2)
+
+def label_section(margin_top=8, margin_bottom=8):
+    """Section header label style."""
+    return Pack(
+        font_size=22,
+        font_weight="bold",
+        text_align="center",
+        margin_top=margin_top,
+        margin_bottom=margin_bottom,
+        color=COLOR_TEXT_LIGHT,
+    )
 
 # ------------------------------------------------------------------
 # Card style — for hit results
