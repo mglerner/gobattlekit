@@ -19,7 +19,7 @@ COLOR_TEXT_DARK = "#1a3a5c"     # dark text on light/teal backgrounds
 COLOR_DESTRUCTIVE = "#E53935"   # red — delete, clear all
 COLOR_CARD_BG = "#0d2a42"       # slightly lighter than primary — card backgrounds
 COLOR_SECONDARY_BTN = "#2a4a6c" # slightly lighter navy — secondary buttons
-COLOR_NAV = "#0d5c4a"  # dark teal-green — navigation buttons
+COLOR_NAV = "#0d5c4a"           # dark teal-green — navigation buttons
 
 # ------------------------------------------------------------------
 # Button styles
@@ -100,6 +100,18 @@ def btn_nav(height=44, font_size=14, margin_bottom=0):
         font_size=font_size,
         margin_bottom=margin_bottom,
         background_color=COLOR_NAV,
+        color=COLOR_TEXT_LIGHT,
+    )
+
+
+def btn_quiz_answer(height=44, font_size=14):
+    """Quiz answer button — full width within its row."""
+    return Pack(
+        flex=1,
+        margin=2,
+        height=height,
+        font_size=font_size,
+        background_color=COLOR_SECONDARY_BTN,
         color=COLOR_TEXT_LIGHT,
     )
 

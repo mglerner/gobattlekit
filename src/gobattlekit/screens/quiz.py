@@ -11,7 +11,8 @@ from ..data.gamemaster import get_moves, get_rankings, counters_to_charge
 from ..platform import ON_ANDROID, ON_IOS
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
-    btn_primary, btn_secondary, btn_nav
+    COLOR_SECONDARY_BTN,
+    btn_primary, btn_secondary, btn_nav, btn_quiz_answer
 )
 
 MAX_ATTEMPTS = 3
@@ -105,7 +106,7 @@ class QuizScreen:
             btn = toga.Button(
                 str(val),
                 on_press=self._make_answer_handler(val),
-                style=btn_secondary(height=44, font_size=14, margin_bottom=0)
+                style=btn_quiz_answer(),
             )
             self.answer_buttons[val] = btn
             row.add(btn)
