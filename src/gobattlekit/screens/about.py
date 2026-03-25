@@ -8,7 +8,7 @@ from toga.style.pack import COLUMN
 from ..platform import ON_ANDROID
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
-    btn_secondary, btn_nav
+    btn_secondary, btn_nav, btn_help
 )
 
 
@@ -114,7 +114,7 @@ class AboutScreen:
             on_press=lambda w: self.app.show_help(
                 back_screen=lambda: self.app.show_about()
             ),
-            style=btn_secondary(height=40, margin_bottom=12)
+            style=btn_help()
         ))
 
         return container

@@ -14,7 +14,8 @@ from ..data.thresholds import EVOLUTION_LINES
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
     btn_primary, btn_secondary, btn_back, btn_nav, btn_league,
-    btn_destructive, btn_icon, btn_destructive_icon, card_box
+    btn_destructive, btn_icon, btn_destructive_icon, card_box,
+    btn_help
 )
 
 
@@ -70,11 +71,6 @@ class EditThresholdsScreen:
             style=btn_destructive()
         )
         top_row.add(self._clear_all_btn)
-        top_row.add(toga.Button(
-            "← My IV Checker",
-            on_press=lambda w: self.app.show_user_iv_checker(),
-            style=btn_nav(height=44, margin_bottom=0)
-        ))
         self.container.add(top_row)
 
         self.container.add(toga.Button(
@@ -96,12 +92,18 @@ class EditThresholdsScreen:
                 back_screen=lambda: self.app.show_edit_thresholds(),
                 back_label="← Edit My Targets"
             ),
-            style=btn_secondary(height=40, margin_bottom=0)
+            style=btn_help()
         ))
 
         self.content_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
         scroll = toga.ScrollContainer(content=self.content_box, style=Pack(flex=1))
         self.container.add(scroll)
+
+        self.container.add(toga.Button(
+            "← My IV Checker",
+            on_press=lambda w: self.app.show_user_iv_checker(),
+            style=btn_nav(height=44)
+        ))        
 
         self._show_threshold_list()
         return self.container

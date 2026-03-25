@@ -8,7 +8,7 @@ from toga.style.pack import COLUMN, ROW
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT,
     COLOR_SECONDARY_BTN, COLOR_NAV,
-    btn_primary, btn_secondary, label_section
+    btn_primary, btn_secondary, label_section, btn_help
 )
 
 
@@ -79,9 +79,7 @@ class HomeScreen:
         bottom_row.add(toga.Button(
             "Help",
             on_press=lambda w: self.app.show_help(),
-            style=Pack(flex=1, height=44, margin_left=4,
-                       background_color=COLOR_NAV,
-                       color=COLOR_TEXT_LIGHT)
+            style=btn_help()
         ))
         container.add(bottom_row)
         

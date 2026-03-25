@@ -13,7 +13,7 @@ from ..platform import ON_ANDROID, ON_IOS, ON_MOBILE
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_BG,
     btn_primary, btn_secondary, btn_back, btn_league, btn_icon, card_box,
-    btn_nav, btn_destructive, btn_destructive_icon
+    btn_nav, btn_destructive, btn_destructive_icon, btn_help
 )
 
 
@@ -125,7 +125,7 @@ class IVCheckerScreen:
                 back_screen=lambda: self.app.show_iv_checker(),
                 back_label="← PvP IV Checker"
             ),
-            style=btn_secondary(height=40, margin_bottom=0)
+            style=btn_help()
         ))        
 
         if self.results:

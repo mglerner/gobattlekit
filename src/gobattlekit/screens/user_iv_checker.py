@@ -14,7 +14,7 @@ from ..platform import ON_ANDROID, ON_IOS, ON_MOBILE
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_BG,
     btn_primary, btn_secondary, btn_back, btn_nav, btn_league, btn_icon,
-    btn_destructive, btn_destructive_icon
+    btn_destructive, btn_destructive_icon, btn_help
 )
 
 NO_TARGETS_MESSAGE = "No user IV targets defined. Tap 'Edit My Targets' to add some."
@@ -127,7 +127,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
                 back_screen=lambda: self.app.show_user_iv_checker(),
                 back_label="← My PvP IV Targets"
             ),
-            style=btn_secondary(height=40)
+            style=btn_help()
         ))
         # Back button
         self.container.add(toga.Button(

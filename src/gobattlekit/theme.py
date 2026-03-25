@@ -20,6 +20,7 @@ COLOR_DESTRUCTIVE = "#E53935"   # red — delete, clear all
 COLOR_CARD_BG = "#0d2a42"       # slightly lighter than primary — card backgrounds
 COLOR_SECONDARY_BTN = "#2a4a6c" # slightly lighter navy — secondary buttons
 COLOR_NAV = "#0d5c4a"           # dark teal-green — navigation buttons
+COLOR_HELP = "#5c3d8f"          # purple — help buttons
 
 # ------------------------------------------------------------------
 # Button styles
@@ -112,6 +113,16 @@ def btn_quiz_answer(height=44, font_size=14):
         height=height,
         font_size=font_size,
         background_color=COLOR_SECONDARY_BTN,
+        color=COLOR_TEXT_LIGHT,
+    )
+
+def btn_help(height=44, font_size=14, margin_bottom=8):
+    """Help button — distinct purple color."""
+    return Pack(
+        height=height,
+        font_size=font_size,
+        margin_bottom=margin_bottom,
+        background_color=COLOR_HELP,
         color=COLOR_TEXT_LIGHT,
     )
 
