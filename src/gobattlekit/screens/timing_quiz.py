@@ -101,7 +101,7 @@ class TimingQuizScreen:
         self.right_answer = OPTIMAL_TIMING.get((your_t, their_t), None)
 
         self.timing_choices = list(ALL_TIMING_PATTERNS)
-        random.shuffle(self.timing_choices)
+        #random.shuffle(self.timing_choices)
 
     # ------------------------------------------------------------------
     # Button construction
