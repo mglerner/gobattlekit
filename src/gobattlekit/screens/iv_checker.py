@@ -117,6 +117,17 @@ class IVCheckerScreen:
             style=btn_nav(height=44, margin_bottom=0)
         ))
 
+        # Help button
+        self.container.add(toga.Button(
+            "? Help",
+            on_press=lambda w: self.app.show_help(
+                topic="PvP IV Checker",
+                back_screen=lambda: self.app.show_iv_checker(),
+                back_label="← PvP IV Checker"
+            ),
+            style=btn_secondary(height=40, margin_bottom=0)
+        ))        
+
         if self.results:
             self._display_species_list()
 

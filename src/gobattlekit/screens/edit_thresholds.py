@@ -89,6 +89,16 @@ class EditThresholdsScreen:
             style=btn_secondary(height=48, font_size=16)
         ))
 
+        self.container.add(toga.Button(
+            "? Help",
+            on_press=lambda w: self.app.show_help(
+                topic="My PvP IV Targets",
+                back_screen=lambda: self.app.show_edit_thresholds(),
+                back_label="← Edit My Targets"
+            ),
+            style=btn_secondary(height=40, margin_bottom=0)
+        ))
+
         self.content_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
         scroll = toga.ScrollContainer(content=self.content_box, style=Pack(flex=1))
         self.container.add(scroll)
