@@ -5,7 +5,7 @@ Main Toga application for GoBattleKit.
 import locale
 import asyncio
 import pathlib
-from .screens.about import AboutScreen
+from .screens.about import AboutScreen, HelpScreen
 _original_setlocale = locale.setlocale
 def _safe_setlocale(category, loc=None):
     try:
@@ -41,6 +41,7 @@ class GoBattleKit(toga.App):
             self.iv_checker_screen = IVCheckerScreen(self)
             self.user_iv_checker_screen = UserIVCheckerScreen(self)
             self.edit_thresholds_screen = EditThresholdsScreen(self)
+            self.help_screen = HelpScreen(self)
             self.main_window = toga.MainWindow(title=self.formal_name)
             self.main_window.content = self.home_screen.build()
             self.main_window.show()
@@ -136,6 +137,12 @@ class GoBattleKit(toga.App):
 
     def show_about(self):
         self.main_window.content = self.about_screen.build()
+
+    def show_help(self, topic=None, back_screen=None):
+        """Switch to the help screen."""
+        self.main_window.content = self.help_screen.build(
+            topic=topic, back_screen=back_screen
+        )    
 
 
 def main():

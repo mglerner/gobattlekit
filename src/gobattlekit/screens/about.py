@@ -109,6 +109,14 @@ class AboutScreen:
                 style=btn_nav(height=44)
             ))
 
+        container.add(toga.Button(
+            "Help",
+            on_press=lambda w: self.app.show_help(
+                back_screen=lambda: self.app.show_about()
+            ),
+            style=btn_secondary(height=40, margin_bottom=12)
+        ))        
+
         return container
 
     def _open_url(self, url):

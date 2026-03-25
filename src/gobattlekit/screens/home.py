@@ -73,6 +73,12 @@ class HomeScreen:
             style=btn_secondary(height=44, margin_bottom=0)
         ))
 
+        container.add(toga.Button(
+            "Help",
+            on_press=lambda w: self.app.show_help(),
+            style=btn_secondary(height=44, margin_bottom=0)
+        ))
+
         return container
 
     def _make_league_handler(self, league):

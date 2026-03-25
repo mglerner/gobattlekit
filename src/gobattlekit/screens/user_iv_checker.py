@@ -118,7 +118,17 @@ class UserIVCheckerScreen(IVCheckerScreen):
                 style=Pack(font_size=14, text_align="center",
                            margin_top=20, color=COLOR_TEXT_LIGHT)
             ))
-            # Back button
+
+        # Help
+        container.add(toga.Button(
+            "?  Help",
+            on_press=lambda w: self.app.show_help(
+                topic="My PvP IV Targets",
+                back_screen=lambda: self.app.show_user_iv_checker()
+            ),
+            style=btn_secondary(height=40)
+        ))
+        # Back button
         self.container.add(toga.Button(
             "← Back to Home",
             on_press=lambda w: self.app.show_home(),
