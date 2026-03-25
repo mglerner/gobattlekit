@@ -15,6 +15,8 @@ def _safe_setlocale(category, loc=None):
         return _original_setlocale(category, "C")
 locale.setlocale = _safe_setlocale
 
+from .platform import ON_ANDROID, ON_IOS, ON_MOBILE
+
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN
@@ -46,6 +48,7 @@ class GoBattleKit(toga.App):
             self.main_window = toga.MainWindow(title=self.formal_name)
             self.main_window.content = self.home_screen.build()
             self.main_window.show()
+
             self.on_running = lambda app: asyncio.create_task(self._poll_inbox(None))
             ## # Auto-load saved CSV if available
             ## from .data.fetcher import SAVED_CSV
