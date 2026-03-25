@@ -124,7 +124,8 @@ class UserIVCheckerScreen(IVCheckerScreen):
             "?  Help",
             on_press=lambda w: self.app.show_help(
                 topic="My PvP IV Targets",
-                back_screen=lambda: self.app.show_user_iv_checker()
+                back_screen=lambda: self.app.show_user_iv_checker(),
+                back_label="← My PvP IV Targets"
             ),
             style=btn_secondary(height=40)
         ))

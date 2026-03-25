@@ -151,7 +151,10 @@ class HelpScreen:
         nav_row = toga.Box(style=Pack(direction=ROW, margin_top=8))
         nav_row.add(toga.Button(
             "← Topics",
-            on_press=lambda w: self.app.show_help(),
+            on_press=lambda w: self.app.show_help(
+                back_screen=self._back_screen,
+                back_label=self._back_label
+                ),
             style=Pack(flex=1, height=44, margin_right=4,
                        background_color=COLOR_SECONDARY_BTN,
                        color=COLOR_TEXT_LIGHT)
