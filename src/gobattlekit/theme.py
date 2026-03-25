@@ -34,12 +34,13 @@ ANSWER_COLORS = [ # for the timing quiz answers. lighter at bottom, darker at to
 # Button styles
 # ------------------------------------------------------------------
 
-def btn_primary(height=50, font_size=16, margin_bottom=18):
+def btn_primary(height=50, font_size=16, margin_bottom=18, margin_top=0):
     """Primary action button — teal background."""
     return Pack(
         height=height,
         font_size=font_size,
         margin_bottom=margin_bottom,
+        margin_top=margin_top,
         background_color=COLOR_ACCENT,
         color=COLOR_TEXT_DARK,
     )
