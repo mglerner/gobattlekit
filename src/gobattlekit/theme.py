@@ -21,6 +21,9 @@ COLOR_CARD_BG = "#0d2a42"       # slightly lighter than primary — card backgro
 COLOR_SECONDARY_BTN = "#2a4a6c" # slightly lighter navy — secondary buttons
 COLOR_NAV = "#0d5c4a"           # dark teal-green — navigation buttons
 COLOR_HELP = "#5c3d8f"          # purple — help buttons
+COLOR_GREAT = "#1565C0"         # blue — Great League
+COLOR_ULTRA = "#F9A825"         # gold/amber — Ultra League
+COLOR_MASTER = "#6A1B9A"        # purple — Master League
 
 # ------------------------------------------------------------------
 # Button styles
@@ -126,6 +129,18 @@ def btn_help(height=44, font_size=14, margin_bottom=8,flex=0):
         color=COLOR_TEXT_LIGHT,
         flex=flex,
     )
+
+def btn_great(height=50, font_size=16, margin_bottom=8):
+    return Pack(height=height, font_size=font_size, margin_bottom=margin_bottom,
+                background_color=COLOR_GREAT, color=COLOR_TEXT_LIGHT)
+
+def btn_ultra(height=50, font_size=16, margin_bottom=8):
+    return Pack(height=height, font_size=font_size, margin_bottom=margin_bottom,
+                background_color=COLOR_ULTRA, color=COLOR_TEXT_DARK)
+
+def btn_master(height=50, font_size=16, margin_bottom=8):
+    return Pack(height=height, font_size=font_size, margin_bottom=margin_bottom,
+                background_color=COLOR_MASTER, color=COLOR_TEXT_LIGHT)
 
 # ------------------------------------------------------------------
 # Label styles

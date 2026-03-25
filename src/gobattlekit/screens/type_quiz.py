@@ -65,6 +65,13 @@ class TypeQuizScreen:
                        color=COLOR_TEXT_LIGHT)
         )
         self.container.add(self.question_label)
+        self.emoji_label = toga.Label(
+            "",
+            style=Pack(font_size=36, text_align="center", margin_bottom=16,
+                       color=COLOR_TEXT_LIGHT)
+        )
+        self.container.add(self.emoji_label)
+        
         self._set_question_text()
 
         # Feedback label
@@ -101,9 +108,9 @@ class TypeQuizScreen:
         attacker_emoji = TYPE_EMOJI.get(self.attacker, '❓')
         defender_emoji = TYPE_EMOJI.get(self.defender, '❓')
         self.question_label.value = (
-            f"How effective is {self.attacker} attacking against {self.defender}?\n"
-            f"        {attacker_emoji} → {defender_emoji}"
-        )        
+            f"How effective is {self.attacker} attacking against {self.defender}?"
+        )
+        self.emoji_label.text = f"{attacker_emoji}  →  {defender_emoji}"
 
     def _build_answer_buttons(self):
         for child in list(self.button_box.children):
