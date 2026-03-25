@@ -53,13 +53,13 @@ class UserIVCheckerScreen(IVCheckerScreen):
 
         # Edit Thresholds button
         self.container.add(toga.Button(
-            "Edit My Thresholds",
+            "Edit My Targets",
             on_press=lambda w: self.app.show_edit_thresholds(),
             style=btn_primary(height=48, font_size=16)
         ))
 
         # Status labels
-        initial_status = "No CSV loaded. Export from PokeGenie and share to GoBattleKit."
+        initial_status = self.NO_CSV_MESSAGE
         csv_name_line = pathlib.Path(self.csv_path).name if self.csv_path else ""
         stats_line = ""
         if self.csv_path:
@@ -119,9 +119,15 @@ class UserIVCheckerScreen(IVCheckerScreen):
             if not user_thresholds:
                 self.status_label_file.text = ""
                 self.clear_csv_btn.enabled = False
-                self.status_label_stats.text = "No user thresholds defined. Tap 'Edit My Thresholds' to add some."
+                self.status_label_stats.text = "No user IV targets defined.\nTap 'Edit My Targets' to add some."
                 for child in list(self.results_box.children):
                     self.results_box.remove(child)
+
+                self.results_box.add(toga.Label(
+                    "To get started:\n1. Tap 'Edit My Targets'\n2. Tap 'Add Target'\n3. Choose a species and\nset minimum stats\n4. Tap 'Save Target'\n5. Make sure a PokeGenie\nCSV is imported",
+                    style=Pack(font_size=14, text_align="center", margin_top=20, color=COLOR_TEXT_LIGHT)
+                ))
+                
                 return
             self.results = check_thresholds(
                 self.csv_path,

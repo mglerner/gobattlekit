@@ -14,7 +14,7 @@ from ..data.thresholds import EVOLUTION_LINES
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
     btn_primary, btn_secondary, btn_back, btn_nav, btn_league,
-    btn_icon, btn_destructive, card_box
+    btn_destructive, btn_icon, btn_destructive_icon, card_box
 )
 
 
@@ -57,7 +57,7 @@ class EditThresholdsScreen:
         self.container = toga.Box(style=CONTAINER)
 
         self.container.add(toga.Label(
-            "My Thresholds",
+            "My IV Targets",
             style=Pack(font_size=24, font_weight="bold",
                        text_align="center", margin_bottom=10,
                        color=COLOR_ACCENT)
@@ -67,7 +67,7 @@ class EditThresholdsScreen:
         self._clear_all_btn = toga.Button(
             "Clear All",
             on_press=self._confirm_clear_all,
-            style=btn_destructive_icon()
+            style=btn_destructive()
         )
         top_row.add(self._clear_all_btn)
         top_row.add(toga.Button(
@@ -78,7 +78,7 @@ class EditThresholdsScreen:
         self.container.add(top_row)
 
         self.container.add(toga.Button(
-            "Add Threshold",
+            "Add Target",
             on_press=self._show_add_form,
             style=btn_primary(height=48, font_size=16)
         ))
@@ -117,7 +117,7 @@ class EditThresholdsScreen:
 
         if not thresholds:
             self.content_box.add(toga.Label(
-                "No user thresholds yet. Tap 'Add Threshold' to get started.",
+                "No user targets yet. Tap 'Add Target' to get started.",
                 style=Pack(font_size=14, text_align="center", margin_top=20,
                            color=COLOR_TEXT_LIGHT)
             ))
@@ -240,6 +240,19 @@ class EditThresholdsScreen:
             style=btn_back(height=44)
         ))
 
+        self.content_box.add(toga.Button(
+            "Save Target",
+            on_press=self._save_threshold,
+            style=btn_primary(height=48, font_size=16)
+        ))
+        
+        self.form_error = toga.Label(
+            "",
+            style=Pack(font_size=13, text_align="center", margin_top=8,
+                       color=COLOR_YELLOW)
+        )
+        self.content_box.add(self.form_error)
+        
         self.content_box.add(toga.Label(
             "League:",
             style=Pack(font_size=14, margin_bottom=4, color=COLOR_TEXT_LIGHT)
@@ -272,18 +285,7 @@ class EditThresholdsScreen:
         self._add_field_row("Only top N:", self._form_onlytop,
                             lambda w: self._show_text_entry("Only top N (0=all)", "onlytop"))
 
-        self.content_box.add(toga.Button(
-            "Save Threshold",
-            on_press=self._save_threshold,
-            style=btn_primary(height=48, font_size=16)
-        ))
 
-        self.form_error = toga.Label(
-            "",
-            style=Pack(font_size=13, text_align="center", margin_top=8,
-                       color=COLOR_YELLOW)
-        )
-        self.content_box.add(self.form_error)
 
     def _add_field_row(self, label, value, handler):
         row = toga.Box(style=Pack(direction=ROW, margin_bottom=8))
@@ -423,7 +425,7 @@ class EditThresholdsScreen:
 
         name = self._form_name.strip()
         if not name:
-            self.form_error.text = "Please enter a threshold name."
+            self.form_error.text = "Please enter a target name."
             return
 
         try:
@@ -519,7 +521,7 @@ class EditThresholdsScreen:
             self.content_box.remove(child)
 
         self.content_box.add(toga.Button(
-            "← Threshold List",
+            "← Target List",
             on_press=lambda w: self._show_threshold_list(),
             style=btn_back(height=44)
         ))
@@ -541,7 +543,7 @@ class EditThresholdsScreen:
             self.content_box.remove(child)
 
         self.content_box.add(toga.Button(
-            "← Threshold List",
+            "← Target List",
             on_press=lambda w: self._show_threshold_list(),
             style=btn_back(height=44)
         ))
@@ -560,7 +562,7 @@ class EditThresholdsScreen:
         self.content_box.add(self._import_error)
 
         self.content_box.add(toga.Label(
-            "Paste a GoBattleKit threshold:",
+            "Paste a GoBattleKit target:",
             style=Pack(font_size=14, margin_bottom=8, color=COLOR_TEXT_LIGHT)
         ))
 
@@ -573,7 +575,7 @@ class EditThresholdsScreen:
     def _do_import(self, widget):
         text = self._import_input.value.strip()
         if not text:
-            self._import_error.text = "Please paste a threshold first."
+            self._import_error.text = "Please paste a target first."
             return
         try:
             species, league, name, t = self._parse_threshold(text)

@@ -57,12 +57,12 @@ class HomeScreen:
             style=label_section()
         ))
         container.add(toga.Button(
-            "IV Checker",
+            "PvP IV Checker",
             on_press=self._start_iv_checker,
             style=btn_primary()
         ))
         container.add(toga.Button(
-            "My IV Checker",
+            "My PvP IV Targets",
             on_press=self._start_user_iv_checker,
             style=btn_primary()
         ))

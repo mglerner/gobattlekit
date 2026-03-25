@@ -16,10 +16,15 @@ from ..theme import (
     btn_nav, btn_destructive, btn_destructive_icon
 )
 
-
+    
 class IVCheckerScreen:
     """Screen for checking Pokemon IVs against stat thresholds."""
 
+    NO_CSV_MESSAGE = (
+    "No CSV loaded. Export from PokeGenie and tap Share → GoBattleKit"
+    if ON_IOS else
+    "No CSV loaded. Tap 'Import PokeGenie CSV' to get started."
+    )
     def __init__(self, app):
         self.app = app
         self.csv_path = None
@@ -58,7 +63,7 @@ class IVCheckerScreen:
             ))
 
         # Status labels
-        initial_status = "No CSV loaded. Export from PokeGenie and share to GoBattleKit."
+        initial_status = self.NO_CSV_MESSAGE
         csv_name_line = pathlib.Path(self.csv_path).name if self.csv_path else ""
         stats_line = ""
         if self.csv_path:
@@ -222,13 +227,21 @@ class IVCheckerScreen:
         for child in list(self.results_box.children):
             self.results_box.remove(child)
 
+
         if not self.results:
-            self.results_box.add(toga.Label(
-                "No mons hit the thresholds for this league.",
-                style=Pack(font_size=14, text_align="center", margin_top=20,
-                           color=COLOR_TEXT_LIGHT)
-            ))
-            return
+            if not self.csv_path:
+                self.results_box.add(toga.Label(
+                    self.NO_CSV_MESSAGE,
+                    style=Pack(font_size=14, text_align="center", margin_top=20,
+                                   color=COLOR_TEXT_LIGHT)
+                ))
+            else:
+                self.results_box.add(toga.Label(
+                    "No Pokémon hit the thresholds\nfor this league.",
+                    style=Pack(font_size=14, text_align="center", margin_top=20,
+                                   flex=1, color=COLOR_TEXT_LIGHT)
+                ))
+            return            
 
         total = sum(len(hits) for hits in self.results.values())
         self.results_box.add(toga.Button(
@@ -389,7 +402,7 @@ class IVCheckerScreen:
         except Exception as e:
             print(f"Could not delete cached CSV: {e}")
         self.status_label_file.text = ""
-        self.status_label_stats.text = "No CSV loaded. Export from PokeGenie and share to GoBattleKit."
+        self.status_label_stats.text = self.NO_CSV_MESSAGE
         self.clear_csv_btn.enabled = False
         for child in list(self.results_box.children):
             self.results_box.remove(child)
