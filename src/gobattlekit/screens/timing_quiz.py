@@ -79,7 +79,7 @@ class TimingQuizScreen:
         self.container.add(toga.Button(
             "End Quiz",
             on_press=self._end_quiz,
-            style=btn_nav(height=44, margin_top=24)
+            style=btn_nav(height=44, margin_top=12)
         ))
 
         return self.container
@@ -123,15 +123,26 @@ class TimingQuizScreen:
         cols_row.add(right_col)
         self.button_box.add(cols_row)
 
+
         for i, pattern in enumerate(pattern_choices):
+            row_index = i // 2  # same color for both buttons in a row
             label = format_timing_pattern(pattern)
             btn = toga.Button(
                 label,
                 on_press=self._make_answer_handler(pattern),
                 style=Pack(height=48, font_size=13, margin_bottom=4,
-                           background_color=ANSWER_COLORS[i % len(ANSWER_COLORS)],
+                           background_color=ANSWER_COLORS[row_index % len(ANSWER_COLORS)],
                            color=COLOR_TEXT_LIGHT)
-            )
+            )        
+        ## for i, pattern in enumerate(pattern_choices):
+        ##     label = format_timing_pattern(pattern)
+        ##     btn = toga.Button(
+        ##         label,
+        ##         on_press=self._make_answer_handler(pattern),
+        ##         style=Pack(height=48, font_size=13, margin_bottom=4,
+        ##                    background_color=ANSWER_COLORS[i % len(ANSWER_COLORS)],
+        ##                    color=COLOR_TEXT_LIGHT)
+        ##     )
             self.answer_buttons[i] = btn
             if i % 2 == 0:
                 left_col.add(btn)
