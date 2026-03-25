@@ -13,6 +13,26 @@ from ..theme import (
     btn_primary, btn_nav
 )
 
+TYPE_EMOJI = {
+    'normal': '⚪',
+    'fire': '🔥',
+    'water': '💧',
+    'grass': '🌿',
+    'electric': '⚡',
+    'ice': '❄️',
+    'fighting': '🥊',
+    'poison': '☠️',
+    'ground': '🏔️',
+    'flying': '🦅',
+    'psychic': '🔮',
+    'bug': '🐛',
+    'rock': '🪨',
+    'ghost': '👻',
+    'dragon': '🐉',
+    'dark': '🌑',
+    'steel': '⚙️',
+    'fairy': '🧚',
+}
 
 class TypeQuizScreen:
     """Quiz screen for type effectiveness questions."""
@@ -78,9 +98,12 @@ class TypeQuizScreen:
         ]
 
     def _set_question_text(self):
+        attacker_emoji = TYPE_EMOJI.get(self.attacker, '❓')
+        defender_emoji = TYPE_EMOJI.get(self.defender, '❓')
         self.question_label.value = (
-            f"How effective is {self.attacker} attacking against {self.defender}?"
-        )
+            f"How effective is {self.attacker} attacking against {self.defender}?\n"
+            f"        {attacker_emoji} → {defender_emoji}"
+        )        
 
     def _build_answer_buttons(self):
         for child in list(self.button_box.children):
