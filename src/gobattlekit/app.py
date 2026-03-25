@@ -55,7 +55,7 @@ class GoBattleKit(toga.App):
             self.main_window = toga.MainWindow(title=self.formal_name)
             error_box = toga.Box(style=Pack(direction=COLUMN, margin=40))
             error_box.add(toga.Label(
-                "No Internet Connection",
+                "Could not load game data",
                 style=Pack(font_size=24, font_weight="bold",
                            text_align="center", margin_bottom=20)
             ))

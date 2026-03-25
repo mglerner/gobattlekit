@@ -13,13 +13,12 @@ CACHE_DIR = pathlib.Path.home() / "Documents" / "gobattlekit_cache"
 CACHE_TTL = 86400  # refresh once a day
 SAVED_CSV = CACHE_DIR / "pokegenie_export.csv"
 
-BASE_URL = "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data"
-
+BASE_URL = "https://raw.githubusercontent.com/pvpoke/pvpoke/refs/heads/master/src/data"
 URLS = {
     "gamemaster": f"{BASE_URL}/gamemaster.json",
-    "great":      f"{BASE_URL}/rankings/gobattleleague/overall/rankings-1500.json",
-    "ultra":      f"{BASE_URL}/rankings/gobattleleague/overall/rankings-2500.json",
-    "master":     f"{BASE_URL}/rankings/gobattleleague/overall/rankings-10000.json",
+    "great":      f"{BASE_URL}/rankings/all/overall/rankings-1500.json",
+    "ultra":      f"{BASE_URL}/rankings/all/overall/rankings-2500.json",
+    "master":     f"{BASE_URL}/rankings/all/overall/rankings-10000.json",
 }
 
 class NoDataError(Exception):
@@ -60,8 +59,8 @@ def _fetch_json(key):
         return data        
         
         return data
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"Fetch error for {key}: {e}")
 
     # Fall back to stale cache if available
     if cache_file.exists():
