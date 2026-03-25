@@ -25,6 +25,11 @@ COLOR_GREAT = "#1565C0"         # blue — Great League
 COLOR_ULTRA = "#F9A825"         # gold/amber — Ultra League
 COLOR_MASTER = "#6A1B9A"        # purple — Master League
 
+ANSWER_COLORS = [ # for the timing quiz answers. lighter at bottom, darker at top.
+    "#0e2036", "#122640", "#162c4a", "#1a3254",
+    "#1e385e", "#223e68", "#264472", "#2a4a7c",
+]
+
 # ------------------------------------------------------------------
 # Button styles
 # ------------------------------------------------------------------
@@ -97,12 +102,13 @@ def btn_icon(width=44, height=36):
     )
 
 
-def btn_nav(height=44, font_size=14, margin_bottom=0):
+def btn_nav(height=44, font_size=14, margin_bottom=0, margin_top=0):
     """Navigation button — distinct from primary and secondary."""
     return Pack(
         height=height,
         font_size=font_size,
         margin_bottom=margin_bottom,
+        margin_top=margin_top,
         background_color=COLOR_NAV,
         color=COLOR_TEXT_LIGHT,
     )
