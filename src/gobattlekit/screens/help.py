@@ -2,12 +2,14 @@
 """
 Help screen — topic list and per-topic help content.
 """
+import re
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from ..platform import ON_ANDROID, ON_IOS
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW, COLOR_BG,
+    COLOR_SECONDARY_BTN, COLOR_NAV,
     btn_primary, btn_secondary, btn_back, btn_nav, card_box
 )
 
@@ -19,6 +21,8 @@ TOPICS = [
     "Optimal Move Timing Quiz",
     "Type Effectiveness Quiz",
 ]
+
+VIDEO_PATTERN = re.compile(r'\[([^\]]+)\]\(([^)]+)\)')
 
 HELP_CONTENT = {
     "Getting Started": [
@@ -44,7 +48,7 @@ HELP_CONTENT = {
     "Optimal Move Timing Quiz": [
         ("", "In PvP, throwing your charge move at the right time minimizes the free turns you give your opponent. The optimal timing depends on your fast move's turn count vs your opponent's."),
         ("", "This quiz helps you learn those patterns."),
-        ("Learn more", "For a detailed explanation, watch this video: https://www.youtube.com/watch?v=UA41fzcAb8A"),
+        ("Learn more", "For a detailed explanation of optimal move timing, watch XehrFelrose's video.[Watch on YouTube](https://www.youtube.com/watch?v=UA41fzcAb8A)"),
     ],
     "Type Effectiveness Quiz": [
         ("", "Practice type matchups - super effective, not very effective, neutral, and double resisted."),
@@ -57,14 +61,18 @@ class HelpScreen:
 
     def __init__(self, app):
         self.app = app
+        self._back_screen = None
+        self._back_label = "← Home"
 
-    def build(self, topic=None, back_screen=None):
+    def build(self, topic=None, back_screen=None, back_label="← Home"):
         """Build the help screen.
-        
+
         If topic is given, show that topic directly.
         back_screen is a callable to return to the calling screen.
+        back_label is the text for the back button.
         """
         self._back_screen = back_screen
+        self._back_label = back_label
         if topic:
             return self._build_topic(topic)
         return self._build_topic_list()
@@ -87,7 +95,7 @@ class HelpScreen:
             ))
 
         container.add(toga.Button(
-            "← Back",
+            self._back_label,
             on_press=self._go_back,
             style=btn_nav(height=44)
         ))
@@ -112,6 +120,10 @@ class HelpScreen:
 
         sections = HELP_CONTENT.get(topic, [])
         for heading, body in sections:
+            # Extract video markers from body
+            videos = VIDEO_PATTERN.findall(body)
+            clean_body = VIDEO_PATTERN.sub('', body).strip()
+
             card = toga.Box(style=card_box(margin_bottom=12))
             if heading:
                 card.add(toga.Label(
@@ -119,20 +131,20 @@ class HelpScreen:
                     style=Pack(font_size=14, font_weight="bold",
                                margin_bottom=4, color=COLOR_YELLOW)
                 ))
-            card.add(toga.Label(
-                body,
-                style=Pack(font_size=14, color=COLOR_TEXT_LIGHT)
+            lines = clean_body.count('\n') + len(clean_body) // 35 + 2
+            card.add(toga.MultilineTextInput(
+                value=clean_body,
+                readonly=True,
+                style=Pack(font_size=14, color=COLOR_TEXT_LIGHT,
+                           height=max(70, lines * 24))
             ))
-            content_box.add(card)
-
-            # If body contains a URL, add a button to open it
-            if "https://" in body:
-                url = [w for w in body.split() if w.startswith("https://")][0]
-                content_box.add(toga.Button(
-                    "Watch on YouTube",
+            for label, url in videos:
+                card.add(toga.Button(
+                    label,
                     on_press=lambda w, u=url: self._open_url(u),
-                    style=btn_primary(height=44, font_size=14)
+                    style=btn_primary(height=44, font_size=14, margin_bottom=4)
                 ))
+            content_box.add(card)
 
         container.add(scroll)
 
@@ -140,12 +152,16 @@ class HelpScreen:
         nav_row.add(toga.Button(
             "← Topics",
             on_press=lambda w: self.app.show_help(),
-            style=btn_back(height=44)
+            style=Pack(flex=1, height=44, margin_right=4,
+                       background_color=COLOR_SECONDARY_BTN,
+                       color=COLOR_TEXT_LIGHT)
         ))
         nav_row.add(toga.Button(
-            "← Back",
+            self._back_label,
             on_press=self._go_back,
-            style=btn_nav(height=44)
+            style=Pack(flex=1, height=44, margin_left=4,
+                       background_color=COLOR_NAV,
+                       color=COLOR_TEXT_LIGHT)
         ))
         container.add(nav_row)
 
@@ -153,7 +169,8 @@ class HelpScreen:
 
     def _make_topic_handler(self, topic):
         def handler(widget):
-            self.app.show_help(topic=topic)
+            self.app.show_help(topic=topic, back_screen=self._back_screen,
+                               back_label=self._back_label)
         return handler
 
     def _go_back(self, widget):
@@ -175,4 +192,3 @@ class HelpScreen:
         else:
             import webbrowser
             webbrowser.open(url)
-            

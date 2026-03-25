@@ -4,9 +4,10 @@ Home screen — league selection.
 """
 import toga
 from toga.style import Pack
-from toga.style.pack import COLUMN
+from toga.style.pack import COLUMN, ROW
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT,
+    COLOR_SECONDARY_BTN, COLOR_NAV,
     btn_primary, btn_secondary, label_section
 )
 
@@ -67,18 +68,23 @@ class HomeScreen:
             style=btn_primary()
         ))
 
-        container.add(toga.Button(
+        bottom_row = toga.Box(style=Pack(direction=ROW, margin_top=8))
+        bottom_row.add(toga.Button(
             "About",
             on_press=lambda w: self.app.show_about(),
-            style=btn_secondary(height=44, margin_bottom=0)
+            style=Pack(flex=1, height=44, margin_right=4,
+                       background_color=COLOR_SECONDARY_BTN,
+                       color=COLOR_TEXT_LIGHT)
         ))
-
-        container.add(toga.Button(
+        bottom_row.add(toga.Button(
             "Help",
             on_press=lambda w: self.app.show_help(),
-            style=btn_secondary(height=44, margin_bottom=0)
+            style=Pack(flex=1, height=44, margin_left=4,
+                       background_color=COLOR_NAV,
+                       color=COLOR_TEXT_LIGHT)
         ))
-
+        container.add(bottom_row)
+        
         return container
 
     def _make_league_handler(self, league):

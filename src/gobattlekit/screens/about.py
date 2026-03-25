@@ -115,7 +115,7 @@ class AboutScreen:
                 back_screen=lambda: self.app.show_about()
             ),
             style=btn_secondary(height=40, margin_bottom=12)
-        ))        
+        ))
 
         return container
 

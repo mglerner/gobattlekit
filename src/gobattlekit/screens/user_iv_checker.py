@@ -120,7 +120,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
             ))
 
         # Help
-        container.add(toga.Button(
+        self.container.add(toga.Button(
             "?  Help",
             on_press=lambda w: self.app.show_help(
                 topic="My PvP IV Targets",
