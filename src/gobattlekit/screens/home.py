@@ -8,7 +8,8 @@ from toga.style.pack import COLUMN, ROW
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT,
     COLOR_SECONDARY_BTN, COLOR_NAV,
-    btn_primary, btn_secondary, label_section, btn_help
+    btn_primary, btn_secondary, label_section, btn_help,
+    btn_great, btn_ultra, btn_master
 )
 
 
@@ -30,15 +31,15 @@ class HomeScreen:
             "Quizzes",
             style=label_section(margin_top=0)
         ))
-        for league, label in (
-            ("great",  "Great League Move Counts"),
-            ("ultra",  "Ultra League Move Counts"),
-            ("master", "Master League Move Counts"),
+        for league, label, btn_fn in (
+            ("great",  "Great League Move Counts", btn_great),
+            ("ultra",  "Ultra League Move Counts", btn_ultra),
+            ("master", "Master League Move Counts", btn_master),
         ):
             container.add(toga.Button(
                 label,
                 on_press=self._make_league_handler(league),
-                style=btn_primary()
+                style=btn_fn()
             ))
 
         container.add(toga.Button(
