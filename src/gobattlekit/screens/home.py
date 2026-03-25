@@ -45,7 +45,7 @@ class HomeScreen:
         container.add(toga.Button(
             "Optimal Move Timing",
             on_press=lambda w: self.app.show_timing_quiz(),
-            style=btn_primary()
+            style=btn_primary(margin_top=8)
         ))
 
         container.add(toga.Button(
