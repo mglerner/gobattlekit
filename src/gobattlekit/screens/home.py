@@ -79,7 +79,7 @@ class HomeScreen:
         bottom_row.add(toga.Button(
             "Help",
             on_press=lambda w: self.app.show_help(),
-            style=btn_help()
+            style=btn_help(flex=1, margin_bottom=0)
         ))
         container.add(bottom_row)
         
