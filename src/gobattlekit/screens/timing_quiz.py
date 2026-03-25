@@ -14,12 +14,13 @@ from ..data.gamemaster import (
 from ..platform import ON_ANDROID
 from ..theme import (
     CONTAINER, COLOR_TEXT_LIGHT, COLOR_YELLOW,
-    COLOR_SECONDARY_BTN, btn_nav
+    COLOR_SECONDARY_BTN,
+    ANSWER_COLORS,
+    btn_nav
 )
 
 MAX_ATTEMPTS = 3
 POINTS = {1: 3, 2: 2, 3: 1}
-
 
 class TimingQuizScreen:
     """Quiz screen for optimal move timing questions."""
@@ -52,7 +53,7 @@ class TimingQuizScreen:
         )
         self.container.add(self.score_label)
 
-        question_height = 160 if ON_ANDROID else 120
+        question_height = 200 if ON_ANDROID else 160
         self.question_label = toga.MultilineTextInput(
             value="",
             readonly=True,
@@ -78,7 +79,7 @@ class TimingQuizScreen:
         self.container.add(toga.Button(
             "End Quiz",
             on_press=self._end_quiz,
-            style=btn_nav(height=44)
+            style=btn_nav(height=44, margin_top=24)
         ))
 
         return self.container
@@ -112,6 +113,9 @@ class TimingQuizScreen:
             self.button_box.remove(child)
         self.answer_buttons = {}
 
+        # Separate out "timing doesn't matter" (None) from the rest
+        pattern_choices = [p for p in self.timing_choices if p is not None]
+
         left_col = toga.Box(style=Pack(direction=COLUMN, flex=1, margin_right=4))
         right_col = toga.Box(style=Pack(direction=COLUMN, flex=1, margin_left=4))
         cols_row = toga.Box(style=Pack(direction=ROW, margin_bottom=4))
@@ -119,13 +123,13 @@ class TimingQuizScreen:
         cols_row.add(right_col)
         self.button_box.add(cols_row)
 
-        for i, pattern in enumerate(self.timing_choices):
+        for i, pattern in enumerate(pattern_choices):
             label = format_timing_pattern(pattern)
             btn = toga.Button(
                 label,
                 on_press=self._make_answer_handler(pattern),
                 style=Pack(height=48, font_size=13, margin_bottom=4,
-                           background_color=COLOR_SECONDARY_BTN,
+                           background_color=ANSWER_COLORS[i % len(ANSWER_COLORS)],
                            color=COLOR_TEXT_LIGHT)
             )
             self.answer_buttons[i] = btn
@@ -133,6 +137,17 @@ class TimingQuizScreen:
                 left_col.add(btn)
             else:
                 right_col.add(btn)
+
+        # "Timing doesn't matter" as full-width button at the bottom
+        tdm_btn = toga.Button(
+            "Timing doesn't matter",
+            on_press=self._make_answer_handler(None),
+            style=Pack(height=48, font_size=13, margin_bottom=4,
+                       background_color=ANSWER_COLORS[-1],
+                       color=COLOR_TEXT_LIGHT)
+        )
+        self.answer_buttons[len(pattern_choices)] = tdm_btn
+        self.button_box.add(tdm_btn)    
 
     def _make_answer_handler(self, pattern):
         def handler(widget):
@@ -171,7 +186,7 @@ class TimingQuizScreen:
         self.question_label.value = (
             f"You're using {self.your_fast_name} ({self.your_turns} turn). "
             f"Your opponent is using {self.their_fast_name} ({self.their_turns} turn). "
-            f"What's the optimal pattern for throwing your charge move?"
+            f"What's the most optimal timing to throw your charge move?"
         )
 
     def _disable_buttons(self):
