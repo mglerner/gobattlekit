@@ -11,20 +11,22 @@ from ..data.iv_checker import check_thresholds
 from ..data.thresholds import DEFAULT_THRESHOLDS, EVOLUTION_LINES
 from ..platform import ON_ANDROID, ON_IOS, ON_MOBILE
 from ..theme import (
-    CONTAINER, LABEL_TITLE, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_BG,
+    CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_BG,
     btn_primary, btn_secondary, btn_back, btn_league, btn_icon, card_box,
     btn_nav, btn_destructive, btn_destructive_icon
 )
 
-    
+
 class IVCheckerScreen:
     """Screen for checking Pokemon IVs against stat thresholds."""
 
-    NO_CSV_MESSAGE = (
-    "No CSV loaded. Export from PokeGenie and tap Share → GoBattleKit"
-    if ON_IOS else
-    "No CSV loaded. Tap 'Import PokeGenie CSV' to get started."
+    NO_CSV_MESSAGE = "No CSV loaded."
+    CSV_INSTRUCTIONS = (
+        "Share CSV from PokeGenie → GoBattleKit"
+        if ON_IOS else
+        "Tap 'Import PokeGenie CSV' to get started."
     )
+
     def __init__(self, app):
         self.app = app
         self.csv_path = None
@@ -63,7 +65,6 @@ class IVCheckerScreen:
             ))
 
         # Status labels
-        initial_status = self.NO_CSV_MESSAGE
         csv_name_line = pathlib.Path(self.csv_path).name if self.csv_path else ""
         stats_line = ""
         if self.csv_path:
@@ -89,18 +90,24 @@ class IVCheckerScreen:
         self.container.add(status_row)
 
         self.status_label_stats = toga.Label(
-            stats_line if stats_line else initial_status,
-            style=Pack(font_size=13, text_align="center", margin_bottom=16,
+            stats_line if stats_line else self.NO_CSV_MESSAGE,
+            style=Pack(font_size=13, text_align="center", margin_bottom=4,
                        color=COLOR_TEXT_LIGHT)
         )
         self.container.add(self.status_label_stats)
+
+        self.csv_instructions_label = toga.Label(
+            "" if self.csv_path else self.CSV_INSTRUCTIONS,
+            style=Pack(font_size=13, text_align="center", margin_bottom=12,
+                       color=COLOR_TEXT_LIGHT)
+        )
+        self.container.add(self.csv_instructions_label)
 
         # Results area — scrollable
         self.results_box = toga.Box(
             style=Pack(direction=COLUMN, flex=1, background_color=COLOR_BG))
         scroll = toga.ScrollContainer(content=self.results_box,
-                                          style=Pack(flex=1, background_color=COLOR_BG))
-        
+                                      style=Pack(flex=1, background_color=COLOR_BG))
         self.container.add(scroll)
 
         # Back button
@@ -206,6 +213,7 @@ class IVCheckerScreen:
             )
             self.status_label_file.text = pathlib.Path(self.csv_path).name
             self.clear_csv_btn.enabled = True
+            self.csv_instructions_label.text = ""
             species_count = len(self.results)
             total = sum(len(hits) for hits in self.results.values())
             self.status_label_stats.text = (
@@ -227,21 +235,20 @@ class IVCheckerScreen:
         for child in list(self.results_box.children):
             self.results_box.remove(child)
 
-
         if not self.results:
             if not self.csv_path:
                 self.results_box.add(toga.Label(
                     self.NO_CSV_MESSAGE,
                     style=Pack(font_size=14, text_align="center", margin_top=20,
-                                   color=COLOR_TEXT_LIGHT)
+                               color=COLOR_TEXT_LIGHT)
                 ))
             else:
                 self.results_box.add(toga.Label(
-                    "No Pokémon hit the thresholds\nfor this league.",
+                    "No Pokémon hit the thresholds for this league.",
                     style=Pack(font_size=14, text_align="center", margin_top=20,
-                                   flex=1, color=COLOR_TEXT_LIGHT)
+                               color=COLOR_TEXT_LIGHT)
                 ))
-            return            
+            return
 
         total = sum(len(hits) for hits in self.results.values())
         self.results_box.add(toga.Button(
@@ -403,6 +410,7 @@ class IVCheckerScreen:
             print(f"Could not delete cached CSV: {e}")
         self.status_label_file.text = ""
         self.status_label_stats.text = self.NO_CSV_MESSAGE
+        self.csv_instructions_label.text = self.CSV_INSTRUCTIONS
         self.clear_csv_btn.enabled = False
         for child in list(self.results_box.children):
             self.results_box.remove(child)
@@ -437,4 +445,3 @@ class IVCheckerScreen:
             style=Pack(font_size=12, color=COLOR_ACCENT)
         ))
         box.add(card)
-        

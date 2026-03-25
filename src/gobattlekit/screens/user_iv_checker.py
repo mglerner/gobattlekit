@@ -17,6 +17,13 @@ from ..theme import (
     btn_destructive, btn_destructive_icon
 )
 
+NO_TARGETS_MESSAGE = "No user IV targets defined. Tap 'Edit My Targets' to add some."
+GETTING_STARTED = (
+    "To get started:\n1. Tap 'Edit My Targets'\n2. Tap 'Add Target'\n"
+    "3. Choose a species and\nset minimum stats\n4. Tap 'Save Target'\n"
+    "5. Make sure a PokeGenie\nCSV is imported"
+)
+
 
 class UserIVCheckerScreen(IVCheckerScreen):
     """IV checker screen using user-defined thresholds."""
@@ -27,7 +34,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
 
         # Title
         self.container.add(toga.Label(
-            "My IV Checker",
+            "My PvP IV Targets",
             style=Pack(font_size=24, font_weight="bold",
                        text_align="center", margin_bottom=10,
                        color=COLOR_ACCENT)
@@ -51,7 +58,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
                 style=btn_primary(height=52, font_size=16)
             ))
 
-        # Edit Thresholds button
+        # Edit Targets button
         self.container.add(toga.Button(
             "Edit My Targets",
             on_press=lambda w: self.app.show_edit_thresholds(),
@@ -59,7 +66,6 @@ class UserIVCheckerScreen(IVCheckerScreen):
         ))
 
         # Status labels
-        initial_status = self.NO_CSV_MESSAGE
         csv_name_line = pathlib.Path(self.csv_path).name if self.csv_path else ""
         stats_line = ""
         if self.csv_path:
@@ -68,7 +74,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
             stats_line = (f"{species_count} species, {total} hit{'s' if total != 1 else ''} "
                           f"in {self.league.capitalize()} League")
 
-        status_row = toga.Box(style=Pack(direction=ROW, margin_bottom=2))
+        status_row = toga.Box(style=Pack(direction=ROW, margin_bottom=2, height=36))
         self.status_label_file = toga.Label(
             csv_name_line,
             style=Pack(flex=1, font_size=13, text_align="center",
@@ -85,20 +91,34 @@ class UserIVCheckerScreen(IVCheckerScreen):
         self.container.add(status_row)
 
         self.status_label_stats = toga.Label(
-            stats_line if stats_line else initial_status,
-            style=Pack(font_size=13, text_align="center", margin_bottom=16,
+            stats_line if stats_line else self.NO_CSV_MESSAGE,
+            style=Pack(font_size=13, text_align="center", margin_bottom=4,
                        color=COLOR_TEXT_LIGHT)
         )
         self.container.add(self.status_label_stats)
+
 
         # Results area — scrollable
         self.results_box = toga.Box(
             style=Pack(direction=COLUMN, flex=1, background_color=COLOR_BG))
         scroll = toga.ScrollContainer(content=self.results_box,
-                                          style=Pack(flex=1, background_color=COLOR_BG))
+                                      style=Pack(flex=1, background_color=COLOR_BG))
         self.container.add(scroll)
 
-        # Back button
+        # Show getting started if no targets defined or no CSV
+        if not load_user_thresholds():
+            self.results_box.add(toga.Label(
+                GETTING_STARTED,
+                style=Pack(font_size=14, text_align="center",
+                           margin_top=20, color=COLOR_TEXT_LIGHT)
+            ))
+        elif not self.csv_path:
+            self.results_box.add(toga.Label(
+                "Share CSV from PokeGenie → GoBattleKit" if ON_IOS else "Tap 'Import PokeGenie CSV' to get started.",
+                style=Pack(font_size=14, text_align="center",
+                           margin_top=20, color=COLOR_TEXT_LIGHT)
+            ))
+            # Back button
         self.container.add(toga.Button(
             "← Back to Home",
             on_press=lambda w: self.app.show_home(),
@@ -119,16 +139,16 @@ class UserIVCheckerScreen(IVCheckerScreen):
             if not user_thresholds:
                 self.status_label_file.text = ""
                 self.clear_csv_btn.enabled = False
-                self.status_label_stats.text = "No user IV targets defined.\nTap 'Edit My Targets' to add some."
+                self.status_label_stats.text = NO_TARGETS_MESSAGE
                 for child in list(self.results_box.children):
                     self.results_box.remove(child)
-
                 self.results_box.add(toga.Label(
-                    "To get started:\n1. Tap 'Edit My Targets'\n2. Tap 'Add Target'\n3. Choose a species and\nset minimum stats\n4. Tap 'Save Target'\n5. Make sure a PokeGenie\nCSV is imported",
-                    style=Pack(font_size=14, text_align="center", margin_top=20, color=COLOR_TEXT_LIGHT)
+                    GETTING_STARTED,
+                    style=Pack(font_size=14, text_align="center",
+                               margin_top=20, color=COLOR_TEXT_LIGHT)
                 ))
-                
                 return
+
             self.results = check_thresholds(
                 self.csv_path,
                 user_thresholds,
