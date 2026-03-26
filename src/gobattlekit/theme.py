@@ -25,18 +25,22 @@ COLOR_GREAT = "#1565C0"         # blue — Great League
 COLOR_ULTRA = "#F9A825"         # gold/amber — Ultra League
 COLOR_MASTER = "#6A1B9A"        # purple — Master League
 
-## ANSWER_COLORS = [ # for the timing quiz answers. lighter at bottom, darker at top.
-##     "#0e2036", "#122640", "#162c4a", "#1a3254",
-##     "#1e385e", "#223e68", "#264472", "#2a4a7c",
-## ]
-
-ANSWER_COLORS = [
-    "#0e2036",  # darkest
-    "#162c4a",  
-    "#1e385e",  
-    "#2a4a7c",  # lightest
-]    
-
+def answer_color_gradient(total_rows, row_index):
+    """Return a background color for a quiz answer button row.
+    Darkest at top, lightest at bottom, scaled to total number of rows.
+    """
+    # Interpolate between darkest and lightest navy
+    dark = (0x0e, 0x20, 0x36)   # #0e2036
+    light = (0x2a, 0x4a, 0x7c)  # #2a4a7c
+    if total_rows <= 1:
+        t = 0.0
+    else:
+        t = row_index / (total_rows - 1)
+    r = int(dark[0] + t * (light[0] - dark[0]))
+    g = int(dark[1] + t * (light[1] - dark[1]))
+    b = int(dark[2] + t * (light[2] - dark[2]))
+    return f"#{r:02x}{g:02x}{b:02x}"
+    
 # ------------------------------------------------------------------
 # Button styles
 # ------------------------------------------------------------------

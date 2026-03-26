@@ -9,13 +9,13 @@ from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from ..data.gamemaster import (
     get_moves, get_rankings,
-    OPTIMAL_TIMING, ALL_TIMING_PATTERNS, format_timing_pattern
+    OPTIMAL_TIMING, ALL_TIMING_PATTERNS, format_timing_pattern,
 )
 from ..platform import ON_ANDROID
 from ..theme import (
     CONTAINER, COLOR_TEXT_LIGHT, COLOR_YELLOW,
     COLOR_SECONDARY_BTN,
-    ANSWER_COLORS,
+    answer_color_gradient,
     btn_nav
 )
 
@@ -72,14 +72,14 @@ class TimingQuizScreen:
         )
         self.container.add(self.feedback_label)
 
-        self.button_box = toga.Box(style=Pack(direction=COLUMN))
+        self.button_box = toga.Box(style=Pack(direction=COLUMN), flex=1)
         self._build_answer_buttons()
         self.container.add(self.button_box)
 
         self.container.add(toga.Button(
             "End Quiz",
             on_press=self._end_quiz,
-            style=btn_nav(height=44, margin_top=12)
+            style=btn_nav(height=44)
         ))
 
         return self.container
@@ -123,7 +123,8 @@ class TimingQuizScreen:
         cols_row.add(right_col)
         self.button_box.add(cols_row)
 
-
+        # ceil(9/2) = 5 + 1 for the doesn't matter button
+        total_rows = ((len(pattern_choices) + 1) // 2) + 1  
         for i, pattern in enumerate(pattern_choices):
             row_index = i // 2  # same color for both buttons in a row
             label = format_timing_pattern(pattern)
@@ -131,18 +132,9 @@ class TimingQuizScreen:
                 label,
                 on_press=self._make_answer_handler(pattern),
                 style=Pack(height=48, font_size=13, margin_bottom=4,
-                           background_color=ANSWER_COLORS[row_index % len(ANSWER_COLORS)],
+                           background_color=answer_color_gradient(total_rows, row_index),
                            color=COLOR_TEXT_LIGHT)
             )        
-        ## for i, pattern in enumerate(pattern_choices):
-        ##     label = format_timing_pattern(pattern)
-        ##     btn = toga.Button(
-        ##         label,
-        ##         on_press=self._make_answer_handler(pattern),
-        ##         style=Pack(height=48, font_size=13, margin_bottom=4,
-        ##                    background_color=ANSWER_COLORS[i % len(ANSWER_COLORS)],
-        ##                    color=COLOR_TEXT_LIGHT)
-        ##     )
             self.answer_buttons[i] = btn
             if i % 2 == 0:
                 left_col.add(btn)
@@ -154,7 +146,7 @@ class TimingQuizScreen:
             "Timing doesn't matter",
             on_press=self._make_answer_handler(None),
             style=Pack(height=48, font_size=13, margin_bottom=4,
-                       background_color=ANSWER_COLORS[-1],
+                       background_color=answer_color_gradient(total_rows,total_rows),
                        color=COLOR_TEXT_LIGHT)
         )
         self.answer_buttons[len(pattern_choices)] = tdm_btn

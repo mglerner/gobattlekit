@@ -10,7 +10,7 @@ from toga.style.pack import COLUMN
 from ..data.effectiveness import effectiveness, effectiveness_to_words
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
-    btn_primary, btn_nav, btn_secondary
+    btn_nav, answer_color_gradient
 )
 
 TYPE_EMOJI = {
@@ -34,6 +34,7 @@ TYPE_EMOJI = {
     'fairy': '🧚',
 }
 
+
 class TypeQuizScreen:
     """Quiz screen for type effectiveness questions."""
 
@@ -47,7 +48,6 @@ class TypeQuizScreen:
 
         self.container = toga.Box(style=CONTAINER)
 
-        # Score bar
         self.score_label = toga.Label(
             self._score_text(),
             style=Pack(font_size=14, margin_bottom=10, text_align="center",
@@ -55,7 +55,6 @@ class TypeQuizScreen:
         )
         self.container.add(self.score_label)
 
-        # Question text
         self.question_label = toga.MultilineTextInput(
             value="",
             readonly=True,
@@ -71,10 +70,8 @@ class TypeQuizScreen:
                        color=COLOR_TEXT_LIGHT)
         )
         self.container.add(self.emoji_label)
-        
         self._set_question_text()
 
-        # Feedback label
         self.feedback_label = toga.Label(
             "",
             style=Pack(font_size=16, margin_bottom=16, text_align="center",
@@ -82,12 +79,10 @@ class TypeQuizScreen:
         )
         self.container.add(self.feedback_label)
 
-        # Answer buttons
-        self.button_box = toga.Box(style=Pack(direction=COLUMN, margin_bottom=10))
+        self.button_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
         self._build_answer_buttons()
         self.container.add(self.button_box)
 
-        # End quiz button
         self.container.add(toga.Button(
             "End Quiz",
             on_press=self._end_quiz,
@@ -118,11 +113,14 @@ class TypeQuizScreen:
 
         self.answer_buttons = {}
         answers = ['double resisted', 'not very effective', 'neutral', 'super effective']
-        for answer in answers:
+        total_rows = len(answers)
+        for i, answer in enumerate(answers):
             btn = toga.Button(
                 answer.capitalize(),
                 on_press=self._make_answer_handler(answer),
-                style=btn_secondary(height=52, font_size=16)
+                style=Pack(height=52, font_size=16, margin_bottom=4,
+                           background_color=answer_color_gradient(total_rows, i),
+                           color=COLOR_TEXT_LIGHT)
             )
             self.answer_buttons[answer] = btn
             self.button_box.add(btn)
@@ -166,3 +164,4 @@ class TypeQuizScreen:
             )
         )
         self.app.show_home()
+        
