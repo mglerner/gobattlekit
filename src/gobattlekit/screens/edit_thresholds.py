@@ -54,6 +54,14 @@ class EditThresholdsScreen:
                 self._all_species = []
         return self._all_species
 
+    def _set_outer_buttons_enabled(self, enabled):
+        """Enable/disable and show/hide the outer buttons."""
+        for btn in [self._clear_all_btn, self._add_target_btn,
+                    self._import_text_btn, self._help_btn]:
+            btn.enabled = enabled
+            btn.style.height = 48 if enabled else 2
+            btn.style.margin_bottom = 8 if enabled else 0
+
     def build(self):
         self.container = toga.Box(style=CONTAINER)
 
@@ -73,19 +81,21 @@ class EditThresholdsScreen:
         top_row.add(self._clear_all_btn)
         self.container.add(top_row)
 
-        self.container.add(toga.Button(
+        self._add_target_btn = toga.Button(
             "Add Target",
             on_press=self._show_add_form,
             style=btn_primary(height=48, font_size=16)
-        ))
+        )
+        self.container.add(self._add_target_btn)
 
-        self.container.add(toga.Button(
+        self._import_text_btn = toga.Button(
             "Import from Text",
             on_press=self._show_import_screen,
             style=btn_secondary(height=48, font_size=16)
-        ))
+        )
+        self.container.add(self._import_text_btn)
 
-        self.container.add(toga.Button(
+        self._help_btn = toga.Button(
             "? Help",
             on_press=lambda w: self.app.show_help(
                 topic="My PvP IV Targets",
@@ -93,7 +103,8 @@ class EditThresholdsScreen:
                 back_label="← Edit My Targets"
             ),
             style=btn_help()
-        ))
+        )
+        self.container.add(self._help_btn)
 
         self.content_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
         scroll = toga.ScrollContainer(content=self.content_box, style=Pack(flex=1))
@@ -103,7 +114,7 @@ class EditThresholdsScreen:
             "← My IV Checker",
             on_press=lambda w: self.app.show_user_iv_checker(),
             style=btn_nav(height=44)
-        ))        
+        ))
 
         self._show_threshold_list()
         return self.container
@@ -115,6 +126,8 @@ class EditThresholdsScreen:
     def _show_threshold_list(self):
         for child in list(self.content_box.children):
             self.content_box.remove(child)
+
+        self._set_outer_buttons_enabled(True)
 
         self._selected_species = None
         self._selected_league = "Great"
@@ -246,25 +259,21 @@ class EditThresholdsScreen:
         for child in list(self.content_box.children):
             self.content_box.remove(child)
 
-        self.content_box.add(toga.Button(
-            "← Cancel",
-            on_press=lambda w: self._show_threshold_list(),
-            style=btn_back(height=44)
-        ))
+        self._set_outer_buttons_enabled(False)
 
         self.content_box.add(toga.Button(
             "Save Target",
             on_press=self._save_threshold,
             style=btn_primary(height=48, font_size=16)
         ))
-        
+
         self.form_error = toga.Label(
             "",
             style=Pack(font_size=13, text_align="center", margin_top=8,
                        color=COLOR_YELLOW)
         )
         self.content_box.add(self.form_error)
-        
+
         self.content_box.add(toga.Label(
             "League:",
             style=Pack(font_size=14, margin_bottom=4, color=COLOR_TEXT_LIGHT)
@@ -297,7 +306,12 @@ class EditThresholdsScreen:
         self._add_field_row("Only top N:", self._form_onlytop,
                             lambda w: self._show_text_entry("Only top N (0=all)", "onlytop"))
 
-
+        # Cancel at the bottom
+        self.content_box.add(toga.Button(
+            "← Cancel",
+            on_press=lambda w: self._show_threshold_list(),
+            style=btn_nav(height=44)
+        ))
 
     def _add_field_row(self, label, value, handler):
         row = toga.Box(style=Pack(direction=ROW, margin_bottom=8))
@@ -330,11 +344,7 @@ class EditThresholdsScreen:
         for child in list(self.content_box.children):
             self.content_box.remove(child)
 
-        self.content_box.add(toga.Button(
-            "← Back to Form",
-            on_press=lambda w: self._show_add_form(),
-            style=btn_back(height=44)
-        ))
+        self._set_outer_buttons_enabled(False)
 
         self.content_box.add(toga.Label(
             prompt,
@@ -358,6 +368,12 @@ class EditThresholdsScreen:
             style=btn_primary(height=48, font_size=16)
         ))
 
+        self.content_box.add(toga.Button(
+            "← Back to Form",
+            on_press=lambda w: self._show_add_form(),
+            style=btn_nav(height=44)
+        ))
+
     def _save_text_entry(self, widget):
         value = self._entry_input.value.strip()
         setattr(self, f"_form_{self._entry_field}", value)
@@ -371,21 +387,12 @@ class EditThresholdsScreen:
         for child in list(self.content_box.children):
             self.content_box.remove(child)
 
+        self._set_outer_buttons_enabled(False)
         self._ensure_species_list()
         self._filtered_species = list(self._all_species)
 
-        self.content_box.add(toga.Button(
-            "← Back to Form",
-            on_press=self._show_add_form,
-            style=btn_back(height=44)
-        ))
-
-        self.content_box.add(toga.Label(
-            "Type to search:",
-            style=Pack(font_size=14, margin_bottom=4, color=COLOR_TEXT_LIGHT)
-        ))
         self.species_search = toga.TextInput(
-            placeholder="e.g. Medicham",
+            placeholder="Type to search (e.g. Medicham)",
             on_change=self._filter_species,
             style=Pack(margin_bottom=8)
         )
@@ -398,6 +405,12 @@ class EditThresholdsScreen:
         )
         self.content_box.add(scroll)
         self._rebuild_species_list()
+
+        self.content_box.add(toga.Button(
+            "← Back to Form",
+            on_press=self._show_add_form,
+            style=btn_nav(height=44)
+        ))
 
     def _filter_species(self, widget):
         query = self.species_search.value.strip().lower()
@@ -532,11 +545,7 @@ class EditThresholdsScreen:
         for child in list(self.content_box.children):
             self.content_box.remove(child)
 
-        self.content_box.add(toga.Button(
-            "← Target List",
-            on_press=lambda w: self._show_threshold_list(),
-            style=btn_back(height=44)
-        ))
+        self._set_outer_buttons_enabled(False)
 
         self.content_box.add(toga.Label(
             "Long-press to select and copy:",
@@ -550,15 +559,17 @@ class EditThresholdsScreen:
             style=Pack(flex=1, font_size=14)
         ))
 
+        self.content_box.add(toga.Button(
+            "← Target List",
+            on_press=lambda w: self._show_threshold_list(),
+            style=btn_nav(height=44)
+        ))
+
     def _show_import_screen(self, widget=None):
         for child in list(self.content_box.children):
             self.content_box.remove(child)
 
-        self.content_box.add(toga.Button(
-            "← Target List",
-            on_press=lambda w: self._show_threshold_list(),
-            style=btn_back(height=44)
-        ))
+        self._set_outer_buttons_enabled(False)
 
         self.content_box.add(toga.Button(
             "Import",
@@ -584,6 +595,12 @@ class EditThresholdsScreen:
         )
         self.content_box.add(self._import_input)
 
+        self.content_box.add(toga.Button(
+            "← Target List",
+            on_press=lambda w: self._show_threshold_list(),
+            style=btn_nav(height=44)
+        ))
+
     def _do_import(self, widget):
         text = self._import_input.value.strip()
         if not text:
@@ -604,3 +621,4 @@ class EditThresholdsScreen:
             self._show_threshold_list()
         except ValueError as e:
             self._import_error.text = str(e)
+            

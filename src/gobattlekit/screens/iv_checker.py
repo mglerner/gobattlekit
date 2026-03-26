@@ -110,12 +110,6 @@ class IVCheckerScreen:
                                       style=Pack(flex=1, background_color=COLOR_BG))
         self.container.add(scroll)
 
-        # Back button
-        self.container.add(toga.Button(
-            "← Back to Home",
-            on_press=lambda w: self.app.show_home(),
-            style=btn_nav(height=44, margin_bottom=0)
-        ))
 
         # Help button
         self.container.add(toga.Button(
@@ -128,6 +122,13 @@ class IVCheckerScreen:
             style=btn_help()
         ))        
 
+        # Back button
+        self.container.add(toga.Button(
+            "← Back to Home",
+            on_press=lambda w: self.app.show_home(),
+            style=btn_nav(height=44, margin_bottom=0)
+        ))
+        
         if self.results:
             self._display_species_list()
 
