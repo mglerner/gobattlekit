@@ -11,7 +11,8 @@ from ..data.gamemaster import get_moves, get_rankings, counters_to_charge, charg
 from ..platform import ON_ANDROID, ON_IOS
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
-    COLOR_SECONDARY_BTN, btn_primary, btn_secondary, btn_nav, btn_quiz_answer
+    COLOR_SECONDARY_BTN, btn_primary, btn_secondary, btn_nav,
+    btn_quiz_answer, answer_color_gradient
 )
 
 MAX_ATTEMPTS = 3
@@ -64,7 +65,7 @@ class QuizScreen:
         )
         self.container.add(self.feedback_label)
 
-        self.button_box = toga.Box(style=Pack(direction=COLUMN))
+        self.button_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
         self._build_answer_buttons()
         self.container.add(self.button_box)
 
@@ -76,12 +77,7 @@ class QuizScreen:
 
         return self.container
 
-    # ------------------------------------------------------------------
-    # Question loading
-    # ------------------------------------------------------------------
-
     def _load_question(self):
-        """Pick a random mon, moveset, and question type."""
         mon = random.choice(self.mons)
         self.fast_id = mon['moveset'][0]
         self.charged_id = random.choice(mon['moveset'][1:])
@@ -90,7 +86,6 @@ class QuizScreen:
         self.mon_name = mon['speciesName']
         self.attempts = 0
 
-        # Randomly pick question type — 50/50
         self.question_type = random.choice([QUESTION_TYPE_FIRST, QUESTION_TYPE_SEQUENCE])
 
         if self.question_type == QUESTION_TYPE_FIRST:
@@ -105,20 +100,14 @@ class QuizScreen:
                 num_charges=4
             )
             self.right_answer = tuple(self.sequence)
-            # Generate all 8 wrong answers: first number fixed, rest vary ±1
             n = self.sequence[0]
-            self.sequence_choices = []
-            for b1 in (n, n-1):
-                for b2 in (n, n-1):
-                    for b3 in (n, n-1):
-                        self.sequence_choices.append((n, b1, b2, b3))
-            # Deduplicate and shuffle
-            self.sequence_choices = list(set(self.sequence_choices))
+            self.sequence_choices = list(set(
+                (n, b1, b2, b3)
+                for b1 in (n, n-1)
+                for b2 in (n, n-1)
+                for b3 in (n, n-1)
+            ))
             random.shuffle(self.sequence_choices)
-
-    # ------------------------------------------------------------------
-    # Button construction
-    # ------------------------------------------------------------------
 
     def _build_answer_buttons(self):
         for child in list(self.button_box.children):
@@ -127,22 +116,24 @@ class QuizScreen:
         self.answer_buttons = {}
 
         if self.question_type == QUESTION_TYPE_FIRST:
-            # Original number grid
             answers = list(range(1, 21)) + ['more']
+            total_rows = (len(answers) + 3) // 4  # ceil(21/4) = 6
             row = None
             for i, val in enumerate(answers):
+                row_index = i // 4
                 if i % 4 == 0:
                     row = toga.Box(style=Pack(direction=ROW, margin_bottom=4))
                     self.button_box.add(row)
                 btn = toga.Button(
                     str(val),
                     on_press=self._make_answer_handler(val),
-                    style=btn_quiz_answer()
+                    style=Pack(flex=1, margin=2, height=44, font_size=14,
+                               background_color=answer_color_gradient(total_rows, row_index),
+                               color=COLOR_TEXT_LIGHT)
                 )
                 self.answer_buttons[val] = btn
                 row.add(btn)
         else:
-            # Sequence question — 2 columns of 4
             left_col = toga.Box(style=Pack(direction=COLUMN, flex=1, margin_right=4))
             right_col = toga.Box(style=Pack(direction=COLUMN, flex=1, margin_left=4))
             cols_row = toga.Box(style=Pack(direction=ROW, margin_bottom=4))
@@ -150,13 +141,15 @@ class QuizScreen:
             cols_row.add(right_col)
             self.button_box.add(cols_row)
 
+            total_rows = (len(self.sequence_choices) + 1) // 2
             for i, choice in enumerate(self.sequence_choices):
+                row_index = i // 2
                 label = ", ".join(str(x) for x in choice)
                 btn = toga.Button(
                     label,
                     on_press=self._make_answer_handler(choice),
                     style=Pack(height=48, font_size=14, margin_bottom=4,
-                               background_color=COLOR_SECONDARY_BTN,
+                               background_color=answer_color_gradient(total_rows, row_index),
                                color=COLOR_TEXT_LIGHT)
                 )
                 self.answer_buttons[choice] = btn
@@ -169,10 +162,6 @@ class QuizScreen:
         def handler(widget):
             self._check_answer(value)
         return handler
-
-    # ------------------------------------------------------------------
-    # Answer checking
-    # ------------------------------------------------------------------
 
     def _check_answer(self, chosen):
         self.attempts += 1
@@ -206,7 +195,7 @@ class QuizScreen:
                 self.feedback_label.text = (
                     f"❌ Try again! {remaining} attempt{'s' if remaining != 1 else ''} left."
                 )
-                
+
     def _set_question_text(self):
         turns = self.fastmoves[self.fast_id].get('turns', '?')
         if self.question_type == QUESTION_TYPE_FIRST:
@@ -230,10 +219,6 @@ class QuizScreen:
         self._set_question_text()
         self.feedback_label.text = ""
         self._build_answer_buttons()
-
-    # ------------------------------------------------------------------
-    # Score and navigation
-    # ------------------------------------------------------------------
 
     def _score_text(self):
         return f"Score: {self.score} / {self.max_score}"
