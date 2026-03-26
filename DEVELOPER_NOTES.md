@@ -1,5 +1,19 @@
 # GoBattleKit Developer Notes
 
+## Setup
+```zsh
+cd ~/coding/MGLPoGo
+source .venv/bin/activate
+cd gobattlekit
+```
+
+## Quick Testing
+```zsh
+briefcase dev
+```
+
+Runs the app on macOS without building for iOS/Android. Note: some platform-specific behavior differs (e.g. colors may look different in light/dark mode).
+
 ## iOS Build Process
 
 1. `briefcase create iOS`
@@ -9,28 +23,64 @@
    - Right-click grey GoBattleKit folder in project navigator
    - New File → search "Privacy" → select "App Privacy"
    - Name it `PrivacyInfo`, add to GoBattleKit target
-   - Contents: see `resources/PrivacyInfo.xcprivacy` in this repo
+   - Copy contents from `resources/PrivacyInfo.xcprivacy` in this repo
 5. Product → Clean Build Folder (Cmd+Shift+K)
 6. Product → Archive → Distribute → App Store Connect → Upload
 
+### TestFlight Notes
+- Internal testers get access immediately after upload
+- External testers require Beta App Review (can take hours, stricter than internal)
+- Apple requires a new version or build number for each upload
+- Update `version` in `pyproject.toml` before each build
+
 ## Android Build Process
-```bash
+```zsh
 briefcase update android
 briefcase build android
 briefcase run android -d "@Medium_Phone_API_36.1"
 ```
 
-## Version Bumping
-- Update `version` in `pyproject.toml`
-- Apple requires a new version or build number for each upload
+Must launch emulator from Android Studio first if AVD config is missing.
 
-## Known Issues
-- iOS navigation bar cannot be hidden via Python/Rubicon — requires native Xcode project modification
-- Android white border around container in light mode — cosmetic, accepted
-- `Window content exceeds available space` warning on iOS — cosmetic, harmless
+## Generating Assets
+
+### Icons (if icon SVG changes)
+```zsh
+python make_icons.py
+```
+Requires `cairosvg`. Generates all iOS and Android icon sizes.
+
+### Evolution Lines (if gamemaster structure changes)
+```zsh
+python make_evolist.py
+```
+Regenerates `src/gobattlekit/data/evolution_lines.json` from PvPoke gamemaster data.
 
 ## PvPoke Data URLs
 ```python
 BASE_URL = "https://raw.githubusercontent.com/pvpoke/pvpoke/refs/heads/master/src/data"
 ```
 Note: The old URL format (`/master/` without `refs/heads/`) stopped working in March 2026.
+
+## Known Issues
+- **iOS navigation bar** — cannot be hidden via Python/Rubicon without modifying native Xcode project files directly. The `title=""` approach doesn't work on iOS.
+- **Android white border** — container has a white border in Android light mode. Cosmetic, accepted for now.
+- **`Window content exceeds available space`** — warning on iOS, cosmetic and harmless.
+- **`briefcase dev` color differences** — macOS dark mode handling differs from iOS/Android. Trust the device, not dev mode, for color appearance.
+
+## Important Code Notes
+
+### `__main__.py` locale monkey-patch
+The locale monkey-patch in `__main__.py` is intentional and required — do not remove it. It fixes a crash on iOS caused by Python's locale module not finding the expected locale settings in the iOS sandbox environment.
+
+### Theme system
+All colors, button styles, and layout constants are in `src/gobattlekit/theme.py`. Always add new styles there rather than inline in screen files.
+
+### CSV persistence
+The PokeGenie CSV is saved to `CACHE_DIR/pokegenie_export.csv` and auto-loaded on startup. `CACHE_DIR` is `~/Documents/gobattlekit_cache/` on iOS and `/data/user/0/com.mglerner.gobattlekit/files/Documents/gobattlekit_cache/` on Android.
+
+### iOS CSV delivery
+iOS uses inbox polling — `app.py` checks `~/Documents/Inbox` every 3 seconds for new CSVs shared from PokeGenie.
+
+### Android CSV delivery
+Android uses a file picker Intent (`ACTION_GET_CONTENT`) with an `on_complete` callback. The callback receives `(result_code, result)` — note the two arguments.
