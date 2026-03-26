@@ -87,12 +87,14 @@ class HelpScreen:
                        color=COLOR_ACCENT)
         ))
 
+        topic_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
         for topic in TOPICS:
-            container.add(toga.Button(
+            topic_box.add(toga.Button(
                 topic,
                 on_press=self._make_topic_handler(topic),
                 style=btn_secondary(height=48, font_size=16)
             ))
+        container.add(topic_box)
 
         container.add(toga.Button(
             self._back_label,
@@ -120,7 +122,6 @@ class HelpScreen:
 
         sections = HELP_CONTENT.get(topic, [])
         for heading, body in sections:
-            # Extract video markers from body
             videos = VIDEO_PATTERN.findall(body)
             clean_body = VIDEO_PATTERN.sub('', body).strip()
 
@@ -154,7 +155,7 @@ class HelpScreen:
             on_press=lambda w: self.app.show_help(
                 back_screen=self._back_screen,
                 back_label=self._back_label
-                ),
+            ),
             style=Pack(flex=1, height=44, margin_right=4,
                        background_color=COLOR_SECONDARY_BTN,
                        color=COLOR_TEXT_LIGHT)
