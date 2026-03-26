@@ -16,16 +16,27 @@ Runs the app on macOS without building for iOS/Android. Note: some platform-spec
 
 ## iOS Build Process
 
-1. `briefcase create iOS`
+1. Run `prepare_ios.sh` instead of `briefcase create iOS` directly:
+```zsh
+   ./prepare_ios.sh
+```
+   This runs `briefcase create iOS` and then copies the required `.xcprivacy` files
+   for `_hashlib` and `_ssl` into the support package. These files are needed to
+   pass Apple's privacy manifest review (ITMS-91061). They must be copied after
+   every `briefcase create iOS` since the build directory is wiped each time.
+
 2. Open `build/gobattlekit/ios/xcode/GoBattleKit.xcodeproj` in Xcode
-3. Set signing team to Michael Lerner (Personal Team) — resets on each `briefcase create`
-4. **Add PrivacyInfo.xcprivacy** (required by Apple, resets on each `briefcase create`):
-   - Right-click grey GoBattleKit folder in project navigator
-   - New File → search "Privacy" → select "App Privacy"
-   - Name it `PrivacyInfo`, add to GoBattleKit target
-   - Copy contents from `resources/PrivacyInfo.xcprivacy` in this repo
-5. Product → Clean Build Folder (Cmd+Shift+K)
-6. Product → Archive → Distribute → App Store Connect → Upload
+3. Set signing team to Michael Lerner (Personal Team) — resets on each run of `prepare_ios.sh`
+4. Product → Clean Build Folder (Cmd+Shift+K)
+5. Product → Archive → Distribute → App Store Connect → Upload
+
+### Verifying the privacy manifest fix
+Before distributing, you can verify the fix worked:
+- In Xcode Organizer (Window → Organizer), right-click the archive → Show in Finder
+- Right-click the `.xcarchive` → Show Package Contents
+- Navigate to `Products/Applications/GoBattleKit.app/Frameworks/`
+- Confirm `_hashlib.framework` and `_ssl.framework` each contain `PrivacyInfo.xcprivacy`
+
 
 ### TestFlight Notes
 - Internal testers get access immediately after upload
