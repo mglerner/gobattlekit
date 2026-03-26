@@ -10,7 +10,7 @@ from toga.style.pack import COLUMN
 from ..data.effectiveness import effectiveness, effectiveness_to_words
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
-    btn_primary, btn_nav
+    btn_primary, btn_nav, btn_secondary
 )
 
 TYPE_EMOJI = {
@@ -122,7 +122,7 @@ class TypeQuizScreen:
             btn = toga.Button(
                 answer.capitalize(),
                 on_press=self._make_answer_handler(answer),
-                style=btn_primary(height=52, font_size=16)
+                style=btn_secondary(height=52, font_size=16)
             )
             self.answer_buttons[answer] = btn
             self.button_box.add(btn)
