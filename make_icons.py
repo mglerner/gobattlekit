@@ -33,7 +33,7 @@ SVG = """<svg width="1024" height="1024" viewBox="0 0 680 680" xmlns="http://www
     <rect x="16" y="-116" width="30" height="46" rx="8"/>
   </g>
 </g>
-<path d="M 160 220 A 210 210 0 0 1 420 110" fill="none" stroke="white" stroke-width="6" stroke-linecap="round" opacity="0.15"/>
+<path d="M 160 220 A 210 210 0 0 1 420 110" fill="none" stroke="white" stroke-width="16" stroke-linecap="round" opacity="0.4"/>
 </svg>"""
 
 SVG_TRANSPARENT = """<svg width="1024" height="1024" viewBox="0 0 680 680" xmlns="http://www.w3.org/2000/svg">
@@ -64,7 +64,7 @@ SVG_TRANSPARENT = """<svg width="1024" height="1024" viewBox="0 0 680 680" xmlns
     <rect x="16" y="-116" width="30" height="46" rx="8"/>
   </g>
 </g>
-<path d="M 160 220 A 210 210 0 0 1 420 110" fill="none" stroke="white" stroke-width="6" stroke-linecap="round" opacity="0.15"/>
+<path d="M 160 220 A 210 210 0 0 1 420 110" fill="none" stroke="white" stroke-width="16" stroke-linecap="round" opacity="0.4"/>
 </svg>"""
 
 out_dir = pathlib.Path("src/gobattlekit/resources")
