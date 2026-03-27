@@ -35,6 +35,13 @@ class QuizScreen:
         self.score = 0
         self.max_score = 0
         self.attempts = 0
+        self.streak = 0
+        self.max_streak = 0
+        self.total_questions = 0
+        self.first_charge_correct = 0
+        self.first_charge_total = 0
+        self.sequence_correct = 0
+        self.sequence_total = 0
         self._load_question()
 
         self.container = toga.Box(style=CONTAINER)
@@ -117,7 +124,7 @@ class QuizScreen:
 
         if self.question_type == QUESTION_TYPE_FIRST:
             answers = list(range(1, 21)) + ['more']
-            total_rows = (len(answers) + 3) // 4  # ceil(21/4) = 6
+            total_rows = (len(answers) + 3) // 4
             row = None
             for i, val in enumerate(answers):
                 row_index = i // 4
@@ -163,19 +170,43 @@ class QuizScreen:
             self._check_answer(value)
         return handler
 
+    def _highlight_correct_button(self):
+        """Highlight the correct answer button in teal."""
+        correct_btn = self.answer_buttons.get(self.right_answer)
+        if correct_btn:
+            correct_btn.style.background_color = COLOR_ACCENT
+
     def _check_answer(self, chosen):
         self.attempts += 1
         if chosen == self.right_answer:
+            self.total_questions += 1
             pts = POINTS.get(self.attempts, 1)
             self.score += pts
             self.max_score += 3
+            if self.attempts == 1:
+                self.streak += 1
+                self.max_streak = max(self.max_streak, self.streak)
+            else:
+                self.streak = 0
+            if self.question_type == QUESTION_TYPE_FIRST:
+                self.first_charge_correct += 1
+                self.first_charge_total += 1
+            else:
+                self.sequence_correct += 1
+                self.sequence_total += 1
             self.score_label.text = self._score_text()
             self.feedback_label.text = f"✅ Correct! +{pts} point{'s' if pts != 1 else ''}"
             self._disable_buttons()
             asyncio.create_task(self._advance_question())
         else:
+            self.streak = 0
             if self.attempts >= MAX_ATTEMPTS:
+                self.total_questions += 1
                 self.max_score += 3
+                if self.question_type == QUESTION_TYPE_FIRST:
+                    self.first_charge_total += 1
+                else:
+                    self.sequence_total += 1
                 self.score_label.text = self._score_text()
                 if self.question_type == QUESTION_TYPE_SEQUENCE:
                     correct = ", ".join(str(x) for x in self.right_answer)
@@ -188,6 +219,7 @@ class QuizScreen:
                         f"{self.fast_name} gives {energy_per_fast} energy, \n"
                         f"{self.charged_name} costs {energy_needed} energy."
                     )
+                self._highlight_correct_button()
                 self._disable_buttons()
                 asyncio.create_task(self._advance_question())
             else:
@@ -221,14 +253,20 @@ class QuizScreen:
         self._build_answer_buttons()
 
     def _score_text(self):
+        if self.streak > 0:
+            return f"Score: {self.score} / {self.max_score} 🔥{self.streak}"
         return f"Score: {self.score} / {self.max_score}"
 
-    async def _end_quiz(self, widget):
-        league_name = self.league.capitalize()
-        await self.app.main_window.dialog(
-            toga.InfoDialog(
-                "Quiz Complete",
-                f"{league_name} League\nFinal score: {self.score} / {self.max_score}"
-            )
-        )
-        self.app.show_home()
+    def _end_quiz(self, widget):
+        stats = {
+            'score': self.score,
+            'max_score': self.max_score,
+            'max_streak': self.max_streak,
+            'total_questions': self.total_questions,
+            'league': self.league,
+            'first_charge_correct': self.first_charge_correct,
+            'first_charge_total': self.first_charge_total,
+            'sequence_correct': self.sequence_correct,
+            'sequence_total': self.sequence_total,
+        }
+        self.app.show_quiz_summary(stats)
