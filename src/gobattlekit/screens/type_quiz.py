@@ -44,6 +44,9 @@ class TypeQuizScreen:
     def build(self):
         self.score = 0
         self.total = 0
+        self.streak = 0
+        self.max_streak = 0
+        self.total_questions = 0
         self._load_question()
 
         self.container = toga.Box(style=CONTAINER)
@@ -130,16 +133,28 @@ class TypeQuizScreen:
             self._check_answer(value)
         return handler
 
+    def _highlight_correct_button(self):
+        """Highlight the correct answer button in teal."""
+        correct_btn = self.answer_buttons.get(self.right_answer)
+        if correct_btn:
+            correct_btn.style.background_color = COLOR_ACCENT
+
     def _check_answer(self, chosen):
-        self.total += 1
+        self.total_questions += 1
         self._disable_buttons()
         if chosen == self.right_answer:
             self.score += 1
+            self.total += 1
+            self.streak += 1
+            self.max_streak = max(self.max_streak, self.streak)
             self.score_label.text = self._score_text()
             self.feedback_label.text = "✅ Correct!"
         else:
+            self.streak = 0
+            self.total += 1
             self.score_label.text = self._score_text()
             self.feedback_label.text = f"❌ The answer was {self.right_answer}."
+            self._highlight_correct_button()
         asyncio.create_task(self._advance_question())
 
     def _disable_buttons(self):
@@ -154,14 +169,16 @@ class TypeQuizScreen:
         self._build_answer_buttons()
 
     def _score_text(self):
+        if self.streak > 0:
+            return f"Score: {self.score} / {self.total} 🔥{self.streak}"
         return f"Score: {self.score} / {self.total}"
 
-    async def _end_quiz(self, widget):
-        await self.app.main_window.dialog(
-            toga.InfoDialog(
-                "Quiz Complete",
-                f"Type Effectiveness\nFinal score: {self.score} / {self.total}"
-            )
-        )
-        self.app.show_home()
-        
+    def _end_quiz(self, widget):
+        stats = {
+            'score': self.score,
+            'max_score': self.total,
+            'max_streak': self.max_streak,
+            'total_questions': self.total_questions,
+            'league': 'type',
+        }
+        self.app.show_quiz_summary(stats)
