@@ -13,7 +13,7 @@ from ..data.gamemaster import (
 )
 from ..platform import ON_ANDROID
 from ..theme import (
-    CONTAINER, COLOR_TEXT_LIGHT, COLOR_YELLOW,
+    CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
     COLOR_SECONDARY_BTN,
     answer_color_gradient,
     btn_nav
@@ -22,13 +22,13 @@ from ..theme import (
 MAX_ATTEMPTS = 3
 POINTS = {1: 3, 2: 2, 3: 1}
 
+
 class TimingQuizScreen:
     """Quiz screen for optimal move timing questions."""
 
     def __init__(self, app):
         self.app = app
         self.fastmoves, _ = get_moves()
-        # Build set of fast move IDs used by ranked mons across all leagues
         all_mons = []
         for league in ('great', 'ultra', 'master'):
             all_mons.extend(get_rankings(league))
@@ -42,6 +42,9 @@ class TimingQuizScreen:
         self.score = 0
         self.total = 0
         self.attempts = 0
+        self.streak = 0
+        self.max_streak = 0
+        self.total_questions = 0
         self._load_question()
 
         self.container = toga.Box(style=CONTAINER)
@@ -72,7 +75,7 @@ class TimingQuizScreen:
         )
         self.container.add(self.feedback_label)
 
-        self.button_box = toga.Box(style=Pack(direction=COLUMN), flex=1)
+        self.button_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
         self._build_answer_buttons()
         self.container.add(self.button_box)
 
@@ -83,10 +86,6 @@ class TimingQuizScreen:
         ))
 
         return self.container
-
-    # ------------------------------------------------------------------
-    # Question loading
-    # ------------------------------------------------------------------
 
     def _load_question(self):
         self.attempts = 0
@@ -102,18 +101,12 @@ class TimingQuizScreen:
         self.right_answer = OPTIMAL_TIMING.get((your_t, their_t), None)
 
         self.timing_choices = list(ALL_TIMING_PATTERNS)
-        #random.shuffle(self.timing_choices)
-
-    # ------------------------------------------------------------------
-    # Button construction
-    # ------------------------------------------------------------------
 
     def _build_answer_buttons(self):
         for child in list(self.button_box.children):
             self.button_box.remove(child)
         self.answer_buttons = {}
 
-        # Separate out "timing doesn't matter" (None) from the rest
         pattern_choices = [p for p in self.timing_choices if p is not None]
 
         left_col = toga.Box(style=Pack(direction=COLUMN, flex=1, margin_right=4))
@@ -123,10 +116,9 @@ class TimingQuizScreen:
         cols_row.add(right_col)
         self.button_box.add(cols_row)
 
-        # ceil(9/2) = 5 + 1 for the doesn't matter button
-        total_rows = ((len(pattern_choices) + 1) // 2) + 1  
+        total_rows = ((len(pattern_choices) + 1) // 2) + 1
         for i, pattern in enumerate(pattern_choices):
-            row_index = i // 2  # same color for both buttons in a row
+            row_index = i // 2
             label = format_timing_pattern(pattern)
             btn = toga.Button(
                 label,
@@ -134,49 +126,64 @@ class TimingQuizScreen:
                 style=Pack(height=48, font_size=13, margin_bottom=4,
                            background_color=answer_color_gradient(total_rows, row_index),
                            color=COLOR_TEXT_LIGHT)
-            )        
+            )
             self.answer_buttons[i] = btn
             if i % 2 == 0:
                 left_col.add(btn)
             else:
                 right_col.add(btn)
 
-        # "Timing doesn't matter" as full-width button at the bottom
         tdm_btn = toga.Button(
             "Timing doesn't matter",
             on_press=self._make_answer_handler(None),
             style=Pack(height=48, font_size=13, margin_bottom=4,
-                       background_color=answer_color_gradient(total_rows,total_rows),
+                       background_color=answer_color_gradient(total_rows, total_rows),
                        color=COLOR_TEXT_LIGHT)
         )
         self.answer_buttons[len(pattern_choices)] = tdm_btn
-        self.button_box.add(tdm_btn)    
+        self.button_box.add(tdm_btn)
 
     def _make_answer_handler(self, pattern):
         def handler(widget):
             self._check_answer(pattern)
         return handler
 
-    # ------------------------------------------------------------------
-    # Answer checking
-    # ------------------------------------------------------------------
+    def _highlight_correct_button(self):
+        """Highlight the correct answer button in teal."""
+        if self.right_answer is None:
+            # correct answer is "Timing doesn't matter"
+            correct_btn = self.answer_buttons.get(len(self.timing_choices) - 1)
+        else:
+            idx = [p for p in self.timing_choices if p is not None].index(self.right_answer)
+            correct_btn = self.answer_buttons.get(idx)
+        if correct_btn:
+            correct_btn.style.background_color = COLOR_ACCENT
 
     def _check_answer(self, chosen):
         self.attempts += 1
         if chosen == self.right_answer:
+            self.total_questions += 1
             pts = POINTS.get(self.attempts, 1)
             self.score += pts
             self.total += 3
+            if self.attempts == 1:
+                self.streak += 1
+                self.max_streak = max(self.max_streak, self.streak)
+            else:
+                self.streak = 0
             self.score_label.text = self._score_text()
             self.feedback_label.text = f"✅ Correct! +{pts} point{'s' if pts != 1 else ''}"
             self._disable_buttons()
             asyncio.create_task(self._advance_question())
         else:
+            self.streak = 0
             if self.attempts >= MAX_ATTEMPTS:
+                self.total_questions += 1
                 self.total += 3
                 self.score_label.text = self._score_text()
                 correct_str = format_timing_pattern(self.right_answer)
                 self.feedback_label.text = f"❌ The answer was: {correct_str}."
+                self._highlight_correct_button()
                 self._disable_buttons()
                 asyncio.create_task(self._advance_question())
             else:
@@ -204,13 +211,16 @@ class TimingQuizScreen:
         self._build_answer_buttons()
 
     def _score_text(self):
+        if self.streak > 0:
+            return f"Score: {self.score} / {self.total} 🔥{self.streak}"
         return f"Score: {self.score} / {self.total}"
 
-    async def _end_quiz(self, widget):
-        await self.app.main_window.dialog(
-            toga.InfoDialog(
-                "Quiz Complete",
-                f"Move Timing\nFinal score: {self.score} / {self.total}"
-            )
-        )
-        self.app.show_home()
+    def _end_quiz(self, widget):
+        stats = {
+            'score': self.score,
+            'max_score': self.total,
+            'max_streak': self.max_streak,
+            'total_questions': self.total_questions,
+            'league': 'timing',
+        }
+        self.app.show_quiz_summary(stats)
