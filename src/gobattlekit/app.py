@@ -27,6 +27,7 @@ from .screens.type_quiz import TypeQuizScreen
 from .screens.iv_checker import IVCheckerScreen
 from .screens.user_iv_checker import UserIVCheckerScreen
 from .screens.edit_thresholds import EditThresholdsScreen
+from .screens.quiz_summary import QuizSummaryScreen
 
 from .theme import COLOR_BG
 
@@ -44,6 +45,7 @@ class GoBattleKit(toga.App):
             self.iv_checker_screen = IVCheckerScreen(self)
             self.user_iv_checker_screen = UserIVCheckerScreen(self)
             self.edit_thresholds_screen = EditThresholdsScreen(self)
+            self.quiz_summary_screen = QuizSummaryScreen(self)
             self.help_screen = HelpScreen(self)
             self.main_window = toga.MainWindow(title=self.formal_name)
             self.main_window.content = self.home_screen.build()
@@ -147,7 +149,10 @@ class GoBattleKit(toga.App):
         self.main_window.content = self.help_screen.build(
             topic=topic, back_screen=back_screen,
             back_label=back_label
-        )    
+        )
+
+    def show_quiz_summary(self,stats):
+        self.main_window.content = self.quiz_summary_screen.build(stats)
 
 
 def main():
