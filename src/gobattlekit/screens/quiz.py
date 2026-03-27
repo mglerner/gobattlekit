@@ -114,7 +114,7 @@ class QuizScreen:
                 for b2 in (n, n-1)
                 for b3 in (n, n-1)
             ))
-            random.shuffle(self.sequence_choices)
+            self.sequence_choices.sort(reverse=True)
 
     def _build_answer_buttons(self):
         for child in list(self.button_box.children):
@@ -208,12 +208,16 @@ class QuizScreen:
                 else:
                     self.sequence_total += 1
                 self.score_label.text = self._score_text()
+                energy_per_fast = self.fastmoves[self.fast_id]['energyGain']
+                energy_needed = self.chargedmoves[self.charged_id]['energy']
                 if self.question_type == QUESTION_TYPE_SEQUENCE:
                     correct = ", ".join(str(x) for x in self.right_answer)
-                    self.feedback_label.text = f"❌ The answer was {correct}."
+                    self.feedback_label.text = (
+                        f"❌ The answer was {correct}.\n"
+                        f"{self.fast_name} gives {energy_per_fast} energy, \n"
+                        f"{self.charged_name} costs {energy_needed} energy."
+                    )
                 elif self.question_type == QUESTION_TYPE_FIRST:
-                    energy_per_fast = self.fastmoves[self.fast_id]['energyGain']
-                    energy_needed = self.chargedmoves[self.charged_id]['energy']
                     self.feedback_label.text = (
                         f"❌ The answer was {self.right_answer}. \n"
                         f"{self.fast_name} gives {energy_per_fast} energy, \n"
