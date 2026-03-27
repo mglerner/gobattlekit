@@ -37,13 +37,13 @@ HELP_CONTENT = {
     "My PvP IV Targets": [
         ("", "Set your own IV targets to check your Pokemon against. For example, add Medicham with a minimum Attack of 105 to find your best Great League Medicham candidates."),
         ("Adding a target", "Tap Edit My Targets -> Add Target, choose a species and league, set minimum stats (0 means any), and tap Save Target. Make sure you import your PokeGenie CSV to see results. Your CSV is remembered between sessions, so you only need to import it once - results update automatically when you add or change targets."),
-        ("Target buttons", "Each target has four buttons:\n✎ Edit - modify the target's stats or name\n⧉ Duplicate - copy the target as a starting point for a new one\n📤 Share - export the target as text to share with friends\n✕ Delete - remove the target"),
+        ("Target buttons", "Each target has four buttons:\n✎ Edit - modify the target's stats or label\n⧉ Duplicate - copy the target as a starting point for a new one\n📤 Share - export the target as text to share with friends\n✕ Delete - remove the target"),
         ("Import from Text", "Lets you paste a target shared by someone else. This is useful for importing targets from the PvP community - for example, if a content creator publishes their recommended IV floors, you can paste them directly into GoBattleKit."),
     ],
     "Move Count Quizzes": [
         ("", "Practice counting how many fast moves it takes to charge a move."),
         ("Question types", "There are two question types: single charge (how many fast moves to reach the first charge move) and sequence (how many fast moves to reach each of the first 4 charge moves, accounting for leftover energy)."),
-        ("Scoring", "You can score up to 3 points per question - more points for fewer attempts."),
+        ("Scoring", "You can score up to 3 points per question — more points for fewer attempts. Your current streak of first-attempt correct answers is shown with 🔥 in the score display."),
     ],
     "Optimal Move Timing Quiz": [
         ("", "In PvP, throwing your charge move at the right time minimizes the free turns you give your opponent. The optimal timing depends on your fast move's turn count vs your opponent's."),
