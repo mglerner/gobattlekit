@@ -295,8 +295,8 @@ class EditThresholdsScreen:
 
         self._add_field_row("Species:", self._selected_species or "tap to select",
                             self._show_species_picker)
-        self._add_field_row("Name:", self._form_name or "tap to enter",
-                            lambda w: self._show_text_entry("Name", "name"))
+        self._add_field_row("Label:", self._form_name or "tap to enter",
+                            lambda w: self._show_text_entry("Label", "name"))
         self._add_field_row("Attack:", self._form_atk,
                             lambda w: self._show_text_entry("Min Attack (0=any)", "atk"))
         self._add_field_row("Defense:", self._form_def,
