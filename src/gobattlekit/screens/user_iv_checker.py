@@ -32,7 +32,6 @@ class UserIVCheckerScreen(IVCheckerScreen):
         """Build and return the user IV checker screen content."""
         self.container = toga.Box(style=CONTAINER)
 
-        # Title
         self.container.add(toga.Label(
             "My PvP IV Targets",
             style=Pack(font_size=24, font_weight="bold",
@@ -40,7 +39,6 @@ class UserIVCheckerScreen(IVCheckerScreen):
                        color=COLOR_ACCENT)
         ))
 
-        # League selector row
         league_box = toga.Box(style=Pack(direction=ROW, margin_bottom=16))
         for league, label in (('great', 'Great'), ('ultra', 'Ultra'), ('master', 'Master')):
             league_box.add(toga.Button(
@@ -50,7 +48,6 @@ class UserIVCheckerScreen(IVCheckerScreen):
             ))
         self.container.add(league_box)
 
-        # Import button — not available on iOS
         if not ON_IOS:
             self.container.add(toga.Button(
                 "Import PokeGenie CSV",
@@ -58,14 +55,12 @@ class UserIVCheckerScreen(IVCheckerScreen):
                 style=btn_primary(height=52, font_size=16)
             ))
 
-        # Edit Targets button
         self.container.add(toga.Button(
             "Edit My Targets",
             on_press=lambda w: self.app.show_edit_thresholds(),
             style=btn_primary(height=48, font_size=16)
         ))
 
-        # Status labels
         csv_name_line = pathlib.Path(self.csv_path).name if self.csv_path else ""
         stats_line = ""
         if self.csv_path:
@@ -97,15 +92,12 @@ class UserIVCheckerScreen(IVCheckerScreen):
         )
         self.container.add(self.status_label_stats)
 
-
-        # Results area — scrollable
         self.results_box = toga.Box(
             style=Pack(direction=COLUMN, flex=1, background_color=COLOR_BG))
         scroll = toga.ScrollContainer(content=self.results_box,
                                       style=Pack(flex=1, background_color=COLOR_BG))
         self.container.add(scroll)
 
-        # Show getting started if no targets defined or no CSV
         if not load_user_thresholds():
             self.results_box.add(toga.Label(
                 GETTING_STARTED,
@@ -119,7 +111,17 @@ class UserIVCheckerScreen(IVCheckerScreen):
                            margin_top=20, color=COLOR_TEXT_LIGHT)
             ))
 
-        # Help
+        # Dynamic back button — hidden on species list, shown on detail views
+        self.back_btn = toga.Button(
+            "← Back to Species List",
+            on_press=lambda w: self._display_species_list(),
+            style=btn_nav(height=44)
+        )
+        self.back_btn.enabled = False
+        self.back_btn.style.height = 2
+        self.back_btn.style.margin_bottom = 0
+        self.container.add(self.back_btn)
+
         self.container.add(toga.Button(
             "?  Help",
             on_press=lambda w: self.app.show_help(
@@ -129,7 +131,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
             ),
             style=btn_help()
         ))
-        # Back button
+
         self.container.add(toga.Button(
             "← Back to Home",
             on_press=lambda w: self.app.show_home(),
