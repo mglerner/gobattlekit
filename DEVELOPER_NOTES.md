@@ -95,3 +95,6 @@ iOS uses inbox polling — `app.py` checks `~/Documents/Inbox` every 3 seconds f
 
 ### Android CSV delivery
 Android uses a file picker Intent (`ACTION_GET_CONTENT`) with an `on_complete` callback. The callback receives `(result_code, result)` — note the two arguments.
+
+### Quiz answer button gradients
+Quiz answer buttons use `answer_color_gradient(total_rows, row_index)` from `theme.py` to generate a dark-to-light gradient across the answer rows. This is used in `quiz.py`, `type_quiz.py`, and `timing_quiz.py`. The function interpolates between `#0e2036` (darkest) and `#2a4a7c` (lightest).

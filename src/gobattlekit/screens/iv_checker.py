@@ -37,7 +37,6 @@ class IVCheckerScreen:
         """Build and return the IV checker screen content."""
         self.container = toga.Box(style=CONTAINER)
 
-        # Title
         self.container.add(toga.Label(
             "IV Checker",
             style=Pack(font_size=24, font_weight="bold",
@@ -45,7 +44,6 @@ class IVCheckerScreen:
                        color=COLOR_ACCENT)
         ))
 
-        # League selector row
         league_box = toga.Box(style=Pack(direction=ROW, margin_bottom=16))
         for league, label in (('great', 'Great'), ('ultra', 'Ultra'), ('master', 'Master')):
             btn = toga.Button(
@@ -56,7 +54,6 @@ class IVCheckerScreen:
             league_box.add(btn)
         self.container.add(league_box)
 
-        # Import button — not available on iOS
         if not ON_IOS:
             self.container.add(toga.Button(
                 "Import PokeGenie CSV",
@@ -64,7 +61,6 @@ class IVCheckerScreen:
                 style=btn_primary(height=52, font_size=16)
             ))
 
-        # Status labels
         csv_name_line = pathlib.Path(self.csv_path).name if self.csv_path else ""
         stats_line = ""
         if self.csv_path:
@@ -103,15 +99,23 @@ class IVCheckerScreen:
         )
         self.container.add(self.csv_instructions_label)
 
-        # Results area — scrollable
         self.results_box = toga.Box(
             style=Pack(direction=COLUMN, flex=1, background_color=COLOR_BG))
         scroll = toga.ScrollContainer(content=self.results_box,
                                       style=Pack(flex=1, background_color=COLOR_BG))
         self.container.add(scroll)
 
+        # Dynamic back button — hidden on species list, shown on detail views
+        self.back_btn = toga.Button(
+            "← Back to Species List",
+            on_press=lambda w: self._display_species_list(),
+            style=btn_nav(height=44)
+        )
+        self.back_btn.enabled = False
+        self.back_btn.style.height = 2
+        self.back_btn.style.margin_bottom = 0
+        self.container.add(self.back_btn)
 
-        # Help button
         self.container.add(toga.Button(
             "? Help",
             on_press=lambda w: self.app.show_help(
@@ -120,26 +124,29 @@ class IVCheckerScreen:
                 back_label="← PvP IV Checker"
             ),
             style=btn_help()
-        ))        
+        ))
 
-        # Back button
         self.container.add(toga.Button(
             "← Back to Home",
             on_press=lambda w: self.app.show_home(),
             style=btn_nav(height=44, margin_bottom=0)
         ))
-        
+
         if self.results:
             self._display_species_list()
 
         return self.container
+
+    def _show_back_btn(self, visible):
+        self.back_btn.enabled = visible
+        self.back_btn.style.height = 44 if visible else 2
+        self.back_btn.style.margin_bottom = 0
 
     # ------------------------------------------------------------------
     # CSV loading
     # ------------------------------------------------------------------
 
     def load_csv(self, path):
-        """Load a CSV file from the given path and run the checker."""
         from ..data.fetcher import CACHE_DIR, SAVED_CSV
         self.csv_path = str(path).replace('file://', '')
         try:
@@ -152,7 +159,6 @@ class IVCheckerScreen:
         self._run_check()
 
     async def _import_csv(self, widget):
-        """Let the user pick a CSV file manually."""
         if ON_ANDROID:
             self._import_csv_android()
         else:
@@ -168,7 +174,6 @@ class IVCheckerScreen:
                 self.status_label_stats.text = f"Error opening file: {e}"
 
     def _import_csv_android(self):
-        """Use Android's file picker Intent to select a CSV."""
         try:
             from java import jclass
             Intent = jclass('android.content.Intent')
@@ -212,7 +217,6 @@ class IVCheckerScreen:
             self.status_label_stats.text = f"Error importing: {e}"
 
     def _run_check(self):
-        """Run the IV check against current thresholds and league."""
         if not self.csv_path:
             return
         try:
@@ -243,9 +247,10 @@ class IVCheckerScreen:
     # ------------------------------------------------------------------
 
     def _display_species_list(self):
-        """Show a list of species with hits, plus a Show All option."""
         for child in list(self.results_box.children):
             self.results_box.remove(child)
+
+        self._show_back_btn(False)
 
         if not self.results:
             if not self.csv_path:
@@ -287,17 +292,12 @@ class IVCheckerScreen:
     # ------------------------------------------------------------------
 
     def _display_species_results(self, species):
-        """Show results for a species with target cycling."""
         for child in list(self.results_box.children):
             self.results_box.remove(child)
 
-        hits = self.results[species]
+        self._show_back_btn(True)
 
-        self.results_box.add(toga.Button(
-            "← Back to Species List",
-            on_press=lambda w: self._display_species_list(),
-            style=btn_back(height=44)
-        ))
+        hits = self.results[species]
 
         self.results_box.add(toga.Label(
             f"{species} — {len(hits)} hit{'s' if len(hits) != 1 else ''}",
@@ -373,15 +373,10 @@ class IVCheckerScreen:
     # ------------------------------------------------------------------
 
     def _display_all_results(self):
-        """Show all results for all species without filtering."""
         for child in list(self.results_box.children):
             self.results_box.remove(child)
 
-        self.results_box.add(toga.Button(
-            "← Back to Species List",
-            on_press=lambda w: self._display_species_list(),
-            style=btn_back(height=44)
-        ))
+        self._show_back_btn(True)
 
         for sp in sorted(self.results.keys()):
             hits = self.results[sp]
@@ -411,7 +406,6 @@ class IVCheckerScreen:
     # ------------------------------------------------------------------
 
     def _clear_csv(self, widget):
-        """Clear the loaded CSV and delete the cached file."""
         from ..data.fetcher import SAVED_CSV
         self.csv_path = None
         self.results = {}
@@ -424,6 +418,7 @@ class IVCheckerScreen:
         self.status_label_stats.text = self.NO_CSV_MESSAGE
         self.csv_instructions_label.text = self.CSV_INSTRUCTIONS
         self.clear_csv_btn.enabled = False
+        self._show_back_btn(False)
         for child in list(self.results_box.children):
             self.results_box.remove(child)
 
@@ -432,7 +427,6 @@ class IVCheckerScreen:
     # ------------------------------------------------------------------
 
     def _add_hit_display(self, box, hit):
-        """Add a card displaying a single hit to the given box."""
         m = hit['mon']
         s = hit['stats']
         pre = f" ({hit['csv_species']})" if hit['is_pre_evo'] else ""
