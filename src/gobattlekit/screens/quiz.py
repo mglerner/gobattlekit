@@ -195,7 +195,13 @@ class QuizScreen:
                 self.sequence_correct += 1
                 self.sequence_total += 1
             self.score_label.text = self._score_text()
-            self.feedback_label.text = f"✅ Correct! +{pts} point{'s' if pts != 1 else ''}"
+            energy_per_fast = self.fastmoves[self.fast_id]['energyGain']
+            energy_needed = self.chargedmoves[self.charged_id]['energy']
+            self.feedback_label.text = (
+                f"✅ Correct! +{pts} point{'s' if pts != 1 else ''}. \n"
+                f"{self.fast_name} gives {energy_per_fast} energy, \n"
+                f"{self.charged_name} costs {energy_needed} energy."
+                )
             self._disable_buttons()
             asyncio.create_task(self._advance_question())
         else:
@@ -225,7 +231,7 @@ class QuizScreen:
                     )
                 self._highlight_correct_button()
                 self._disable_buttons()
-                asyncio.create_task(self._advance_question())
+                asyncio.create_task(self._advance_question(delay=2.5))
             else:
                 remaining = MAX_ATTEMPTS - self.attempts
                 self.feedback_label.text = (
@@ -249,8 +255,8 @@ class QuizScreen:
         for btn in self.answer_buttons.values():
             btn.enabled = False
 
-    async def _advance_question(self):
-        await asyncio.sleep(1.5)
+    async def _advance_question(self, delay=1.5):
+        await asyncio.sleep(delay)
         self._load_question()
         self._set_question_text()
         self.feedback_label.text = ""
