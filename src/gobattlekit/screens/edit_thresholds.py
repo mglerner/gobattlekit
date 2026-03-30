@@ -89,7 +89,7 @@ class EditThresholdsScreen:
         self.container.add(self._add_target_btn)
 
         self._import_text_btn = toga.Button(
-            "Import from Text",
+            "Import from Text 📥",
             on_press=self._show_import_screen,
             style=btn_secondary(height=48, font_size=16)
         )
