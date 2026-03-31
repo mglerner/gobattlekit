@@ -14,6 +14,9 @@ briefcase dev
 
 Runs the app on macOS without building for iOS/Android. Note: some platform-specific behavior differs (e.g. colors may look different in light/dark mode).
 
+## GitHub
+`https://github.com/mglerner/gobattlekit` (public)
+
 ## iOS Build Process
 
 1. Run `prepare_ios.sh` instead of `briefcase create iOS` directly:
@@ -36,7 +39,6 @@ Before distributing, you can verify the fix worked:
 - Right-click the `.xcarchive` → Show Package Contents
 - Navigate to `Products/Applications/GoBattleKit.app/Frameworks/`
 - Confirm `_hashlib.framework` and `_ssl.framework` each contain `PrivacyInfo.xcprivacy`
-
 
 ### TestFlight Notes
 - Internal testers get access immediately after upload
@@ -98,3 +100,6 @@ Android uses a file picker Intent (`ACTION_GET_CONTENT`) with an `on_complete` c
 
 ### Quiz answer button gradients
 Quiz answer buttons use `answer_color_gradient(total_rows, row_index)` from `theme.py` to generate a dark-to-light gradient across the answer rows. This is used in `quiz.py`, `type_quiz.py`, and `timing_quiz.py`. The function interpolates between `#0e2036` (darkest) and `#2a4a7c` (lightest).
+
+### Quiz question type selection
+The move count quiz uses weighted random selection between question types: 60% first charge move, 40% sequence. There are also streak limits — no more than 4 consecutive first charge questions or 3 consecutive sequence questions. This is implemented in `_pick_question_type()` in `quiz.py`.
