@@ -56,9 +56,8 @@ def _fetch_json(key):
                 save_evolution_lines(evo_lines)
             except Exception as e:
                 print(f"Could not regenerate evolution lines: {e}")
-        return data        
-        
         return data
+    
     except Exception as e:
         print(f"Fetch error for {key}: {e}")
 
