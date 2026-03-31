@@ -21,6 +21,10 @@ POINTS = {1: 3, 2: 2, 3: 1}
 QUESTION_TYPE_FIRST = 'first'
 QUESTION_TYPE_SEQUENCE = 'sequence'
 
+MAX_FIRST_STREAK = 4
+MAX_SEQUENCE_STREAK = 3
+FIRST_WEIGHT = 0.6
+
 
 class QuizScreen:
     """Quiz screen for move timing questions."""
@@ -42,6 +46,8 @@ class QuizScreen:
         self.first_charge_total = 0
         self.sequence_correct = 0
         self.sequence_total = 0
+        self.question_type = None
+        self._type_streak = 0
         self._load_question()
 
         self.container = toga.Box(style=CONTAINER)
@@ -84,6 +90,16 @@ class QuizScreen:
 
         return self.container
 
+    def _pick_question_type(self):
+        """Pick question type with weighted probability and streak limits."""
+        if self.question_type is None:
+            return QUESTION_TYPE_FIRST if random.random() < FIRST_WEIGHT else QUESTION_TYPE_SEQUENCE
+        if self.question_type == QUESTION_TYPE_FIRST and self._type_streak >= MAX_FIRST_STREAK:
+            return QUESTION_TYPE_SEQUENCE
+        if self.question_type == QUESTION_TYPE_SEQUENCE and self._type_streak >= MAX_SEQUENCE_STREAK:
+            return QUESTION_TYPE_FIRST
+        return QUESTION_TYPE_FIRST if random.random() < FIRST_WEIGHT else QUESTION_TYPE_SEQUENCE
+
     def _load_question(self):
         mon = random.choice(self.mons)
         self.fast_id = mon['moveset'][0]
@@ -93,7 +109,12 @@ class QuizScreen:
         self.mon_name = mon['speciesName']
         self.attempts = 0
 
-        self.question_type = random.choice([QUESTION_TYPE_FIRST, QUESTION_TYPE_SEQUENCE])
+        new_type = self._pick_question_type()
+        if new_type == self.question_type:
+            self._type_streak += 1
+        else:
+            self._type_streak = 1
+        self.question_type = new_type
 
         if self.question_type == QUESTION_TYPE_FIRST:
             self.right_answer = counters_to_charge(
@@ -197,11 +218,12 @@ class QuizScreen:
             self.score_label.text = self._score_text()
             energy_per_fast = self.fastmoves[self.fast_id]['energyGain']
             energy_needed = self.chargedmoves[self.charged_id]['energy']
+            self._highlight_correct_button()
             self.feedback_label.text = (
                 f"✅ Correct! +{pts} point{'s' if pts != 1 else ''}. \n"
                 f"{self.fast_name} gives {energy_per_fast} energy, \n"
                 f"{self.charged_name} costs {energy_needed} energy."
-                )
+            )
             self._disable_buttons()
             asyncio.create_task(self._advance_question())
         else:
