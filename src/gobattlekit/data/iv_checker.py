@@ -69,10 +69,10 @@ CPM = {
 LEAGUE_CAPS = {
     'great': 1500.99,
     'ultra': 2500.99,
-    'master': 999999.99,
+    'master': 10000.99,
 }
 
-# Cache for stat product rankings: (species, league, max_level) -> {(atk, def, sta): rank}
+# Cache for stat product rankings: (species, max_level, max_cp) -> {(atk, def, sta): rank}
 _rank_cache = {}
 
 
@@ -137,6 +137,7 @@ def compute_rank_table(species, base_atk, base_def, base_sta,
     """Compute stat product ranks for all 4096 IV combinations.
 
     Returns a dict mapping (atk_iv, def_iv, sta_iv) -> rank (1=best).
+    Uses dense ranking: ties share the same rank, next rank skips tied count.
     Cached in _rank_cache by (species, max_level, max_cp).
     """
     cache_key = (species, max_level, max_cp)
@@ -157,9 +158,14 @@ def compute_rank_table(species, base_atk, base_def, base_sta,
                 combos.append((sp, a, d, s))
 
     combos.sort(reverse=True)
+
+    # Dense ranking: ties share rank, next rank = position after all ties
     rank_table = {}
-    for rank, (sp, a, d, s) in enumerate(combos, start=1):
-        rank_table[(a, d, s)] = rank
+    current_rank = 1
+    for i, (sp, a, d, s) in enumerate(combos):
+        if i > 0 and sp < combos[i - 1][0]:
+            current_rank = i + 1
+        rank_table[(a, d, s)] = current_rank
 
     _rank_cache[cache_key] = rank_table
     return rank_table
@@ -192,7 +198,7 @@ def parse_csv(csv_path):
 
 
 def check_thresholds(csv_path, thresholds, league='great', max_level=40,
-                     evolution_lines=None):
+                     evolution_lines=None, include_empty=False):
     """Check which mons from a CSV meet the given thresholds.
 
     Also checks pre-evolutions using the final form's base stats,
@@ -212,7 +218,7 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
             for member in line:
                 pre_evo_to_final[member] = final
 
-    # Cache of rank tables needed this run: species -> rank_table
+    # Cache of rank tables: (species, max_level, max_cp) -> rank_table
     rank_tables = {}
 
     for mon in mons:
@@ -240,6 +246,17 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
         if stats is None:
             continue
 
+        # Always compute rank for this species
+        rank_key = (final_species, max_level, max_cp)
+        if rank_key not in rank_tables:
+            rank_tables[rank_key] = compute_rank_table(
+                final_species,
+                base['atk'], base['def'], base['hp'],
+                max_level=max_level, max_cp=max_cp,
+            )
+        stats['rank'] = rank_tables[rank_key].get(
+            (mon['atk_iv'], mon['def_iv'], mon['sta_iv']), 4096)
+
         league_label = league.capitalize()
         if league_label not in thresholds[final_species]:
             continue
@@ -252,20 +269,9 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
                     stats['stamina'] >= target.get('stamina', 0)):
                 continue
 
-            # Check onlytop if present
+            # Check onlytop if present — rank already computed above
             if 'onlytop' in target:
-                onlytop = target['onlytop']
-                # Compute rank table for this species/league if not yet done
-                rank_key = (final_species, max_level, max_cp)
-                if rank_key not in rank_tables:
-                    rank_tables[rank_key] = compute_rank_table(
-                        final_species,
-                        base['atk'], base['def'], base['hp'],
-                        max_level=max_level, max_cp=max_cp,
-                    )
-                rank = rank_tables[rank_key].get(
-                    (mon['atk_iv'], mon['def_iv'], mon['sta_iv']), 9999)
-                if rank > onlytop:
+                if stats['rank'] > target['onlytop']:
                     continue
 
             matched.append(target_name)
@@ -281,5 +287,13 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
                 'stats': stats,
                 'matched': matched,
             })
+
+    # Optionally include species with targets but no hits
+    if include_empty:
+        league_label = league.capitalize()
+        for species in thresholds:
+            if species not in results:
+                if league_label in thresholds[species]:
+                    results[species] = []            
 
     return results

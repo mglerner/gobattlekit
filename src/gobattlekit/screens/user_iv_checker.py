@@ -28,6 +28,9 @@ GETTING_STARTED = (
 class UserIVCheckerScreen(IVCheckerScreen):
     """IV checker screen using user-defined thresholds."""
 
+    def _get_thresholds(self):
+        return load_user_thresholds()
+
     def build(self):
         """Build and return the user IV checker screen content."""
         self.container = toga.Box(style=CONTAINER)
@@ -98,19 +101,6 @@ class UserIVCheckerScreen(IVCheckerScreen):
                                       style=Pack(flex=1, background_color=COLOR_BG))
         self.container.add(scroll)
 
-        if not load_user_thresholds():
-            self.results_box.add(toga.Label(
-                GETTING_STARTED,
-                style=Pack(font_size=14, text_align="center",
-                           margin_top=20, color=COLOR_TEXT_LIGHT)
-            ))
-        elif not self.csv_path:
-            self.results_box.add(toga.Label(
-                "Share CSV from PokeGenie → GoBattleKit" if ON_IOS else "Tap 'Import PokeGenie CSV' to get started.",
-                style=Pack(font_size=14, text_align="center",
-                           margin_top=20, color=COLOR_TEXT_LIGHT)
-            ))
-
         # Dynamic back button — hidden on species list, shown on detail views
         self.back_btn = toga.Button(
             "← Back to Species List",
@@ -138,11 +128,61 @@ class UserIVCheckerScreen(IVCheckerScreen):
             style=btn_nav(height=44)
         ))
 
-        if self.results:
+        if self.results or load_user_thresholds():
             self._display_species_list()
 
         return self.container
 
+        def _display_species_list(self):
+            for child in list(self.results_box.children):
+                self.results_box.remove(child)
+
+            self._show_back_btn(False)
+
+            user_thresholds = load_user_thresholds()
+            league_label = self.league.capitalize()
+
+            if not user_thresholds:
+                self.results_box.add(toga.Label(
+                    GETTING_STARTED,
+                    style=Pack(font_size=14, text_align="center",
+                               margin_top=20, color=COLOR_TEXT_LIGHT)
+                ))
+                return
+
+            if not self.csv_path:
+                self.results_box.add(toga.Label(
+                    "Share CSV from PokeGenie → GoBattleKit" if ON_IOS
+                    else "Tap 'Import PokeGenie CSV' to get started.",
+                    style=Pack(font_size=14, text_align="center",
+                               margin_top=20, color=COLOR_TEXT_LIGHT)
+                ))
+                return
+
+            if not self.results:
+                self.results_box.add(toga.Label(
+                    f"No targets defined for {league_label} League.",
+                    style=Pack(font_size=14, text_align="center",
+                               margin_top=20, color=COLOR_TEXT_LIGHT)
+                ))
+                return
+
+            total = sum(len(hits) for hits in self.results.values())
+            if total > 0:
+                self.results_box.add(toga.Button(
+                    f"Show All ({total} hits)",
+                    on_press=lambda w: self._display_all_results(),
+                    style=btn_primary(height=48, font_size=16)
+                ))
+
+            for species in sorted(self.results.keys()):
+                hits = self.results[species]
+                self.results_box.add(toga.Button(
+                    f"{species} ({len(hits)})",
+                    on_press=self._make_species_handler(species),
+                    style=btn_secondary(height=48, font_size=16)
+                ))
+    
     def _run_check(self):
         """Run the IV check against user thresholds."""
         if not self.csv_path:
@@ -168,6 +208,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
                 league=self.league,
                 max_level=51,
                 evolution_lines=EVOLUTION_LINES,
+                include_empty=True,
             )
             self.status_label_file.text = pathlib.Path(self.csv_path).name
             self.clear_csv_btn.enabled = True
