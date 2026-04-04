@@ -25,18 +25,67 @@ from .evolution_lines import load_evolution_lines
 
 EVOLUTION_LINES = load_evolution_lines()
 
+# TO ADD
+# * inadequance chilling water florges
 
 DEFAULT_THRESHOLDS = {
-    'Jumpluff': {
+    'Spidops': {
+        'sources': "Homeslice Henry's Discord",
         'Great': {
-            'Top SP (157D)': {
-                'attack': 0, 'defense': 157.31, 'stamina': 0, 'onlytop': 12},
-            'Atk+Def (97.6A, 156D)': {
-                'attack': 97.6, 'defense': 156.3, 'stamina': 0},
-            'Atk+Bulk (97.6A, 150D, 151S)': {
-                'attack': 97.6, 'defense': 150, 'stamina': 151},
+            'Atk': {
+                'attack': 113.03, 'defense': 138.88, 'stamina': 0},
+            'Bulk': {
+                'attack': 109.82, 'defense': 138.88, 'stamina': 0},
+            'Bulk+': {
+                'attack': 109.82, 'defense': 140.67, 'stamina': 0},
         },
     },
+    'Tinkaton': {
+        'sources': "Homeslice Henry's Discord",
+        'Great': {
+            'GH Great': {
+                'attack': 0, 'defense': 143.03, 'stamina': 138},
+            'GH Good': {
+                'attack': 0, 'defense': 141.66, 'stamina': 138},
+        },
+    },
+    'Corviknight': {
+        'sources': "Homeslice Henry's Discord",
+        'Great': {
+            'Basic': {
+                'attack': 0, 'defense': 127.59, 'stamina': 0},
+            'Atk': {
+                'attack': 111.47, 'defense': 127.59, 'stamina': 0},
+            'Bulk': {
+                'attack': 111.47, 'defense': 132.10, 'stamina': 149},
+        },
+    },
+    'Drapion (Shadow)': {
+        'sources': "Homeslice Henry's Discord",
+        'Great': {
+            'Azu bul': {
+                'attack': 0, 'defense': 138, 'stamina': 0,},
+        },
+    },
+    'Florges': {
+        'sources': "Inadequance's [YouTube Video](https://www.youtube.com/watch?v=KXLWLcOw3G4&t=295s)",
+        'Great': {
+            'SWak 9/6/14': {
+                'attack': 121.5, 'defense': 0, 'stamina': 0},
+            ## 'Tog 8/1/8': {
+            ##     'attack': 97.6, 'defense': 156.3, 'stamina': 0},
+        },
+        'Master': {
+            'Basic': { # 15/15/13
+                'attack': 190, 'defense': 217, 'stamina': 167},
+        },
+    },
+}
+
+
+# Do not delete these. They're the old SwagTips era thresholds, and I
+# kinda like them anyway.
+SENTIMENTAL_DEFAULT_THRESHOLDS = {
     'Walrein': {
         'Great': {
             'GOD (114A, 114D, 148S)': {

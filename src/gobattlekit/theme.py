@@ -137,12 +137,15 @@ def btn_quiz_answer(height=44, font_size=14):
         color=COLOR_TEXT_LIGHT,
     )
 
-def btn_help(height=44, font_size=14, margin_bottom=8,flex=0):
+def btn_help(height=44, font_size=14, margin_bottom=8,flex=0,
+                 margin_left=0, margin_right=0,):
     """Help button — distinct purple color."""
     return Pack(
         height=height,
         font_size=font_size,
         margin_bottom=margin_bottom,
+        margin_left=margin_left,
+        margin_right=margin_right,
         background_color=COLOR_HELP,
         color=COLOR_TEXT_LIGHT,
         flex=flex,

@@ -120,15 +120,36 @@ class IVCheckerScreen:
         self.back_btn.style.margin_bottom = 0
         self.container.add(self.back_btn)
 
-        self.container.add(toga.Button(
+        ## self.container.add(toga.Button(
+        ##     "? Help",
+        ##     on_press=lambda w: self.app.show_help(
+        ##         topic="PvP IV Checker",
+        ##         back_screen=lambda: self.app.show_iv_checker(),
+        ##         back_label="← PvP IV Checker"
+        ##     ),
+        ##     style=btn_help()
+        ## ))
+
+        help_row = toga.Box(style=Pack(direction=ROW))
+        help_row.add(toga.Button(
             "? Help",
             on_press=lambda w: self.app.show_help(
                 topic="PvP IV Checker",
                 back_screen=lambda: self.app.show_iv_checker(),
                 back_label="← PvP IV Checker"
             ),
-            style=btn_help()
+            style=btn_help(flex=1, margin_right=2)
         ))
+        help_row.add(toga.Button(
+            "IV Credits",
+            on_press=lambda w: self.app.show_iv_credits(
+                back_screen=lambda: self.app.show_iv_checker(),
+                back_label="← IV Checker"
+            ),
+            style=btn_help(flex=1, margin_left=2)
+        ))
+        self.container.add(help_row)
+        
 
         self.container.add(toga.Button(
             "← Back to Home",

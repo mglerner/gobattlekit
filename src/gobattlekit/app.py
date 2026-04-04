@@ -7,6 +7,7 @@ import asyncio
 import pathlib
 from .screens.about import AboutScreen
 from .screens.help import HelpScreen
+from.screens.iv_credits import IVCreditsScreen
 _original_setlocale = locale.setlocale
 def _safe_setlocale(category, loc=None):
     try:
@@ -47,6 +48,7 @@ class GoBattleKit(toga.App):
             self.edit_thresholds_screen = EditThresholdsScreen(self)
             self.quiz_summary_screen = QuizSummaryScreen(self)
             self.help_screen = HelpScreen(self)
+            self.iv_credits_screen = IVCreditsScreen(self)
             self.main_window = toga.MainWindow(title=self.formal_name)
             self.main_window.content = self.home_screen.build()
             self.main_window.show()
@@ -153,6 +155,12 @@ class GoBattleKit(toga.App):
 
     def show_quiz_summary(self,stats):
         self.main_window.content = self.quiz_summary_screen.build(stats)
+
+    def show_iv_credits(self, back_screen=None, back_label="← IV Checker"):
+        self.main_window.content = self.iv_credits_screen.build(
+            back_screen=back_screen,
+            back_label=back_label
+        )        
 
 
 def main():
