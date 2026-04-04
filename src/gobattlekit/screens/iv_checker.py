@@ -33,6 +33,10 @@ class IVCheckerScreen:
         self.results = {}
         self.league = 'great'
 
+    def _get_thresholds(self):
+        """Return the thresholds dict for this screen. Override in subclasses."""
+        return DEFAULT_THRESHOLDS
+
     def build(self):
         """Build and return the IV checker screen content."""
         self.container = toga.Box(style=CONTAINER)
@@ -105,7 +109,7 @@ class IVCheckerScreen:
                                       style=Pack(flex=1, background_color=COLOR_BG))
         self.container.add(scroll)
 
-        # Dynamic back button — hidden on species list, shown on detail views
+        # Dynamic back button
         self.back_btn = toga.Button(
             "← Back to Species List",
             on_press=lambda w: self._display_species_list(),
@@ -226,6 +230,7 @@ class IVCheckerScreen:
                 league=self.league,
                 max_level=51,
                 evolution_lines=EVOLUTION_LINES,
+                include_empty=True,
             )
             self.status_label_file.text = pathlib.Path(self.csv_path).name
             self.clear_csv_btn.enabled = True
@@ -297,7 +302,8 @@ class IVCheckerScreen:
 
         self._show_back_btn(True)
 
-        hits = self.results[species]
+        hits = self.results.get(species, [])
+        league_label = self.league.capitalize()
 
         self.results_box.add(toga.Label(
             f"{species} — {len(hits)} hit{'s' if len(hits) != 1 else ''}",
@@ -306,17 +312,24 @@ class IVCheckerScreen:
                        color=COLOR_ACCENT)
         ))
 
-        all_targets = sorted({
-            target for hit in hits for target in hit['matched']
-        })
+        # Get all targets for this species
+        thresholds = self._get_thresholds()
+        all_targets = sorted(
+            thresholds.get(species, {}).get(league_label, {}).keys()
+        )
 
+        # Split into targets with hits and targets without
         targets_with_hits = {}
         for hit in hits:
             for target in hit['matched']:
                 targets_with_hits[target] = targets_with_hits.get(target, 0) + 1
 
+        targets_without_hits = [t for t in all_targets if t not in targets_with_hits]
+
+        # target_options: None (all), then targets with hits, then empty targets
         self._target_index = 0
-        self._target_options_raw = [None] + all_targets
+        self._target_options_raw = [None] + sorted(targets_with_hits.keys()) + targets_without_hits
+        self._targets_without_hits = set(targets_without_hits)
 
         def make_cycle_handler(direction):
             def handler(widget):
@@ -324,6 +337,8 @@ class IVCheckerScreen:
                 current = self._target_options_raw[self._target_index]
                 if current is None:
                     self.target_label.text = f"All targets ({len(hits)})"
+                elif current in self._targets_without_hits:
+                    self.target_label.text = f"{current} (0)"
                 else:
                     count = targets_with_hits.get(current, 0)
                     self.target_label.text = f"{current} ({count})"
@@ -352,6 +367,35 @@ class IVCheckerScreen:
             self.hits_box.remove(child)
 
         current = self._target_options_raw[self._target_index]
+        league_label = self.league.capitalize()
+
+        # Empty target card
+        if current is not None and current in self._targets_without_hits:
+            thresholds = self._get_thresholds()
+            target = thresholds.get(species, {}).get(league_label, {}).get(current, {})
+            parts = []
+            if target.get('attack', 0):
+                parts.append(f"{target['attack']}A")
+            if target.get('defense', 0):
+                parts.append(f"{target['defense']}D")
+            if target.get('stamina', 0):
+                parts.append(f"{target['stamina']}S")
+            if target.get('onlytop', 0):
+                parts.append(f"top{target['onlytop']}")
+            req_str = ', '.join(parts) if parts else 'any'
+            card = toga.Box(style=card_box())
+            card.add(toga.Label(
+                "No Pokémon meets this target",
+                style=Pack(font_size=14, font_weight="bold",
+                           color=COLOR_TEXT_LIGHT)
+            ))
+            card.add(toga.Label(
+                f"Requires: {req_str}",
+                style=Pack(font_size=12, color=COLOR_TEXT_LIGHT)
+            ))
+            self.hits_box.add(card)
+            return
+
         hits = all_hits if current is None else [
             h for h in all_hits if current in h['matched']
         ]
@@ -431,11 +475,10 @@ class IVCheckerScreen:
         s = hit['stats']
         pre = f" ({hit['csv_species']})" if hit['is_pre_evo'] else ""
         iv_str = f"{m['atk_iv']}/{m['def_iv']}/{m['sta_iv']}{pre} (CP {m['cp']})"
-        stat_str = (f"Atk:{s['attack']:.1f} "
-                    f"Def:{s['defense']:.1f} "
-                    f"Sta:{s['stamina']} "
-                    f"SP:{s['stat_prod']}")
-        matched = ", ".join(hit['matched'])
+        line1 = (f"Atk:{s['attack']:.2f} "
+                 f"Def:{s['defense']:.2f} "
+                 f"Sta:{s['stamina']}")
+        line2 = f"SP:{s['stat_prod']}  Rank:#{s.get('rank', '?')}"
 
         card = toga.Box(style=card_box())
         card.add(toga.Label(
@@ -443,11 +486,16 @@ class IVCheckerScreen:
             style=Pack(font_size=14, font_weight="bold", color=COLOR_TEXT_LIGHT)
         ))
         card.add(toga.Label(
-            stat_str,
+            line1,
             style=Pack(font_size=12, color=COLOR_TEXT_LIGHT)
         ))
         card.add(toga.Label(
-            f"✅ {matched}",
-            style=Pack(font_size=12, color=COLOR_ACCENT)
+            line2,
+            style=Pack(font_size=12, color=COLOR_TEXT_LIGHT)
         ))
+        for target in hit['matched']:
+            card.add(toga.Label(
+                f"✅ {target}",
+                style=Pack(font_size=12, color=COLOR_ACCENT)
+            ))
         box.add(card)
