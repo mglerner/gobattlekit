@@ -30,7 +30,7 @@ EVOLUTION_LINES = load_evolution_lines()
 
 DEFAULT_THRESHOLDS = {
     'Spidops': {
-        'sources': "Homeslice Henry's Discord",
+        'sources': "the HomeSliceHenry Discord server",
         'Great': {
             'Atk': {
                 'attack': 113.03, 'defense': 138.88, 'stamina': 0},
@@ -41,7 +41,7 @@ DEFAULT_THRESHOLDS = {
         },
     },
     'Tinkaton': {
-        'sources': "Homeslice Henry's Discord",
+        'sources': "These are Gigaton Hammer matchups, from the HomeSliceHenry Discord server",
         'Great': {
             'GH Great': {
                 'attack': 0, 'defense': 143.03, 'stamina': 138},
@@ -50,7 +50,7 @@ DEFAULT_THRESHOLDS = {
         },
     },
     'Corviknight': {
-        'sources': "Homeslice Henry's Discord",
+        'sources': "the HomeSliceHenry Discord server",
         'Great': {
             'Basic': {
                 'attack': 0, 'defense': 127.59, 'stamina': 0},
@@ -61,7 +61,7 @@ DEFAULT_THRESHOLDS = {
         },
     },
     'Drapion (Shadow)': {
-        'sources': "Homeslice Henry's Discord",
+        'sources': "the HomeSliceHenry Discord server",
         'Great': {
             'Azu bul': {
                 'attack': 0, 'defense': 138, 'stamina': 0,},

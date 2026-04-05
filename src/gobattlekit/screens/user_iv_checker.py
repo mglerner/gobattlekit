@@ -223,3 +223,35 @@ class UserIVCheckerScreen(IVCheckerScreen):
             self.status_label_file.text = ""
             self.clear_csv_btn.enabled = False
             self.status_label_stats.text = f"Error: {e}"
+
+
+    def _display_no_csv(self):
+        for child in list(self.results_box.children):
+            self.results_box.remove(child)
+
+        self._show_back_btn(False)
+
+        if ON_IOS:
+            self.results_box.add(toga.Label(
+                "Share a CSV from PokeGenie to import.\nRequires PokeGenie iVision subscription.",
+                style=Pack(font_size=14, text_align="center",
+                           margin_top=12, margin_bottom=12,
+                           color=COLOR_TEXT_LIGHT)
+            ))
+        else:
+            self.results_box.add(toga.Button(
+                "📥 Import from PokeGenie (requires iVision)",
+                on_press=self._import_csv,
+                style=btn_secondary(height=52, font_size=14)
+            ))
+            self.results_box.add(toga.Label(
+                "Requires PokeGenie iVision subscription.",
+                style=Pack(font_size=12, text_align="center",
+                           margin_bottom=12, color=COLOR_TEXT_LIGHT)
+            ))
+
+        self.results_box.add(toga.Button(
+            "✏️ Enter a Pokémon manually",
+            on_press=lambda w: self._show_manual_entry(),
+            style=btn_secondary(height=52, font_size=14)
+        ))

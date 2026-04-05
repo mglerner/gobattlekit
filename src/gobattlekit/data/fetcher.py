@@ -12,6 +12,7 @@ import certifi
 CACHE_DIR = pathlib.Path.home() / "Documents" / "gobattlekit_cache"
 CACHE_TTL = 86400  # refresh once a day
 SAVED_CSV = CACHE_DIR / "pokegenie_export.csv"
+USER_GENERATED_CSV = CACHE_DIR / 'user_generated.csv'
 
 BASE_URL = "https://raw.githubusercontent.com/pvpoke/pvpoke/refs/heads/master/src/data"
 URLS = {
@@ -21,6 +22,14 @@ URLS = {
     "master":     f"{BASE_URL}/rankings/all/overall/rankings-10000.json",
 }
 
+def get_csv_path():
+    """Return the CSV path to use: PokeGenie export if exists, else user-generated."""
+    if SAVED_CSV.exists():
+        return str(SAVED_CSV)
+    if USER_GENERATED_CSV.exists():
+        return str(USER_GENERATED_CSV)
+    return None
+    
 class NoDataError(Exception):
     """Raised when data cannot be fetched and no cache is available."""
     pass

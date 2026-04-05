@@ -27,18 +27,22 @@ VIDEO_PATTERN = re.compile(r'\[([^\]]+)\]\(([^)]+)\)')
 HELP_CONTENT = {
     "Getting Started": [
         ("", "GoBattleKit helps you prepare for Pokemon GO PvP battles. It has two main features: quizzes to help you learn move timing and type matchups, and an IV checker to find your best PvP Pokemon."),
-        ("", "To use the IV checker, you'll need the free PokeGenie app to export your Pokemon as a CSV file."),
+        ("IV Checker", "The IV checker lets you find Pokémon that meet PvP IV targets. You can import a CSV from PokeGenie, or enter Pokémon manually one at a time."),
+        ("PokeGenie import", "To import from PokeGenie, you need PokeGenie's iVision subscription. With iVision, tap the export button in PokeGenie and share the CSV to GoBattleKit. Your CSV is remembered between sessions."),
+        ("Manual entry", "If you don't have iVision, you can enter Pokémon manually. Tap 'Enter a Pokémon manually' on the IV Checker screen, pick a species, enter IVs and CP, and tap Check. Results are saved and remembered between sessions."),
     ],
     "PvP IV Checker": [
-        ("", "The PvP IV Checker checks your Pokemon against a curated list of targets for Great, Ultra, and Master League."),
-        ("How to use", "Export your Pokemon from PokeGenie (tap the export button and share to GoBattleKit on iOS, or use Import on Android)."),
-        ("Results", "Results show each Pokemon's IVs, CP, and stats. SP (stat product) measures overall PvP performance - higher is better."),
+        ("", "The PvP IV Checker checks your Pokémon against a curated list of targets for Great, Ultra, and Master League."),
+        ("PokeGenie import", "Export your Pokémon from PokeGenie and share to GoBattleKit on iOS, or use Import on Android. Note: CSV export requires PokeGenie's iVision subscription."),
+        ("Manual entry", "No iVision? Tap 'Enter a Pokémon manually' to add Pokémon one at a time. Enter the species, IVs (0-15 each), and CP. GoBattleKit will calculate the level and check against targets. Manually entered Pokémon are saved between sessions."),
+        ("Results", "Results show each Pokémon's IVs, CP, and stats. SP (stat product) measures overall PvP performance - higher is better. Rank shows how this IV combination compares to all 4096 possible combinations for that species."),
     ],
     "My PvP IV Targets": [
-        ("", "Set your own IV targets to check your Pokemon against. For example, add Medicham with a minimum Attack of 105 to find your best Great League Medicham candidates."),
-        ("Adding a target", "Tap Edit My Targets -> Add Target, choose a species and league, set minimum stats (0 means any), and tap Save Target. Make sure you import your PokeGenie CSV to see results. Your CSV is remembered between sessions, so you only need to import it once - results update automatically when you add or change targets."),
+        ("", "Set your own IV targets to check your Pokémon against. For example, add Medicham with a minimum Attack of 105 to find your best Great League Medicham candidates."),
+        ("Adding a target", "Tap Edit My Targets → Add Target, choose a species and league, set minimum stats (0 means any), and tap Save Target. Make sure a CSV is imported or Pokémon are entered manually to see results. Your data is remembered between sessions."),
         ("Target buttons", "Each target has four buttons:\n✎ Edit - modify the target's stats or label\n⧉ Duplicate - copy the target as a starting point for a new one\n📤 Share - export the target as text to share with friends\n✕ Delete - remove the target"),
-        ("Import from Text", "Lets you paste a target shared by someone else. This is useful for importing targets from the PvP community - for example, if a content creator publishes their recommended IV floors, you can paste them directly into GoBattleKit."),
+        ("Import from Text", "Lets you paste a target shared by someone else. This is useful for importing targets from the PvP community."),
+        ("PokeGenie note", "Importing a CSV from PokeGenie requires the iVision subscription. Alternatively, use manual entry to add Pokémon one at a time."),
     ],
     "Move Count Quizzes": [
         ("", "Practice counting how many fast moves it takes to charge a move."),
@@ -54,7 +58,6 @@ HELP_CONTENT = {
         ("", "Practice type matchups - super effective, not very effective, neutral, and double resisted."),
     ],
 }
-
 
 class HelpScreen:
     """Help screen with topic list and per-topic content."""
