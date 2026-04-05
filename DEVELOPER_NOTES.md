@@ -103,3 +103,17 @@ Quiz answer buttons use `answer_color_gradient(total_rows, row_index)` from `the
 
 ### Quiz question type selection
 The move count quiz uses weighted random selection between question types: 60% first charge move, 40% sequence. There are also streak limits — no more than 4 consecutive first charge questions or 3 consecutive sequence questions. This is implemented in `_pick_question_type()` in `quiz.py`.
+
+### CSV loading priority
+`get_csv_path()` in `data/fetcher.py` returns the CSV to use: PokeGenie export (`pokegenie_export.csv`) if it exists, otherwise user-generated (`user_generated.csv`). Both live in `CACHE_DIR`.
+
+### Manual Pokémon entry
+Users can enter Pokémon manually without a PokeGenie CSV. Entries are saved to `user_generated.csv` in PokeGenie CSV format using `append_user_generated()` in `data/iv_checker.py`. The CSV is loaded automatically on next launch.
+
+### IV target species list
+Both IV Checker and My PvP IV Targets now always show all species with
+targets for the current league, regardless of whether any Pokémon are
+loaded. Species with no hits show as "Species (0)". Clicking a species
+with 0 hits shows qualifying IV combinations (top 100 by stat product,
+displayed by IVs descending).
+
