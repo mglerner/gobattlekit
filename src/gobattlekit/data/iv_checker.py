@@ -7,7 +7,6 @@ import csv
 import math
 from .fetcher import load_gamemaster
 
-# Form name mapping from PokeGenie CSV to PvPoke gamemaster
 FORM_MAP = {
     '': None,
     'Normal': None,
@@ -35,7 +34,6 @@ FORM_MAP = {
     'Mega': 'Mega',
 }
 
-# CP multiplier table — from gamepress.gg/pokemongo/cp-multiplier
 CPM = {
     1: 0.094, 1.5: 0.1351374318, 2: 0.16639787, 2.5: 0.192650919,
     3: 0.21573247, 3.5: 0.2365726613, 4: 0.25572005, 4.5: 0.2735303812,
@@ -65,19 +63,16 @@ CPM = {
     51: 0.84529999,
 }
 
-# League CP caps
 LEAGUE_CAPS = {
     'great': 1500.99,
     'ultra': 2500.99,
     'master': 10000.99,
 }
 
-# Cache for stat product rankings: (species, max_level, max_cp) -> {(atk, def, sta): rank}
 _rank_cache = {}
 
 
 def get_species_name(name, form, is_shadow):
-    """Convert PokeGenie CSV name+form+shadow to gamemaster species name."""
     form_str = FORM_MAP.get(form, form)
     species = name
     if form_str:
@@ -88,20 +83,36 @@ def get_species_name(name, form, is_shadow):
 
 
 def get_pokemon_index():
-    """Return a dict of speciesName -> baseStats from the gamemaster."""
     gm = load_gamemaster()
     return {mon['speciesName']: mon['baseStats'] for mon in gm['pokemon']}
+
+
+def cp_to_level(cp, atk_iv, def_iv, sta_iv, base_atk, base_def, base_sta):
+    """Find the level that produces the given CP for the given IVs and base stats.
+
+    Returns the level as a float (e.g. 20.0 or 20.5), or None if no match found.
+    CP is computed as floor((atk * def^0.5 * sta^0.5 * cpm^2) / 10).
+    We find the highest level whose computed CP matches the given CP.
+    """
+    attack = base_atk + atk_iv
+    defense = base_def + def_iv
+    stamina = base_sta + sta_iv
+
+    best_level = None
+    for level, cpm in sorted(CPM.items()):
+        computed_cp = int(math.floor(
+            (attack * (defense ** 0.5) * (stamina ** 0.5) * (cpm ** 2)) / 10
+        ))
+        if computed_cp == cp:
+            best_level = level
+        elif computed_cp > cp and best_level is not None:
+            break
+    return best_level
 
 
 def ivs_to_stats(atk_iv, def_iv, sta_iv, start_level, *,
                  base_atk, base_def, base_sta,
                  max_level=40, max_cp=1500.99):
-    """Compute the best battle stats for a mon at the given IVs.
-
-    Returns a dict with level, cp, attack, defense, stamina,
-    stat_prod, bulk_prod at the highest level that stays under max_cp.
-    Returns None if the mon exceeds max_cp even at start_level.
-    """
     attack = base_atk + atk_iv
     defense = base_def + def_iv
     stamina = base_sta + sta_iv
@@ -134,12 +145,6 @@ def ivs_to_stats(atk_iv, def_iv, sta_iv, start_level, *,
 
 def compute_rank_table(species, base_atk, base_def, base_sta,
                        max_level, max_cp):
-    """Compute stat product ranks for all 4096 IV combinations.
-
-    Returns a dict mapping (atk_iv, def_iv, sta_iv) -> rank (1=best).
-    Uses dense ranking: ties share the same rank, next rank skips tied count.
-    Cached in _rank_cache by (species, max_level, max_cp).
-    """
     cache_key = (species, max_level, max_cp)
     if cache_key in _rank_cache:
         return _rank_cache[cache_key]
@@ -159,7 +164,6 @@ def compute_rank_table(species, base_atk, base_def, base_sta,
 
     combos.sort(reverse=True)
 
-    # Dense ranking: ties share rank, next rank = position after all ties
     rank_table = {}
     current_rank = 1
     for i, (sp, a, d, s) in enumerate(combos):
@@ -172,10 +176,7 @@ def compute_rank_table(species, base_atk, base_def, base_sta,
 
 
 def parse_csv(csv_path):
-    """Parse a PokeGenie CSV export.
-
-    Returns a list of dicts with the relevant fields.
-    """
+    """Parse a PokeGenie-format CSV export (or user_generated.csv in same format)."""
     mons = []
     with open(csv_path, newline='', encoding='utf-8-sig') as f:
         reader = csv.DictReader(f)
@@ -197,34 +198,49 @@ def parse_csv(csv_path):
     return mons
 
 
+def append_user_generated(csv_path, name, atk_iv, def_iv, sta_iv, cp, level):
+    """Append a manually entered mon to the user_generated CSV in PokeGenie format."""
+    import pathlib
+    path = pathlib.Path(csv_path)
+    write_header = not path.exists() or path.stat().st_size == 0
+    with open(csv_path, 'a', newline='', encoding='utf-8-sig') as f:
+        writer = csv.DictWriter(f, fieldnames=[
+            'Name', 'Form', 'CP', 'Atk IV', 'Def IV', 'Sta IV',
+            'Level Min', 'Shadow/Purified', 'Lucky'
+        ])
+        if write_header:
+            writer.writeheader()
+        writer.writerow({
+            'Name': name,
+            'Form': '',
+            'CP': cp,
+            'Atk IV': atk_iv,
+            'Def IV': def_iv,
+            'Sta IV': sta_iv,
+            'Level Min': level,
+            'Shadow/Purified': '0',
+            'Lucky': '0',
+        })
+
+
 def check_thresholds(csv_path, thresholds, league='great', max_level=40,
                      evolution_lines=None, include_empty=False):
-    """Check which mons from a CSV meet the given thresholds.
-
-    Also checks pre-evolutions using the final form's base stats,
-    so e.g. a Meditite will show up as a Medicham candidate.
-
-    evolution_lines maps final form -> list of all forms in the line.
-    """
     pokemon_index = get_pokemon_index()
     mons = parse_csv(csv_path)
     max_cp = LEAGUE_CAPS.get(league, 1500.99)
     results = {}
 
-    # Build reverse lookup: pre-evolution -> final form
     pre_evo_to_final = {}
     if evolution_lines:
         for final, line in evolution_lines.items():
             for member in line:
                 pre_evo_to_final[member] = final
 
-    # Cache of rank tables: (species, max_level, max_cp) -> rank_table
     rank_tables = {}
 
     for mon in mons:
         csv_species = get_species_name(mon['name'], mon['form'], mon['is_shadow'])
 
-        # Determine which final form to check thresholds against
         if csv_species in thresholds:
             final_species = csv_species
         elif csv_species in pre_evo_to_final:
@@ -246,7 +262,6 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
         if stats is None:
             continue
 
-        # Always compute rank for this species
         rank_key = (final_species, max_level, max_cp)
         if rank_key not in rank_tables:
             rank_tables[rank_key] = compute_rank_table(
@@ -263,17 +278,13 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
 
         matched = []
         for target_name, target in thresholds[final_species][league_label].items():
-            # Check stat thresholds
             if not (stats['attack'] >= target.get('attack', 0) and
                     stats['defense'] >= target.get('defense', 0) and
                     stats['stamina'] >= target.get('stamina', 0)):
                 continue
-
-            # Check onlytop if present — rank already computed above
             if 'onlytop' in target:
                 if stats['rank'] > target['onlytop']:
                     continue
-
             matched.append(target_name)
 
         if matched:
@@ -288,12 +299,11 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
                 'matched': matched,
             })
 
-    # Optionally include species with targets but no hits
     if include_empty:
         league_label = league.capitalize()
         for species in thresholds:
             if species not in results:
                 if league_label in thresholds[species]:
-                    results[species] = []            
+                    results[species] = []
 
     return results

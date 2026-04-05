@@ -7,8 +7,11 @@ import pathlib
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
-from ..data.iv_checker import check_thresholds
+from ..data.iv_checker import (
+    check_thresholds, get_pokemon_index, cp_to_level, append_user_generated
+)
 from ..data.thresholds import DEFAULT_THRESHOLDS, EVOLUTION_LINES
+from ..data.fetcher import CACHE_DIR, SAVED_CSV, USER_GENERATED_CSV, get_csv_path
 from ..platform import ON_ANDROID, ON_IOS, ON_MOBILE
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_BG,
@@ -20,11 +23,9 @@ from ..theme import (
 class IVCheckerScreen:
     """Screen for checking Pokemon IVs against stat thresholds."""
 
-    NO_CSV_MESSAGE = "No CSV loaded."
+    NO_CSV_MESSAGE = "No Pokémon data loaded."
     CSV_INSTRUCTIONS = (
-        "Share CSV from PokeGenie → GoBattleKit"
-        if ON_IOS else
-        "Tap 'Import PokeGenie CSV' to get started."
+        "Import from PokeGenie (requires iVision) or enter Pokémon manually."
     )
 
     def __init__(self, app):
@@ -32,13 +33,17 @@ class IVCheckerScreen:
         self.csv_path = None
         self.results = {}
         self.league = 'great'
+        # Manual entry state
+        self._manual_species = None
+        self._manual_atk = '0'
+        self._manual_def = '0'
+        self._manual_sta = '0'
+        self._manual_cp = ''        
 
     def _get_thresholds(self):
-        """Return the thresholds dict for this screen. Override in subclasses."""
         return DEFAULT_THRESHOLDS
 
     def build(self):
-        """Build and return the IV checker screen content."""
         self.container = toga.Box(style=CONTAINER)
 
         self.container.add(toga.Label(
@@ -97,7 +102,7 @@ class IVCheckerScreen:
         self.container.add(self.status_label_stats)
 
         self.csv_instructions_label = toga.Label(
-            "" if self.csv_path else self.CSV_INSTRUCTIONS,
+            "",
             style=Pack(font_size=13, text_align="center", margin_bottom=12,
                        color=COLOR_TEXT_LIGHT)
         )
@@ -109,7 +114,6 @@ class IVCheckerScreen:
                                       style=Pack(flex=1, background_color=COLOR_BG))
         self.container.add(scroll)
 
-        # Dynamic back button
         self.back_btn = toga.Button(
             "← Back to Species List",
             on_press=lambda w: self._display_species_list(),
@@ -119,16 +123,6 @@ class IVCheckerScreen:
         self.back_btn.style.height = 2
         self.back_btn.style.margin_bottom = 0
         self.container.add(self.back_btn)
-
-        ## self.container.add(toga.Button(
-        ##     "? Help",
-        ##     on_press=lambda w: self.app.show_help(
-        ##         topic="PvP IV Checker",
-        ##         back_screen=lambda: self.app.show_iv_checker(),
-        ##         back_label="← PvP IV Checker"
-        ##     ),
-        ##     style=btn_help()
-        ## ))
 
         help_row = toga.Box(style=Pack(direction=ROW))
         help_row.add(toga.Button(
@@ -149,7 +143,6 @@ class IVCheckerScreen:
             style=btn_help(flex=1, margin_left=2)
         ))
         self.container.add(help_row)
-        
 
         self.container.add(toga.Button(
             "← Back to Home",
@@ -157,7 +150,15 @@ class IVCheckerScreen:
             style=btn_nav(height=44, margin_bottom=0)
         ))
 
-        if self.results:
+        # Auto-load CSV if available
+        if not self.csv_path:
+            path = get_csv_path()
+            if path:
+                self.csv_path = path
+                self._run_check()
+            else:
+                self._display_no_csv()
+        else:
             self._display_species_list()
 
         return self.container
@@ -168,17 +169,295 @@ class IVCheckerScreen:
         self.back_btn.style.margin_bottom = 0
 
     # ------------------------------------------------------------------
+    # No CSV state
+    # ------------------------------------------------------------------
+
+    def _display_no_csv(self):
+        for child in list(self.results_box.children):
+            self.results_box.remove(child)
+
+        self._show_back_btn(False)
+
+        if ON_IOS:
+            self.results_box.add(toga.Label(
+                "Share a CSV from PokeGenie to import.\nRequires PokeGenie iVision subscription.",
+                style=Pack(font_size=14, text_align="center",
+                           margin_top=12, margin_bottom=12,
+                           color=COLOR_TEXT_LIGHT)
+            ))
+        else:
+            self.results_box.add(toga.Button(
+                "📥 Import from PokeGenie (requires iVision)",
+                on_press=self._import_csv,
+                style=btn_secondary(height=52, font_size=14)
+            ))
+            self.results_box.add(toga.Label(
+                "Requires PokeGenie iVision subscription.",
+                style=Pack(font_size=12, text_align="center",
+                           margin_bottom=12, color=COLOR_TEXT_LIGHT)
+            ))
+
+        self.results_box.add(toga.Button(
+            "✏️ Enter a Pokémon manually",
+            on_press=lambda w: self._show_manual_entry(),
+            style=btn_secondary(height=52, font_size=14)
+        ))
+
+    # ------------------------------------------------------------------
+    # Manual entry form
+    # ------------------------------------------------------------------
+
+
+    def _show_manual_entry(self, error=None):
+        for child in list(self.results_box.children):
+            self.results_box.remove(child)
+
+        self._show_back_btn(False)
+
+        form_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
+        scroll = toga.ScrollContainer(content=form_box,
+                                          style=Pack(flex=1),
+                                          horizontal=False,
+                                          vertical=True,
+                                          )
+        self.results_box.add(scroll)
+
+        form_box.add(toga.Label(
+            "Enter Pokémon details:",
+            style=Pack(font_size=16, font_weight="bold",
+                       margin_bottom=8, color=COLOR_ACCENT)
+        ))
+
+        if error:
+            form_box.add(toga.Label(
+                error,
+                style=Pack(font_size=13, text_align="center",
+                           margin_bottom=8, color=COLOR_TEXT_LIGHT)
+            ))
+
+        # Species row
+        species_row = toga.Box(style=Pack(direction=ROW, margin_bottom=8))
+        species_row.add(toga.Label(
+            "Species:",
+            style=Pack(width=90, font_size=14, color=COLOR_TEXT_LIGHT)
+        ))
+        species_label = toga.Label(
+            self._manual_species or "tap to select",
+            style=Pack(flex=1, font_size=14, color=COLOR_ACCENT)
+        )
+        species_row.add(species_label)
+        species_row.add(toga.Button(
+            "→",
+            on_press=lambda w: self._save_manual_inputs_and_pick_species(),
+            style=btn_icon()
+        ))
+        form_box.add(species_row)
+
+        # IVs all on one row
+        iv_row = toga.Box(style=Pack(direction=ROW, margin_bottom=8))
+        iv_row.add(toga.Label(
+            "IVs:",
+            style=Pack(width=50, font_size=14, color=COLOR_TEXT_LIGHT)
+        ))
+        for label, attr in [("Atk", '_manual_atk'), ("Def", '_manual_def'), ("HP", '_manual_sta')]:
+            col = toga.Box(style=Pack(direction=COLUMN, flex=1, margin_right=4))
+            col.add(toga.Label(
+                label,
+                style=Pack(font_size=12, text_align="center", color=COLOR_TEXT_LIGHT)
+            ))
+            current = getattr(self, attr, '0')
+            inp = toga.TextInput(
+                value=str(current),
+                style=Pack(font_size=14)
+            )
+            setattr(self, f'{attr}_input', inp)
+            col.add(inp)
+            iv_row.add(col)
+        form_box.add(iv_row)
+
+        # CP row
+        cp_row = toga.Box(style=Pack(direction=ROW, margin_bottom=8))
+        cp_row.add(toga.Label(
+            "CP:",
+            style=Pack(width=50, font_size=14, color=COLOR_TEXT_LIGHT)
+        ))
+        current_cp = getattr(self, '_manual_cp', '')
+        self._manual_cp_input = toga.TextInput(
+            value=str(current_cp),
+            style=Pack(flex=1, font_size=14)
+        )
+        cp_row.add(self._manual_cp_input)
+        form_box.add(cp_row)
+
+        form_box.add(toga.Button(
+            "Check this Pokémon",
+            on_press=self._submit_manual_entry,
+            style=btn_primary(height=48, font_size=16)
+        ))
+
+        form_box.add(toga.Button(
+            "← Cancel",
+            on_press=lambda w: self._display_no_csv() if not self.csv_path
+                               else self._display_species_list(),
+            style=btn_nav(height=44)
+        ))
+
+    def _save_manual_inputs_and_pick_species(self):
+        """Save current input values before navigating to species picker."""
+        self._manual_atk = getattr(self, '_manual_atk_input', toga.TextInput()).value.strip() or '0'
+        self._manual_def = getattr(self, '_manual_def_input', toga.TextInput()).value.strip() or '0'
+        self._manual_sta = getattr(self, '_manual_sta_input', toga.TextInput()).value.strip() or '0'
+        self._manual_cp = getattr(self, '_manual_cp_input', toga.TextInput()).value.strip() or ''
+        self._show_manual_species_picker()
+        
+
+
+    def _show_manual_species_picker(self):
+        for child in list(self.results_box.children):
+            self.results_box.remove(child)
+
+        pokemon_index = get_pokemon_index()
+        all_species = sorted(pokemon_index.keys())
+        self._manual_filtered = list(all_species)
+        self._manual_all_species = all_species
+
+        search = toga.TextInput(
+            placeholder="Type to search (e.g. Medicham)",
+            on_change=self._filter_manual_species,
+            style=Pack(margin_bottom=8)
+        )
+        self._manual_search = search
+        self.results_box.add(search)
+
+        self._manual_species_list_box = toga.Box(style=Pack(direction=COLUMN))
+        scroll = toga.ScrollContainer(
+            content=self._manual_species_list_box,
+            style=Pack(flex=1)
+        )
+        self.results_box.add(scroll)
+        self._rebuild_manual_species_list()
+
+        self.results_box.add(toga.Button(
+            "← Back to Form",
+            on_press=lambda w: self._show_manual_entry(),
+            style=btn_nav(height=44)
+        ))
+
+    def _filter_manual_species(self, widget):
+        query = self._manual_search.value.strip().lower()
+        if query:
+            self._manual_filtered = [
+                s for s in self._manual_all_species if query in s.lower()
+            ]
+        else:
+            self._manual_filtered = list(self._manual_all_species)
+        self._rebuild_manual_species_list()
+
+    def _rebuild_manual_species_list(self):
+        for child in list(self._manual_species_list_box.children):
+            self._manual_species_list_box.remove(child)
+        for species in self._manual_filtered[:50]:
+            self._manual_species_list_box.add(toga.Button(
+                species,
+                on_press=self._make_manual_species_handler(species),
+                style=btn_secondary(height=40, font_size=14, margin_bottom=2)
+            ))
+
+    def _make_manual_species_handler(self, species):
+        def handler(widget):
+            self._manual_species = species
+            self._show_manual_entry()
+        return handler
+
+    def _save_manual_inputs_and_pick_species(self):
+        self._manual_atk = self._manual_atk_input.value.strip()
+        self._manual_def = self._manual_def_input.value.strip()
+        self._manual_sta = self._manual_sta_input.value.strip()
+        self._manual_cp = self._manual_cp_input.value.strip()
+        self._show_manual_species_picker()    
+
+    def _submit_manual_entry(self, widget):
+        # Read inputs
+        species = getattr(self, '_manual_species', None)
+        if not species:
+            self._show_manual_entry(error="Please select a species.")
+            return
+
+        try:
+            atk_iv = int(self._manual_atk_input.value.strip())
+            def_iv = int(self._manual_def_input.value.strip())
+            sta_iv = int(self._manual_sta_input.value.strip())
+            cp = int(self._manual_cp_input.value.strip())
+        except ValueError:
+            self._show_manual_entry(error="Please enter valid numbers for IVs and CP.")
+            return
+
+        if not (0 <= atk_iv <= 15 and 0 <= def_iv <= 15 and 0 <= sta_iv <= 15):
+            self._show_manual_entry(error="IVs must be between 0 and 15.")
+            return
+
+        if cp <= 0:
+            self._show_manual_entry(error="Please enter a valid CP.")
+            return
+
+        # Save inputs for next time
+        self._manual_atk = atk_iv
+        self._manual_def = def_iv
+        self._manual_sta = sta_iv
+        self._manual_cp = cp
+
+        # Look up base stats
+        pokemon_index = get_pokemon_index()
+        if species not in pokemon_index:
+            self._show_manual_entry(error=f"Could not find base stats for {species}.")
+            return
+
+        base = pokemon_index[species]
+        level = cp_to_level(cp, atk_iv, def_iv, sta_iv,
+                             base['atk'], base['def'], base['hp'])
+        if level is None:
+            self._show_manual_entry(
+                error=f"Could not find a level matching CP {cp} for those IVs. "
+                      f"Please check your values."
+            )
+            return
+
+        # Append to user_generated.csv
+        try:
+            CACHE_DIR.mkdir(exist_ok=True, parents=True)
+            append_user_generated(
+                str(USER_GENERATED_CSV),
+                species, atk_iv, def_iv, sta_iv, cp, level
+            )
+        except Exception as e:
+            self._show_manual_entry(error=f"Could not save: {e}")
+            return
+
+        # Reset species for next entry, load CSV and run check
+        self._manual_species = None
+        self._manual_atk = 0
+        self._manual_def = 0
+        self._manual_sta = 0
+        self._manual_cp = ''
+
+        if not self.csv_path:
+            self.csv_path = str(USER_GENERATED_CSV)
+
+        self._run_check()
+
+    # ------------------------------------------------------------------
     # CSV loading
     # ------------------------------------------------------------------
 
     def load_csv(self, path):
-        from ..data.fetcher import CACHE_DIR, SAVED_CSV
+        from ..data.fetcher import SAVED_CSV
         self.csv_path = str(path).replace('file://', '')
         try:
             CACHE_DIR.mkdir(exist_ok=True, parents=True)
             src = pathlib.Path(self.csv_path)
             if src.resolve() != SAVED_CSV.resolve():
                 shutil.copy2(src, SAVED_CSV)
+            self.csv_path = str(SAVED_CSV)
         except Exception as e:
             print(f"Could not save CSV to cache: {e}")
         self._run_check()
@@ -210,7 +489,6 @@ class IVCheckerScreen:
                 try:
                     if result and result.getData():
                         uri = result.getData()
-                        from ..data.fetcher import CACHE_DIR
                         CACHE_DIR.mkdir(exist_ok=True, parents=True)
                         dest = CACHE_DIR / 'pokegenie_import.csv'
                         ContentResolver = self.app._impl.native.getContentResolver()
@@ -247,7 +525,7 @@ class IVCheckerScreen:
         try:
             self.results = check_thresholds(
                 self.csv_path,
-                DEFAULT_THRESHOLDS,
+                self._get_thresholds(),
                 league=self.league,
                 max_level=51,
                 evolution_lines=EVOLUTION_LINES,
@@ -256,7 +534,7 @@ class IVCheckerScreen:
             self.status_label_file.text = pathlib.Path(self.csv_path).name
             self.clear_csv_btn.enabled = True
             self.csv_instructions_label.text = ""
-            species_count = len(self.results)
+            species_count = len([s for s in self.results if self.results[s]])
             total = sum(len(hits) for hits in self.results.values())
             self.status_label_stats.text = (
                 f"{species_count} species, {total} hit{'s' if total != 1 else ''} "
@@ -279,25 +557,22 @@ class IVCheckerScreen:
         self._show_back_btn(False)
 
         if not self.results:
-            if not self.csv_path:
-                self.results_box.add(toga.Label(
-                    self.NO_CSV_MESSAGE,
-                    style=Pack(font_size=14, text_align="center", margin_top=20,
-                               color=COLOR_TEXT_LIGHT)
-                ))
-            else:
-                self.results_box.add(toga.Label(
-                    "No Pokémon hit the thresholds for this league.",
-                    style=Pack(font_size=14, text_align="center", margin_top=20,
-                               color=COLOR_TEXT_LIGHT)
-                ))
+            self._display_no_csv()
             return
 
         total = sum(len(hits) for hits in self.results.values())
+        if total > 0:
+            self.results_box.add(toga.Button(
+                f"Show All ({total} hits)",
+                on_press=lambda w: self._display_all_results(),
+                style=btn_primary(height=48, font_size=16)
+            ))
+
+        # Add button to enter more mons manually
         self.results_box.add(toga.Button(
-            f"Show All ({total} hits)",
-            on_press=lambda w: self._display_all_results(),
-            style=btn_primary(height=48, font_size=16)
+            "✏️ Enter a Pokémon manually",
+            on_press=lambda w: self._show_manual_entry(),
+            style=btn_secondary(height=44, font_size=14)
         ))
 
         for species in sorted(self.results.keys()):
@@ -333,13 +608,11 @@ class IVCheckerScreen:
                        color=COLOR_ACCENT)
         ))
 
-        # Get all targets for this species
         thresholds = self._get_thresholds()
         all_targets = sorted(
             thresholds.get(species, {}).get(league_label, {}).keys()
         )
 
-        # Split into targets with hits and targets without
         targets_with_hits = {}
         for hit in hits:
             for target in hit['matched']:
@@ -347,7 +620,6 @@ class IVCheckerScreen:
 
         targets_without_hits = [t for t in all_targets if t not in targets_with_hits]
 
-        # target_options: None (all), then targets with hits, then empty targets
         self._target_index = 0
         self._target_options_raw = [None] + sorted(targets_with_hits.keys()) + targets_without_hits
         self._targets_without_hits = set(targets_without_hits)
@@ -390,7 +662,6 @@ class IVCheckerScreen:
         current = self._target_options_raw[self._target_index]
         league_label = self.league.capitalize()
 
-        # Empty target card
         if current is not None and current in self._targets_without_hits:
             thresholds = self._get_thresholds()
             target = thresholds.get(species, {}).get(league_label, {}).get(current, {})
@@ -445,6 +716,8 @@ class IVCheckerScreen:
 
         for sp in sorted(self.results.keys()):
             hits = self.results[sp]
+            if not hits:
+                continue
             self.results_box.add(toga.Label(
                 f"{sp} ({len(hits)} hit{'s' if len(hits) != 1 else ''})",
                 style=Pack(font_size=16, font_weight="bold",
@@ -471,12 +744,13 @@ class IVCheckerScreen:
     # ------------------------------------------------------------------
 
     def _clear_csv(self, widget):
-        from ..data.fetcher import SAVED_CSV
         self.csv_path = None
         self.results = {}
         try:
             if SAVED_CSV.exists():
                 SAVED_CSV.unlink()
+            if USER_GENERATED_CSV.exists():
+                USER_GENERATED_CSV.unlink()
         except Exception as e:
             print(f"Could not delete cached CSV: {e}")
         self.status_label_file.text = ""
@@ -484,8 +758,7 @@ class IVCheckerScreen:
         self.csv_instructions_label.text = self.CSV_INSTRUCTIONS
         self.clear_csv_btn.enabled = False
         self._show_back_btn(False)
-        for child in list(self.results_box.children):
-            self.results_box.remove(child)
+        self._display_no_csv()
 
     # ------------------------------------------------------------------
     # Hit display

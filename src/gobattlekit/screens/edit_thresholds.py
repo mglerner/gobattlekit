@@ -297,16 +297,41 @@ class EditThresholdsScreen:
                             self._show_species_picker)
         self._add_field_row("Label:", self._form_name or "tap to enter",
                             lambda w: self._show_text_entry("Label", "name"))
-        self._add_field_row("Attack:", self._form_atk,
-                            lambda w: self._show_text_entry("Min Attack (0=any)", "atk"))
-        self._add_field_row("Defense:", self._form_def,
-                            lambda w: self._show_text_entry("Min Defense (0=any)", "def"))
-        self._add_field_row("Stamina:", self._form_sta,
-                            lambda w: self._show_text_entry("Min Stamina (0=any)", "sta"))
+
+        # Compact IV row — Atk, Def, Sta on one line
+        self.content_box.add(toga.Label(
+            "Min stats (0 = any):",
+            style=Pack(font_size=14, margin_bottom=4, color=COLOR_TEXT_LIGHT)
+        ))
+        iv_row = toga.Box(style=Pack(direction=ROW, margin_bottom=8))
+        for label, form_attr, entry_prompt, entry_field in [
+            ("Atk", '_form_atk', "Min Attack (0=any)", "atk"),
+            ("Def", '_form_def', "Min Defense (0=any)", "def"),
+            ("HP",  '_form_sta', "Min HP (0=any)", "sta"),
+        ]:
+            col = toga.Box(style=Pack(direction=COLUMN, flex=1, margin_right=4))
+            col.add(toga.Label(
+                label,
+                style=Pack(font_size=12, text_align="center", color=COLOR_TEXT_LIGHT)
+            ))
+            value = getattr(self, form_attr, '0')
+            col.add(toga.Label(
+                str(value),
+                style=Pack(font_size=14, text_align="center", color=COLOR_ACCENT)
+            ))
+            prompt = entry_prompt
+            field = entry_field
+            col.add(toga.Button(
+                "→",
+                on_press=lambda w, p=prompt, f=field: self._show_text_entry(p, f),
+                style=btn_icon()
+            ))
+            iv_row.add(col)
+        self.content_box.add(iv_row)
+
         self._add_field_row("Only top N:", self._form_onlytop,
                             lambda w: self._show_text_entry("Only top N (0=all)", "onlytop"))
 
-        # Cancel at the bottom
         self.content_box.add(toga.Button(
             "← Cancel",
             on_press=lambda w: self._show_threshold_list(),
