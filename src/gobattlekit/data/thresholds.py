@@ -57,7 +57,7 @@ DEFAULT_THRESHOLDS = {
             'Atk': {
                 'attack': 111.47, 'defense': 127.59, 'stamina': 0},
             'Bulk': {
-                'attack': 111.47, 'defense': 132.10, 'stamina': 149},
+                'attack': 100, 'defense': 132.10, 'stamina': 149},
         },
     },
     'Drapion (Shadow)': {

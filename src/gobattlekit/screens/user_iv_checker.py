@@ -10,6 +10,7 @@ from .iv_checker import IVCheckerScreen
 from ..data.user_thresholds import load_user_thresholds
 from ..data.iv_checker import check_thresholds
 from ..data.thresholds import EVOLUTION_LINES
+from ..data.fetcher import SAVED_CSV, USER_GENERATED_CSV, get_csv_path, CACHE_DIR
 from ..platform import ON_ANDROID, ON_IOS, ON_MOBILE
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_BG,
@@ -20,8 +21,7 @@ from ..theme import (
 NO_TARGETS_MESSAGE = "No user IV targets defined. Tap 'Edit My Targets' to add some."
 GETTING_STARTED = (
     "To get started:\n1. Tap 'Edit My Targets'\n2. Tap 'Add Target'\n"
-    "3. Choose a species and\nset minimum stats\n4. Tap 'Save Target'\n"
-    "5. Make sure a PokeGenie\nCSV is imported"
+    "3. Choose a species and\nset minimum stats\n4. Tap 'Save Target'"
 )
 
 
@@ -32,7 +32,6 @@ class UserIVCheckerScreen(IVCheckerScreen):
         return load_user_thresholds()
 
     def build(self):
-        """Build and return the user IV checker screen content."""
         self.container = toga.Box(style=CONTAINER)
 
         self.container.add(toga.Label(
@@ -64,17 +63,9 @@ class UserIVCheckerScreen(IVCheckerScreen):
             style=btn_primary(height=48, font_size=16)
         ))
 
-        csv_name_line = pathlib.Path(self.csv_path).name if self.csv_path else ""
-        stats_line = ""
-        if self.csv_path:
-            species_count = len(self.results)
-            total = sum(len(hits) for hits in self.results.values())
-            stats_line = (f"{species_count} species, {total} hit{'s' if total != 1 else ''} "
-                          f"in {self.league.capitalize()} League")
-
         status_row = toga.Box(style=Pack(direction=ROW, margin_bottom=2, height=36))
         self.status_label_file = toga.Label(
-            csv_name_line,
+            pathlib.Path(self.csv_path).name if self.csv_path else "",
             style=Pack(flex=1, font_size=13, text_align="center",
                        color=COLOR_TEXT_LIGHT)
         )
@@ -89,7 +80,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
         self.container.add(status_row)
 
         self.status_label_stats = toga.Label(
-            stats_line if stats_line else self.NO_CSV_MESSAGE,
+            self._stats_line() if self.csv_path else self.NO_CSV_MESSAGE,
             style=Pack(font_size=13, text_align="center", margin_bottom=4,
                        color=COLOR_TEXT_LIGHT)
         )
@@ -101,7 +92,6 @@ class UserIVCheckerScreen(IVCheckerScreen):
                                       style=Pack(flex=1, background_color=COLOR_BG))
         self.container.add(scroll)
 
-        # Dynamic back button — hidden on species list, shown on detail views
         self.back_btn = toga.Button(
             "← Back to Species List",
             on_press=lambda w: self._display_species_list(),
@@ -128,64 +118,70 @@ class UserIVCheckerScreen(IVCheckerScreen):
             style=btn_nav(height=44)
         ))
 
-        if self.results or load_user_thresholds():
+        path = get_csv_path()
+        if path and not self.csv_path:
+            self.csv_path = path
+            self._run_check()
+        else:
             self._display_species_list()
 
         return self.container
 
-        def _display_species_list(self):
-            for child in list(self.results_box.children):
-                self.results_box.remove(child)
+    def _display_species_list(self):
+        for child in list(self.results_box.children):
+            self.results_box.remove(child)
 
-            self._show_back_btn(False)
+        self._show_back_btn(False)
 
-            user_thresholds = load_user_thresholds()
-            league_label = self.league.capitalize()
+        user_thresholds = load_user_thresholds()
+        league_label = self.league.capitalize()
 
-            if not user_thresholds:
-                self.results_box.add(toga.Label(
-                    GETTING_STARTED,
-                    style=Pack(font_size=14, text_align="center",
-                               margin_top=20, color=COLOR_TEXT_LIGHT)
-                ))
-                return
+        if not user_thresholds:
+            self.results_box.add(toga.Label(
+                GETTING_STARTED,
+                style=Pack(font_size=14, text_align="center",
+                           margin_top=20, color=COLOR_TEXT_LIGHT)
+            ))
+            return
 
-            if not self.csv_path:
-                self.results_box.add(toga.Label(
-                    "Share CSV from PokeGenie → GoBattleKit" if ON_IOS
-                    else "Tap 'Import PokeGenie CSV' to get started.",
-                    style=Pack(font_size=14, text_align="center",
-                               margin_top=20, color=COLOR_TEXT_LIGHT)
-                ))
-                return
+        all_target_species = sorted([
+            s for s in user_thresholds
+            if league_label in user_thresholds.get(s, {})
+        ])
 
-            if not self.results:
-                self.results_box.add(toga.Label(
-                    f"No targets defined for {league_label} League.",
-                    style=Pack(font_size=14, text_align="center",
-                               margin_top=20, color=COLOR_TEXT_LIGHT)
-                ))
-                return
+        if not all_target_species:
+            self.results_box.add(toga.Label(
+                f"No targets defined for {league_label} League.",
+                style=Pack(font_size=14, text_align="center",
+                           margin_top=20, color=COLOR_TEXT_LIGHT)
+            ))
+            return
 
-            total = sum(len(hits) for hits in self.results.values())
-            if total > 0:
-                self.results_box.add(toga.Button(
-                    f"Show All ({total} hits)",
-                    on_press=lambda w: self._display_all_results(),
-                    style=btn_primary(height=48, font_size=16)
-                ))
+        total = sum(len(hits) for hits in self.results.values())
+        if total > 0:
+            self.results_box.add(toga.Button(
+                f"Show All ({total} hits)",
+                on_press=lambda w: self._display_all_results(),
+                style=btn_primary(height=48, font_size=16)
+            ))
 
-            for species in sorted(self.results.keys()):
-                hits = self.results[species]
-                self.results_box.add(toga.Button(
-                    f"{species} ({len(hits)})",
-                    on_press=self._make_species_handler(species),
-                    style=btn_secondary(height=48, font_size=16)
-                ))
-    
+        self.results_box.add(toga.Button(
+            "✏️ Enter a Pokémon manually",
+            on_press=lambda w: self._show_manual_entry(),
+            style=btn_secondary(height=44, font_size=14)
+        ))
+
+        for species in all_target_species:
+            hits = self.results.get(species, [])
+            self.results_box.add(toga.Button(
+                f"{species} ({len(hits)})",
+                on_press=self._make_species_handler(species),
+                style=btn_secondary(height=48, font_size=16)
+            ))
+
     def _run_check(self):
-        """Run the IV check against user thresholds."""
         if not self.csv_path:
+            self._display_species_list()
             return
         try:
             user_thresholds = load_user_thresholds()
@@ -212,46 +208,9 @@ class UserIVCheckerScreen(IVCheckerScreen):
             )
             self.status_label_file.text = pathlib.Path(self.csv_path).name
             self.clear_csv_btn.enabled = True
-            species_count = len(self.results)
-            total = sum(len(hits) for hits in self.results.values())
-            self.status_label_stats.text = (
-                f"{species_count} species, {total} hit{'s' if total != 1 else ''} "
-                f"in {self.league.capitalize()} League"
-            )
+            self.status_label_stats.text = self._stats_line()
             self._display_species_list()
         except Exception as e:
             self.status_label_file.text = ""
             self.clear_csv_btn.enabled = False
             self.status_label_stats.text = f"Error: {e}"
-
-
-    def _display_no_csv(self):
-        for child in list(self.results_box.children):
-            self.results_box.remove(child)
-
-        self._show_back_btn(False)
-
-        if ON_IOS:
-            self.results_box.add(toga.Label(
-                "Share a CSV from PokeGenie to import.\nRequires PokeGenie iVision subscription.",
-                style=Pack(font_size=14, text_align="center",
-                           margin_top=12, margin_bottom=12,
-                           color=COLOR_TEXT_LIGHT)
-            ))
-        else:
-            self.results_box.add(toga.Button(
-                "📥 Import from PokeGenie (requires iVision)",
-                on_press=self._import_csv,
-                style=btn_secondary(height=52, font_size=14)
-            ))
-            self.results_box.add(toga.Label(
-                "Requires PokeGenie iVision subscription.",
-                style=Pack(font_size=12, text_align="center",
-                           margin_bottom=12, color=COLOR_TEXT_LIGHT)
-            ))
-
-        self.results_box.add(toga.Button(
-            "✏️ Enter a Pokémon manually",
-            on_press=lambda w: self._show_manual_entry(),
-            style=btn_secondary(height=52, font_size=14)
-        ))
