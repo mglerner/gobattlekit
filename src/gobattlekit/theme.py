@@ -216,3 +216,25 @@ def card_box(margin_bottom=8):
 # ------------------------------------------------------------------
 
 CONTAINER = Pack(direction=COLUMN, margin=20, flex=1, background_color=COLOR_BG)
+
+
+# ------------------------------------------------------------------
+# Widget visibility helpers
+# ------------------------------------------------------------------
+
+def show_widget(widget, height, width=None, margin_bottom=None):
+    """Show a widget that was previously hidden with hide_widget."""
+    widget.enabled = True
+    widget.style.height = height
+    if width is not None:
+        widget.style.width = width
+    if margin_bottom is not None:
+        widget.style.margin_bottom = margin_bottom
+
+
+def hide_widget(widget):
+    """Hide a widget by collapsing it to zero size and disabling it."""
+    widget.enabled = False
+    widget.style.height = 0
+    widget.style.width = 0
+    widget.style.margin_bottom = 0

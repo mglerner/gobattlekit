@@ -7,11 +7,20 @@ import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from ..platform import ON_ANDROID, ON_IOS
+from ..data.preferences import get_pref, set_pref
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW, COLOR_BG,
     COLOR_SECONDARY_BTN, COLOR_NAV,
     btn_primary, btn_secondary, btn_back, btn_nav, card_box
 )
+
+INTRO_PREF_KEYS = [
+    "skip_intro_move_count_quiz",
+    "skip_intro_timing_quiz",
+    "skip_intro_type_quiz",
+    "skip_intro_iv_checker",
+    "skip_intro_user_iv_checker",
+]
 
 TOPICS = [
     "Getting Started",
@@ -99,6 +108,17 @@ class HelpScreen:
             ))
         container.add(topic_box)
 
+        any_skipped = any(get_pref(k) for k in INTRO_PREF_KEYS)
+        self._reset_intro_btn = toga.Button(
+            "Reset intro screens",
+            on_press=self._reset_intros,
+            style=btn_secondary(height=44, font_size=14, margin_bottom=8)
+        )
+        if not any_skipped:
+            from ..theme import hide_widget
+            hide_widget(self._reset_intro_btn)
+        container.add(self._reset_intro_btn)
+
         container.add(toga.Button(
             self._back_label,
             on_press=self._go_back,
@@ -179,6 +199,12 @@ class HelpScreen:
             self.app.show_help(topic=topic, back_screen=self._back_screen,
                                back_label=self._back_label)
         return handler
+
+    def _reset_intros(self, widget):
+        for key in INTRO_PREF_KEYS:
+            set_pref(key, False)
+        self._reset_intro_btn.text = "Intro screens reset ✓"
+        self._reset_intro_btn.enabled = False
 
     def _go_back(self, widget):
         if self._back_screen:

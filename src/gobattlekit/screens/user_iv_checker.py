@@ -15,7 +15,8 @@ from ..platform import ON_ANDROID, ON_IOS, ON_MOBILE
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_BG,
     btn_primary, btn_secondary, btn_back, btn_nav, btn_league, btn_icon,
-    btn_destructive, btn_destructive_icon, btn_help
+    btn_destructive, btn_destructive_icon, btn_help,
+    show_widget, hide_widget
 )
 
 NO_TARGETS_MESSAGE = "No user IV targets defined. Tap 'Edit My Targets' to add some."
@@ -74,7 +75,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
             on_press=self._clear_csv,
             style=btn_destructive_icon()
         )
-        self.clear_csv_btn.enabled = bool(self.csv_path)
+        self._show_clear_btn(bool(self.csv_path))
         status_row.add(self.status_label_file)
         status_row.add(self.clear_csv_btn)
         self.container.add(status_row)
@@ -97,16 +98,14 @@ class UserIVCheckerScreen(IVCheckerScreen):
             on_press=lambda w: self._display_species_list(),
             style=btn_nav(height=44)
         )
-        self.back_btn.enabled = False
-        self.back_btn.style.height = 2
-        self.back_btn.style.margin_bottom = 0
+        hide_widget(self.back_btn)
         self.container.add(self.back_btn)
 
         self.container.add(toga.Button(
             "?  Help",
             on_press=lambda w: self.app.show_help(
                 topic="My PvP IV Targets",
-                back_screen=lambda: self.app.show_user_iv_checker(),
+                back_screen=lambda: self.app.show_user_iv_checker(skip_intro=True),
                 back_label="← My PvP IV Targets"
             ),
             style=btn_help()
@@ -171,6 +170,13 @@ class UserIVCheckerScreen(IVCheckerScreen):
             style=btn_secondary(height=44, font_size=14)
         ))
 
+        if not self._has_pokegenie_csv():
+            self.results_box.add(toga.Button(
+                "Import from PokeGenie",
+                on_press=self._show_pokegenie_help,
+                style=btn_secondary(height=44, font_size=14)
+            ))
+
         for species in all_target_species:
             hits = self.results.get(species, [])
             self.results_box.add(toga.Button(
@@ -187,7 +193,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
             user_thresholds = load_user_thresholds()
             if not user_thresholds:
                 self.status_label_file.text = ""
-                self.clear_csv_btn.enabled = False
+                self._show_clear_btn(False)
                 self.status_label_stats.text = NO_TARGETS_MESSAGE
                 for child in list(self.results_box.children):
                     self.results_box.remove(child)
@@ -207,10 +213,10 @@ class UserIVCheckerScreen(IVCheckerScreen):
                 include_empty=True,
             )
             self.status_label_file.text = pathlib.Path(self.csv_path).name
-            self.clear_csv_btn.enabled = True
+            self._show_clear_btn(True)
             self.status_label_stats.text = self._stats_line()
             self._display_species_list()
         except Exception as e:
             self.status_label_file.text = ""
-            self.clear_csv_btn.enabled = False
+            self._show_clear_btn(False)
             self.status_label_stats.text = f"Error: {e}"

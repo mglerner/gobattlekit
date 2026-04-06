@@ -29,6 +29,8 @@ from .screens.iv_checker import IVCheckerScreen
 from .screens.user_iv_checker import UserIVCheckerScreen
 from .screens.edit_thresholds import EditThresholdsScreen
 from .screens.quiz_summary import QuizSummaryScreen
+from .screens.intro import IntroScreen
+from .data.preferences import get_pref
 
 from .theme import COLOR_BG
 
@@ -47,6 +49,7 @@ class GoBattleKit(toga.App):
             self.user_iv_checker_screen = UserIVCheckerScreen(self)
             self.edit_thresholds_screen = EditThresholdsScreen(self)
             self.quiz_summary_screen = QuizSummaryScreen(self)
+            self.intro_screen = IntroScreen(self)
             self.help_screen = HelpScreen(self)
             self.iv_credits_screen = IVCreditsScreen(self)
             self.main_window = toga.MainWindow(title=self.formal_name)
@@ -100,40 +103,79 @@ class GoBattleKit(toga.App):
                             if f != latest:
                                 f.unlink()
                         seen = {latest}
-                        self.show_iv_checker()
+                        self.show_iv_checker(skip_intro=True)
                         self.iv_checker_screen.load_csv(str(latest))
             except Exception as e:
                 print("Inbox poll error:", e)            
 
-    def show_quiz(self, league):
+    def _show_with_intro(self, feature_key, on_continue):
+        """Show intro screen if user hasn't opted out, otherwise go direct."""
+        if get_pref(f"skip_intro_{feature_key}"):
+            on_continue()
+        else:
+            self.main_window.content = self.intro_screen.build(
+                feature_key, on_continue
+            )
+
+    def show_quiz(self, league, skip_intro=False):
         """Switch to the move count quiz screen for the given league."""
-        self.main_window.content = self.quiz_screen.build(league)
+        if skip_intro:
+            self.main_window.content = self.quiz_screen.build(league)
+        else:
+            self._show_with_intro(
+                "move_count_quiz",
+                lambda: self.show_quiz(league, skip_intro=True)
+            )
 
-    def show_timing_quiz(self):
+    def show_timing_quiz(self, skip_intro=False):
         """Switch to the move timing quiz screen."""
-        self.main_window.content = self.timing_quiz_screen.build()    
+        if skip_intro:
+            self.main_window.content = self.timing_quiz_screen.build()
+        else:
+            self._show_with_intro(
+                "timing_quiz",
+                lambda: self.show_timing_quiz(skip_intro=True)
+            )
 
-    def show_type_quiz(self):
+    def show_type_quiz(self, skip_intro=False):
         """Switch to the type effectiveness quiz screen."""
-        self.main_window.content = self.type_quiz_screen.build()
+        if skip_intro:
+            self.main_window.content = self.type_quiz_screen.build()
+        else:
+            self._show_with_intro(
+                "type_quiz",
+                lambda: self.show_type_quiz(skip_intro=True)
+            )
 
-    def show_iv_checker(self):
+    def show_iv_checker(self, skip_intro=False):
         """Switch to the IV checker screen."""
-        self.main_window.content = self.iv_checker_screen.build()
-        # Auto-load saved CSV if not already loaded
-        from .data.fetcher import SAVED_CSV
-        if not self.iv_checker_screen.csv_path and SAVED_CSV.exists():
-            self.iv_checker_screen.load_csv(str(SAVED_CSV))
+        if skip_intro:
+            self.main_window.content = self.iv_checker_screen.build()
+            # Auto-load saved CSV if not already loaded
+            from .data.fetcher import SAVED_CSV
+            if not self.iv_checker_screen.csv_path and SAVED_CSV.exists():
+                self.iv_checker_screen.load_csv(str(SAVED_CSV))
+        else:
+            self._show_with_intro(
+                "iv_checker",
+                lambda: self.show_iv_checker(skip_intro=True)
+            )
 
-    def show_user_iv_checker(self):
+    def show_user_iv_checker(self, skip_intro=False):
         """Switch to the user IV checker screen."""
-        self.main_window.content = self.user_iv_checker_screen.build()
-        from .data.fetcher import SAVED_CSV
-        if not self.user_iv_checker_screen.csv_path and SAVED_CSV.exists():
-            self.user_iv_checker_screen.load_csv(str(SAVED_CSV))
-        elif self.user_iv_checker_screen.csv_path:
-            # Re-run check in case thresholds changed
-            self.user_iv_checker_screen._run_check()
+        if skip_intro:
+            self.main_window.content = self.user_iv_checker_screen.build()
+            from .data.fetcher import SAVED_CSV
+            if not self.user_iv_checker_screen.csv_path and SAVED_CSV.exists():
+                self.user_iv_checker_screen.load_csv(str(SAVED_CSV))
+            elif self.user_iv_checker_screen.csv_path:
+                # Re-run check in case thresholds changed
+                self.user_iv_checker_screen._run_check()
+        else:
+            self._show_with_intro(
+                "user_iv_checker",
+                lambda: self.show_user_iv_checker(skip_intro=True)
+            )
 
     def show_edit_thresholds(self):
         """Switch to the edit thresholds screen."""
