@@ -50,8 +50,8 @@ INTROS = {
              "defending type (or type pair), and asked whether the attack "
              "is super effective, not very effective, neutral, or double "
              "resisted."),
-            ("Scoring", "Same as the other quizzes: up to 3 points per "
-             "question, with 3 attempts allowed."),
+            ("Scoring", "Each question is worth 1 point — you get one "
+             "attempt per question, so answer carefully!"),
         ],
     ),
     "iv_checker": (

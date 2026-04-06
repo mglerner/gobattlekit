@@ -181,6 +181,8 @@ info."CFBundleDocumentTypes" = [
     {CFBundleTypeName = "CSV File", CFBundleTypeRole = "Viewer", LSHandlerRank = "Owner", LSItemContentTypes = ["public.comma-separated-values-text"]}
 ]
 info."LSSupportsOpeningDocumentsInPlace" = false
+info."UISupportedInterfaceOrientations" = ["UIInterfaceOrientationPortrait"]
+info."UISupportedInterfaceOrientations~ipad" = ["UIInterfaceOrientationPortrait", "UIInterfaceOrientationPortraitUpsideDown"]
 
 [tool.briefcase.app.gobattlekit.android]
 requires = [
@@ -188,6 +190,8 @@ requires = [
 ]
 
 base_theme = "Theme.MaterialComponents.Light.DarkActionBar"
+
+android_manifest_activity_attrs_extra_content = 'android:screenOrientation="portrait"'
 
 build_gradle_dependencies = [
     "com.google.android.material:material:1.13.0",
