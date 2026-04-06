@@ -35,7 +35,8 @@ class QuizScreen:
 
     def build(self, league):
         self.league = league
-        self.mons = get_rankings(league)
+        self.mons = [m for m in get_rankings(league)
+                     if len(set(m['moveset'][1:])) > 1]
         self.score = 0
         self.max_score = 0
         self.attempts = 0
