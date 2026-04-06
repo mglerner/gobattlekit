@@ -15,7 +15,7 @@ from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
     btn_primary, btn_secondary, btn_back, btn_nav, btn_league,
     btn_destructive, btn_icon, btn_destructive_icon, card_box,
-    btn_help
+    btn_help, show_widget, hide_widget
 )
 
 
@@ -58,9 +58,10 @@ class EditThresholdsScreen:
         """Enable/disable and show/hide the outer buttons."""
         for btn in [self._clear_all_btn, self._add_target_btn,
                     self._import_text_btn, self._help_btn]:
-            btn.enabled = enabled
-            btn.style.height = 48 if enabled else 2
-            btn.style.margin_bottom = 8 if enabled else 0
+            if enabled:
+                show_widget(btn, height=48, margin_bottom=8)
+            else:
+                hide_widget(btn)
 
     def build(self):
         self.container = toga.Box(style=CONTAINER)
@@ -112,7 +113,7 @@ class EditThresholdsScreen:
 
         self.container.add(toga.Button(
             "← My IV Checker",
-            on_press=lambda w: self.app.show_user_iv_checker(),
+            on_press=lambda w: self.app.show_user_iv_checker(skip_intro=True),
             style=btn_nav(height=44)
         ))
 

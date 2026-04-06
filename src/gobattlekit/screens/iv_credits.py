@@ -93,7 +93,7 @@ class IVCreditsScreen:
         if self._back_screen:
             self._back_screen()
         else:
-            self.app.show_iv_checker()
+            self.app.show_iv_checker(skip_intro=True)
 
     def _open_url(self, url):
         if ON_ANDROID:

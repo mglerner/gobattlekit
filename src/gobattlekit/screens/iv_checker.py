@@ -17,7 +17,8 @@ from ..platform import ON_ANDROID, ON_IOS, ON_MOBILE
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW, COLOR_BG,
     btn_primary, btn_secondary, btn_back, btn_league, btn_icon, card_box,
-    btn_nav, btn_destructive, btn_destructive_icon, btn_help
+    btn_nav, btn_destructive, btn_destructive_icon, btn_help,
+    show_widget, hide_widget
 )
 
 
@@ -78,7 +79,7 @@ class IVCheckerScreen:
             on_press=self._clear_csv,
             style=btn_destructive_icon()
         )
-        self.clear_csv_btn.enabled = bool(self.csv_path)
+        self._show_clear_btn(bool(self.csv_path))
         status_row.add(self.status_label_file)
         status_row.add(self.clear_csv_btn)
         self.container.add(status_row)
@@ -101,9 +102,7 @@ class IVCheckerScreen:
             on_press=lambda w: self._display_species_list(),
             style=btn_nav(height=44)
         )
-        self.back_btn.enabled = False
-        self.back_btn.style.height = 2
-        self.back_btn.style.margin_bottom = 0
+        hide_widget(self.back_btn)
         self.container.add(self.back_btn)
 
         help_row = toga.Box(style=Pack(direction=ROW))
@@ -111,7 +110,7 @@ class IVCheckerScreen:
             "? Help",
             on_press=lambda w: self.app.show_help(
                 topic="PvP IV Checker",
-                back_screen=lambda: self.app.show_iv_checker(),
+                back_screen=lambda: self.app.show_iv_checker(skip_intro=True),
                 back_label="← PvP IV Checker"
             ),
             style=btn_help(flex=1, margin_right=2)
@@ -119,7 +118,7 @@ class IVCheckerScreen:
         help_row.add(toga.Button(
             "IV Credits",
             on_press=lambda w: self.app.show_iv_credits(
-                back_screen=lambda: self.app.show_iv_checker(),
+                back_screen=lambda: self.app.show_iv_checker(skip_intro=True),
                 back_label="← IV Checker"
             ),
             style=btn_help(flex=1, margin_left=2)
@@ -147,10 +146,88 @@ class IVCheckerScreen:
         return (f"{species_count} species, {total} hit{'s' if total != 1 else ''} "
                 f"in {self.league.capitalize()} League")
 
+    def _show_clear_btn(self, visible):
+        if visible:
+            show_widget(self.clear_csv_btn, height=32, width=44)
+        else:
+            hide_widget(self.clear_csv_btn)
+
     def _show_back_btn(self, visible):
-        self.back_btn.enabled = visible
-        self.back_btn.style.height = 44 if visible else 2
-        self.back_btn.style.margin_bottom = 0
+        if visible:
+            show_widget(self.back_btn, height=44)
+        else:
+            hide_widget(self.back_btn)
+
+    # ------------------------------------------------------------------
+    # PokeGenie import help
+    # ------------------------------------------------------------------
+
+    def _has_pokegenie_csv(self):
+        return SAVED_CSV.exists()
+
+    def _show_pokegenie_help(self, widget):
+        """Show instructions for importing from PokeGenie."""
+        for child in list(self.results_box.children):
+            self.results_box.remove(child)
+
+        self._show_back_btn(False)
+
+        if ON_IOS:
+            steps = (
+                "1. Open PokeGenie (requires iVision subscription)\n"
+                "2. Tap the export/share button in PokeGenie\n"
+                "3. Choose 'Share' and select GoBattleKit\n"
+                "4. Your CSV will be imported automatically"
+            )
+        elif ON_ANDROID:
+            steps = (
+                "1. Open PokeGenie (requires iVision subscription)\n"
+                "2. Export your Pokémon data as a CSV file\n"
+                "3. Come back here and tap 'Import PokeGenie CSV'\n"
+                "4. Select the exported CSV file"
+            )
+        else:
+            steps = (
+                "1. Open PokeGenie (requires iVision subscription)\n"
+                "2. Export your Pokémon data as a CSV file\n"
+                "3. Come back here and tap 'Import PokeGenie CSV'\n"
+                "4. Select the exported CSV file"
+            )
+
+        self.results_box.add(toga.Label(
+            "Importing from PokeGenie",
+            style=Pack(font_size=18, font_weight="bold",
+                       margin_bottom=8, text_align="center",
+                       color=COLOR_ACCENT)
+        ))
+
+        lines = steps.count('\n') + len(steps) // 35 + 2
+        self.results_box.add(toga.MultilineTextInput(
+            value=steps,
+            readonly=True,
+            style=Pack(font_size=14, color=COLOR_TEXT_LIGHT,
+                       height=max(70, lines * 24), margin_bottom=12)
+        ))
+
+        self.results_box.add(toga.Label(
+            "Note: CSV export requires PokeGenie's iVision subscription. "
+            "Without iVision, you can enter Pokémon manually instead.",
+            style=Pack(font_size=13, margin_bottom=12,
+                       color=COLOR_TEXT_LIGHT)
+        ))
+
+        if not ON_IOS:
+            self.results_box.add(toga.Button(
+                "Import PokeGenie CSV",
+                on_press=self._import_csv,
+                style=btn_primary(height=48, font_size=16)
+            ))
+
+        self.results_box.add(toga.Button(
+            "← Back to Species List",
+            on_press=lambda w: self._display_species_list(),
+            style=btn_nav(height=44)
+        ))
 
     # ------------------------------------------------------------------
     # Manual entry
@@ -460,12 +537,12 @@ class IVCheckerScreen:
                 include_empty=True,
             )
             self.status_label_file.text = pathlib.Path(self.csv_path).name
-            self.clear_csv_btn.enabled = True
+            self._show_clear_btn(True)
             self.status_label_stats.text = self._stats_line()
             self._display_species_list()
         except Exception as e:
             self.status_label_file.text = ""
-            self.clear_csv_btn.enabled = False
+            self._show_clear_btn(False)
             self.status_label_stats.text = f"Error reading CSV: {e}"
 
     # ------------------------------------------------------------------
@@ -507,6 +584,13 @@ class IVCheckerScreen:
             on_press=lambda w: self._show_manual_entry(),
             style=btn_secondary(height=44, font_size=14)
         ))
+
+        if not self._has_pokegenie_csv():
+            self.results_box.add(toga.Button(
+                "Import from PokeGenie",
+                on_press=self._show_pokegenie_help,
+                style=btn_secondary(height=44, font_size=14)
+            ))
 
         for species in all_target_species:
             hits = self.results.get(species, [])
@@ -553,29 +637,40 @@ class IVCheckerScreen:
 
         targets_without_hits = [t for t in all_targets if t not in targets_with_hits]
 
-        self._target_index = 0
-        self._target_options_raw = [None] + sorted(targets_with_hits.keys()) + targets_without_hits
         self._targets_without_hits = set(targets_without_hits)
+
+        # Build the list of target options to cycle through.
+        # If there are hits, include "All targets" as the first option.
+        # If there are no hits, skip "All targets" and start on the first
+        # specific target so qualifying IVs are shown immediately.
+        if hits:
+            self._target_options_raw = [None] + sorted(targets_with_hits.keys()) + targets_without_hits
+        else:
+            self._target_options_raw = targets_without_hits or [None]
+        self._target_index = 0
+
+        def _target_label_text(target):
+            if target is None:
+                return f"All targets ({len(hits)})"
+            elif target in self._targets_without_hits:
+                return f"{target} (0)"
+            else:
+                return f"{target} ({targets_with_hits.get(target, 0)})"
 
         def make_cycle_handler(direction):
             def handler(widget):
                 self._target_index = (self._target_index + direction) % len(self._target_options_raw)
                 current = self._target_options_raw[self._target_index]
-                if current is None:
-                    self.target_label.text = f"All targets ({len(hits)})"
-                elif current in self._targets_without_hits:
-                    self.target_label.text = f"{current} (0)"
-                else:
-                    count = targets_with_hits.get(current, 0)
-                    self.target_label.text = f"{current} ({count})"
+                self.target_label.text = _target_label_text(current)
                 self._refresh_hits(species, hits)
             return handler
 
+        initial_target = self._target_options_raw[self._target_index]
         target_row = toga.Box(style=Pack(direction=ROW, margin_bottom=12))
         target_row.add(toga.Button("◀", on_press=make_cycle_handler(-1),
                                    style=btn_icon(width=44, height=44)))
         self.target_label = toga.Label(
-            f"All targets ({len(hits)})",
+            _target_label_text(initial_target),
             style=Pack(flex=1, text_align="center", font_size=14,
                        color=COLOR_TEXT_LIGHT)
         )
@@ -640,13 +735,10 @@ class IVCheckerScreen:
                         continue
                     qualifying.append((rank, a, d, s, stats))
 
-                # We want to display these in IV stats descending
-                # order. But it takes FOREVER to build up the UI if we
-                # have too many. So, we'll sort them by CP, truncate
-                # at 100 combinations, then sort how we want.
+                # Sort by rank, truncate to top 100.
                 qualifying.sort(key=lambda x: x[0])
                 qualifying = qualifying[:100]
-                qualifying.sort(key=lambda x: (-x[1], -x[2], -x[3]))  # atk desc, def desc, sta desc
+                # qualifying.sort(key=lambda x: (-x[1], -x[2], -x[3]))  # atk desc, def desc, sta desc
 
                 self.hits_box.add(toga.Label(
                     f"Requires: {req_str}",
@@ -654,7 +746,12 @@ class IVCheckerScreen:
                                color=COLOR_TEXT_LIGHT)
                 ))
                 self.hits_box.add(toga.Label(
-                    f"Top {len(qualifying)} qualifying IV combinations:",
+                    "None of your mons meet this target.",
+                    style=Pack(font_size=13, font_weight="bold",
+                               margin_bottom=2, color=COLOR_YELLOW)
+                ))
+                self.hits_box.add(toga.Label(
+                    f"Here are the top {len(qualifying)} IV combinations that do:",
                     style=Pack(font_size=13, font_weight="bold",
                                margin_bottom=8, color=COLOR_YELLOW)
                 ))
@@ -689,6 +786,12 @@ class IVCheckerScreen:
                 style=Pack(font_size=14, text_align="center", margin_top=10,
                            color=COLOR_TEXT_LIGHT)
             ))
+            if not self.csv_path:
+                self.hits_box.add(toga.Button(
+                    "✏️ Enter a Pokémon manually",
+                    on_press=lambda w: self._show_manual_entry(),
+                    style=btn_secondary(height=44, font_size=14)
+                ))
             return
 
         hits = sorted(hits, key=lambda h: h['stats']['stat_prod'], reverse=True)
@@ -748,7 +851,7 @@ class IVCheckerScreen:
             print(f"Could not delete cached CSV: {e}")
         self.status_label_file.text = ""
         self.status_label_stats.text = self.NO_CSV_MESSAGE
-        self.clear_csv_btn.enabled = False
+        self._show_clear_btn(False)
         self._show_back_btn(False)
         self._display_species_list()
 
