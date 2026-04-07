@@ -179,13 +179,6 @@ class IVCheckerScreen:
                 "3. Choose 'Share' and select GoBattleKit\n"
                 "4. Your CSV will be imported automatically"
             )
-        elif ON_ANDROID:
-            steps = (
-                "1. Open PokeGenie (requires iVision subscription)\n"
-                "2. Export your Pokémon data as a CSV file\n"
-                "3. Come back here and tap 'Import PokeGenie CSV'\n"
-                "4. Select the exported CSV file"
-            )
         else:
             steps = (
                 "1. Open PokeGenie (requires iVision subscription)\n"

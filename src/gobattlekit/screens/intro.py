@@ -97,7 +97,6 @@ class IntroScreen:
         """
         self._feature_key = feature_key
         self._on_continue = on_continue
-        pref_key = f"skip_intro_{feature_key}"
 
         title, sections = INTROS[feature_key]
 
