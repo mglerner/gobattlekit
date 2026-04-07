@@ -222,18 +222,45 @@ CONTAINER = Pack(direction=COLUMN, margin=20, flex=1, background_color=COLOR_BG)
 # Widget visibility helpers
 # ------------------------------------------------------------------
 
-def show_widget(widget, height, width=None, margin_bottom=None):
-    """Show a widget that was previously hidden with hide_widget."""
+def show_widget(widget, height=None, width=None, margin_bottom=None):
+    """Show a widget that was previously hidden with hide_widget.
+
+    Restores the dimensions stashed by hide_widget. Explicit height/width/
+    margin_bottom arguments override the stashed values (useful when the
+    widget is being shown at a different size than it was originally).
+    """
     widget.enabled = True
-    widget.style.height = height
-    if width is not None:
-        widget.style.width = width
-    if margin_bottom is not None:
-        widget.style.margin_bottom = margin_bottom
+    stashed = getattr(widget, '_hidden_state', None)
+    if stashed is not None:
+        s_height, s_width, s_margin = stashed
+        widget.style.height = height if height is not None else s_height
+        widget.style.width = width if width is not None else s_width
+        widget.style.margin_bottom = (
+            margin_bottom if margin_bottom is not None else s_margin
+        )
+        widget._hidden_state = None
+    else:
+        # First show (no prior hide). Only set what the caller asked for.
+        if height is not None:
+            widget.style.height = height
+        if width is not None:
+            widget.style.width = width
+        if margin_bottom is not None:
+            widget.style.margin_bottom = margin_bottom
 
 
 def hide_widget(widget):
-    """Hide a widget by collapsing it to zero size and disabling it."""
+    """Hide a widget by collapsing it to zero size and disabling it.
+
+    Stashes the prior height/width/margin_bottom on the widget so
+    show_widget can restore them symmetrically.
+    """
+    if getattr(widget, '_hidden_state', None) is None:
+        widget._hidden_state = (
+            widget.style.height,
+            widget.style.width,
+            widget.style.margin_bottom,
+        )
     widget.enabled = False
     widget.style.height = 0
     widget.style.width = 0

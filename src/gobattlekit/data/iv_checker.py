@@ -69,6 +69,11 @@ LEAGUE_CAPS = {
     'master': 10000.99,
 }
 
+# Module-level cache of (species, max_level, max_cp) -> rank table.
+# Grows unbounded across screen visits but is bounded in practice by
+# (number of target species) × (3 leagues) × (4096 IV combos per entry),
+# which is small enough to ignore. If we ever balloon the target list,
+# revisit with an LRU.
 _rank_cache = {}
 
 
@@ -277,11 +282,15 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
             continue
 
         matched = []
+        iv_tuple = (mon['atk_iv'], mon['def_iv'], mon['sta_iv'])
         for target_name, target in thresholds[final_species][league_label].items():
             if not (stats['attack'] >= target.get('attack', 0) and
                     stats['defense'] >= target.get('defense', 0) and
                     stats['stamina'] >= target.get('stamina', 0)):
                 continue
+            if 'ivs' in target:
+                if not any(tuple(iv) == iv_tuple for iv in target['ivs']):
+                    continue
             if 'onlytop' in target:
                 if stats['rank'] > target['onlytop']:
                     continue

@@ -17,6 +17,17 @@ Each entry is:
 }
 
 A value of 0 means "don't care" for that stat.
+
+A target may also include an explicit IV list:
+
+    'Target Name': {
+        'ivs': [[atk, def, sta], [atk, def, sta], ...],
+    }
+
+When 'ivs' is present, a mon must match one of the listed IV triples.
+Stat-floor keys ('attack'/'defense'/'stamina') and 'onlytop' may also be
+combined with 'ivs' — in that case all conditions must be satisfied
+(e.g. "in this IV list AND defense >= 138").
 """
 
 import json
@@ -74,10 +85,50 @@ DEFAULT_THRESHOLDS = {
                 'attack': 121.5, 'defense': 0, 'stamina': 0},
             ## 'Tog 8/1/8': {
             ##     'attack': 97.6, 'defense': 156.3, 'stamina': 0},
+            # Example of the explicit-IV-list syntax (placeholder values).
+            # Replace with real IVs from a video / article when available.
+            'Specific IVs': {
+                'ivs': [[0, 15, 14], [1, 14, 15], [2, 13, 15]],
+            },
         },
         'Master': {
             'Basic': { # 15/15/13
                 'attack': 190, 'defense': 217, 'stamina': 167},
+        },
+    },
+    'Annihilape': {
+        'Great': {
+            'Ape Slayer': {
+                'ivs': [
+                    [11, 10, 2],
+                    [15, 12, 5],
+                    [11, 11, 0],
+                    [15, 13, 4],
+                    [11, 9, 3],
+                    [11, 9, 2],
+                    [15, 14, 3],
+                    [15, 14, 2],
+                    [11, 10, 1],
+                    [11, 10, 0],
+                    [12, 9, 1],
+                    [12, 9, 0],
+                    [15, 15, 1],
+                    [15, 15, 0],
+                    [15, 12, 4],
+                    [15, 13, 3],
+                    [15, 13, 2],
+                    [11, 9, 1],
+                    [11, 9, 0],
+                    [15, 14, 1],
+                    [15, 14, 0],
+                    [15, 12, 3],
+                    [15, 12, 2],
+                    [15, 13, 1],
+                    [15, 13, 0],
+                    [15, 12, 1],
+                    [15, 12, 0],
+                ],
+            },
         },
     },
 }

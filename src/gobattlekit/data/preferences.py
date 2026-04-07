@@ -3,6 +3,7 @@
 Simple JSON-based preferences persistence.
 """
 import json
+import os
 from .fetcher import CACHE_DIR
 
 _PREFS_FILE = CACHE_DIR / "preferences.json"
@@ -20,7 +21,11 @@ def _load_all():
 def _save_all(data):
     try:
         CACHE_DIR.mkdir(exist_ok=True, parents=True)
-        _PREFS_FILE.write_text(json.dumps(data))
+        # Atomic write: write to a temp file then rename, so a kill
+        # mid-write can't leave a truncated preferences.json behind.
+        tmp = _PREFS_FILE.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(data))
+        os.replace(tmp, _PREFS_FILE)
     except Exception as e:
         print(f"Could not save preferences: {e}")
 

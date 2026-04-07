@@ -102,13 +102,22 @@ Android uses a file picker Intent (`ACTION_GET_CONTENT`) with an `on_complete` c
 Quiz answer buttons use `answer_color_gradient(total_rows, row_index)` from `theme.py` to generate a dark-to-light gradient across the answer rows. This is used in `quiz.py`, `type_quiz.py`, and `timing_quiz.py`. The function interpolates between `#0e2036` (darkest) and `#2a4a7c` (lightest).
 
 ### Quiz question type selection
-The move count quiz uses weighted random selection between question types: 60% first charge move, 40% sequence. There are also streak limits — no more than 4 consecutive first charge questions or 3 consecutive sequence questions. This is implemented in `_pick_question_type()` in `quiz.py`.
+The move count quiz uses weighted random selection between question types: 70% first charge move, 30% sequence (`FIRST_WEIGHT = 0.7` in `quiz.py`). There are also streak limits — no more than 4 consecutive first charge questions (`MAX_FIRST_STREAK`) or 2 consecutive sequence questions (`MAX_SEQUENCE_STREAK`). This is implemented in `_pick_question_type()` in `quiz.py`.
 
 ### CSV loading priority
 `get_csv_path()` in `data/fetcher.py` returns the CSV to use: PokeGenie export (`pokegenie_export.csv`) if it exists, otherwise user-generated (`user_generated.csv`). Both live in `CACHE_DIR`.
 
 ### Manual Pokémon entry
 Users can enter Pokémon manually without a PokeGenie CSV. Entries are saved to `user_generated.csv` in PokeGenie CSV format using `append_user_generated()` in `data/iv_checker.py`. The CSV is loaded automatically on next launch.
+
+### IV threshold targets: stat floors vs. explicit IV lists
+A target in `data/thresholds.py` can be specified two ways, and they can be combined:
+
+- **Stat floors** — `'attack' / 'defense' / 'stamina'` are minimums on the *scaled* stats (`base + iv`, level-adjusted), not raw IVs. `0` means "don't care".
+- **Explicit IV list** — `'ivs': [[atk, def, sta], ...]` matches only the listed raw IV triples.
+- **`onlytop: N`** — additionally requires the mon's overall stat-product rank to be ≤ N.
+
+When multiple keys are present they are AND-combined in `check_thresholds()` (`data/iv_checker.py`). The important gotcha: combining `ivs` with a stat floor like `'attack': 122` does **not** mean "atk IV ≥ 122" — it means "this raw IV combo, *and* the resulting scaled attack stat is ≥ 122". That's the right behavior for cases like "30 IVs that win the mirror, but I also need a bulk point against another mon", but it's easy to misread the floor as an IV constraint.
 
 ### IV target species list
 Both IV Checker and My PvP IV Targets now always show all species with

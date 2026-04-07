@@ -192,8 +192,10 @@ class UserIVCheckerScreen(IVCheckerScreen):
         try:
             user_thresholds = load_user_thresholds()
             if not user_thresholds:
-                self.status_label_file.text = ""
-                self._show_clear_btn(False)
+                # CSV is still loaded — show its name; only the targets
+                # are missing. Don't clear the file label here.
+                self.status_label_file.text = pathlib.Path(self.csv_path).name
+                self._show_clear_btn(True)
                 self.status_label_stats.text = NO_TARGETS_MESSAGE
                 for child in list(self.results_box.children):
                     self.results_box.remove(child)
