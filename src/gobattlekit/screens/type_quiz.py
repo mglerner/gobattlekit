@@ -58,6 +58,10 @@ class TypeQuizScreen:
         )
         self.container.add(self.score_label)
 
+        # NOTE: intentionally NOT using theme.paragraph_text here. Question
+        # text needs a fixed height across questions of varying length so
+        # the answer buttons below don't jump around between questions.
+        # See DEVELOPER_NOTES "Wrapping paragraph text".
         self.question_label = toga.MultilineTextInput(
             value="",
             readonly=True,

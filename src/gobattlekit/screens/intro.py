@@ -9,7 +9,7 @@ from ..data.preferences import get_pref, set_pref
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW, COLOR_BG,
     COLOR_SECONDARY_BTN, COLOR_NAV,
-    btn_primary, btn_nav, card_box
+    btn_primary, btn_nav, card_box, paragraph_text,
 )
 
 
@@ -123,13 +123,7 @@ class IntroScreen:
                     style=Pack(font_size=14, font_weight="bold",
                                margin_bottom=4, color=COLOR_YELLOW)
                 ))
-            lines = body.count('\n') + len(body) // 35 + 2
-            card.add(toga.MultilineTextInput(
-                value=body,
-                readonly=True,
-                style=Pack(font_size=14, color=COLOR_TEXT_LIGHT,
-                           height=max(70, lines * 24))
-            ))
+            card.add(paragraph_text(body, font_size=14))
             content_box.add(card)
 
         container.add(scroll)

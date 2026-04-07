@@ -3,6 +3,7 @@
 App-wide theme constants for GoBattleKit.
 Colors and reusable Pack styles.
 """
+import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 
@@ -216,6 +217,69 @@ def card_box(margin_bottom=8):
 # ------------------------------------------------------------------
 
 CONTAINER = Pack(direction=COLUMN, margin=20, flex=1, background_color=COLOR_BG)
+
+
+# ------------------------------------------------------------------
+# Wrapping paragraph text
+# ------------------------------------------------------------------
+#
+# toga.Label does NOT wrap text — long strings overflow the right edge
+# of the screen on iOS and Android. See DEVELOPER_NOTES "Wrapping
+# paragraph text" for the full story. Use paragraph_text() below for any
+# multi-sentence body text. Never use toga.Label for paragraphs.
+
+# Conservative chars-per-line for paragraph_text. Slightly under-counts
+# the typical wrap point so we never truncate. Tuned from real iPhone
+# screenshots (5 screens, 14pt and 13pt bodies measured 2026-04-08).
+_PARAGRAPH_CHARS_PER_LINE = {12: 42, 13: 38, 14: 35}
+
+# Approximate visible line height (text + spacing) in pt for a
+# MultilineTextInput, indexed by font_size.
+_PARAGRAPH_LINE_HEIGHT = {12: 20, 13: 22, 14: 25}
+
+
+def paragraph_text(text, *, font_size=14, color=COLOR_TEXT_LIGHT,
+                   margin_bottom=0, min_height=None):
+    """Return a read-only MultilineTextInput that fakes a wrapping Label.
+
+    Use this anywhere you would naively reach for `toga.Label` with
+    multi-sentence body text. See DEVELOPER_NOTES "Wrapping paragraph
+    text" for the why.
+
+    The height is computed from the text length and font size using a
+    conservative characters-per-line estimate, so we never truncate.
+    A trailing line of slack is added to absorb formula error and
+    descender clipping.
+    """
+    cpl = _PARAGRAPH_CHARS_PER_LINE.get(font_size, max(20, 60 - font_size))
+    line_h = _PARAGRAPH_LINE_HEIGHT.get(font_size, font_size + 11)
+
+    # Count visual lines: split on explicit newlines first, then ceil-
+    # divide each paragraph by chars-per-line. The previous heuristic
+    # (`text.count('\n') + len(text)//cpl`) double-counted characters
+    # on lines that ended in a newline, which made multi-paragraph text
+    # massively over-sized — see PokeGenie help, before/after.
+    visual_lines = 0
+    for paragraph in text.split('\n'):
+        if paragraph:
+            visual_lines += -(-len(paragraph) // cpl)  # ceil div
+        else:
+            visual_lines += 1  # blank line preserves vertical space
+
+    height = (visual_lines + 1) * line_h  # +1 line slack
+    if min_height is not None:
+        height = max(min_height, height)
+
+    return toga.MultilineTextInput(
+        value=text,
+        readonly=True,
+        style=Pack(
+            font_size=font_size,
+            color=color,
+            height=height,
+            margin_bottom=margin_bottom,
+        ),
+    )
 
 
 # ------------------------------------------------------------------

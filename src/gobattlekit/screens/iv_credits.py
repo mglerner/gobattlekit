@@ -10,7 +10,7 @@ from ..data.thresholds import DEFAULT_THRESHOLDS
 from ..platform import ON_ANDROID
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW, COLOR_BG,
-    btn_primary, btn_nav, card_box
+    btn_primary, btn_nav, card_box, paragraph_text,
 )
 
 VIDEO_PATTERN = re.compile(r'\[([^\]]+)\]\(([^)]+)\)')
@@ -64,13 +64,7 @@ class IVCreditsScreen:
                            margin_bottom=4, color=COLOR_YELLOW)
             ))
             if clean_text:
-                lines = clean_text.count('\n') + len(clean_text) // 35 + 2
-                card.add(toga.MultilineTextInput(
-                    value=clean_text,
-                    readonly=True,
-                    style=Pack(font_size=13, color=COLOR_TEXT_LIGHT,
-                               height=max(50, lines * 22))
-                ))
+                card.add(paragraph_text(clean_text, font_size=13))
             for label, url in videos:
                 card.add(toga.Button(
                     label,

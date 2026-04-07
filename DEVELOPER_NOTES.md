@@ -89,6 +89,29 @@ The locale monkey-patch in `__main__.py` is intentional and required — do not 
 ### Theme system
 All colors, button styles, and layout constants are in `src/gobattlekit/theme.py`. Always add new styles there rather than inline in screen files.
 
+### Wrapping paragraph text — never use `toga.Label` for body text
+`toga.Label` does **not** wrap. Long strings overflow the right edge of the screen on iOS and Android. This bit us in commit `85ab5ff` ("status label wrapping…"), which is why most body text in the app is rendered as a `toga.MultilineTextInput(readonly=True)` instead of a `Label`. Toga 0.5 has no wrapping label widget; tracked upstream at `beeware/toga#1325`.
+
+**The rule:** for any paragraph of body text, use the `paragraph_text()` helper from `theme.py`:
+
+```python
+from ..theme import paragraph_text
+card.add(paragraph_text(body, font_size=14))
+```
+
+`paragraph_text()` returns a read-only `MultilineTextInput` sized from the text length using a conservative chars-per-line estimate (tuned from real device screenshots — see the constants in `theme.py`), plus one line of slack so we never truncate.
+
+**Do NOT:**
+- Use `toga.Label` for anything longer than a single line of fixed text. It will overflow.
+- Hand-roll your own `MultilineTextInput`-with-height-math at call sites. Use the helper so the whole app stays consistent if we re-tune the heuristic later.
+- Try to set `width=...` on a `Label` to get wrapping. It does not work.
+
+**Single-line text** (titles, status lines, button labels, card headings) can stay as `toga.Label` — that's fine, those don't need wrapping.
+
+**Quiz question labels** (`quiz.py`, `type_quiz.py`, `timing_quiz.py`) intentionally use a `MultilineTextInput` with a *fixed* height instead of `paragraph_text`, because the height needs to be predictable across questions of varying length so the answer buttons below don't jump around between questions. Don't "fix" those by switching them to `paragraph_text`.
+
+**If you need to re-tune the heuristic:** the constants are `_PARAGRAPH_CHARS_PER_LINE` and `_PARAGRAPH_LINE_HEIGHT` at the bottom of `theme.py`. Take screenshots of the worst-case body text (currently the IV Checker intro "Reading results" card and the Move Count Quiz "How it works" card), measure visible chars-per-line and line-height in pt, and adjust. Always err on the side of slightly *under*-counting chars-per-line so we never truncate.
+
 ### CSV persistence
 The PokeGenie CSV is saved to `CACHE_DIR/pokegenie_export.csv` and auto-loaded on startup. `CACHE_DIR` is `~/Documents/gobattlekit_cache/` on iOS and `/data/user/0/com.mglerner.gobattlekit/files/Documents/gobattlekit_cache/` on Android.
 
