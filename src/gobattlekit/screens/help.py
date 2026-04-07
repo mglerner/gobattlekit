@@ -11,7 +11,7 @@ from ..data.preferences import get_pref, set_pref
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW, COLOR_BG,
     COLOR_SECONDARY_BTN, COLOR_NAV,
-    btn_primary, btn_secondary, btn_back, btn_nav, card_box
+    btn_primary, btn_secondary, btn_back, btn_nav, card_box, paragraph_text,
 )
 
 INTRO_PREF_KEYS = [
@@ -155,13 +155,7 @@ class HelpScreen:
                     style=Pack(font_size=14, font_weight="bold",
                                margin_bottom=4, color=COLOR_YELLOW)
                 ))
-            lines = clean_body.count('\n') + len(clean_body) // 35 + 2
-            card.add(toga.MultilineTextInput(
-                value=clean_body,
-                readonly=True,
-                style=Pack(font_size=14, color=COLOR_TEXT_LIGHT,
-                           height=max(70, lines * 24))
-            ))
+            card.add(paragraph_text(clean_body, font_size=14))
             for label, url in videos:
                 card.add(toga.Button(
                     label,

@@ -18,7 +18,7 @@ from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW, COLOR_BG,
     btn_primary, btn_secondary, btn_back, btn_league, btn_icon, card_box,
     btn_nav, btn_destructive, btn_destructive_icon, btn_help,
-    show_widget, hide_widget
+    show_widget, hide_widget, paragraph_text,
 )
 
 
@@ -194,13 +194,7 @@ class IVCheckerScreen:
                        color=COLOR_ACCENT)
         ))
 
-        lines = steps.count('\n') + len(steps) // 35 + 2
-        self.results_box.add(toga.MultilineTextInput(
-            value=steps,
-            readonly=True,
-            style=Pack(font_size=14, color=COLOR_TEXT_LIGHT,
-                       height=max(70, lines * 24), margin_bottom=12)
-        ))
+        self.results_box.add(paragraph_text(steps, font_size=14, margin_bottom=12))
 
         self.results_box.add(toga.Label(
             "Note: CSV export requires PokeGenie's iVision subscription. "
