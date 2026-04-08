@@ -718,6 +718,10 @@ class IVCheckerScreen:
                             stats['defense'] >= target.get('defense', 0) and
                             stats['stamina'] >= target.get('stamina', 0)):
                         continue
+                    if 'ivs' in target and not any(
+                        tuple(iv) == (a, d, s) for iv in target['ivs']
+                    ):
+                        continue
                     if 'onlytop' in target and rank > target['onlytop']:
                         continue
                     qualifying.append((rank, a, d, s, stats))
