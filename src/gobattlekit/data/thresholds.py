@@ -83,17 +83,23 @@ DEFAULT_THRESHOLDS = {
         'Great': {
             'SWak 9/6/14': {
                 'attack': 121.5, 'defense': 0, 'stamina': 0},
-            ## 'Tog 8/1/8': {
-            ##     'attack': 97.6, 'defense': 156.3, 'stamina': 0},
-            # Example of the explicit-IV-list syntax (placeholder values).
-            # Replace with real IVs from a video / article when available.
-            'Specific IVs': {
-                'ivs': [[0, 15, 14], [1, 14, 15], [2, 13, 15]],
+            'Inadequance': {
+                'ivs': [[0, 14, 13], [9, 6, 14], [8, 1, 8]],
             },
+        },
+        'Ultra': {
+            'Inadequance': { # 15/15/13
+                'ivs': [[0, 14, 15], [0, 15, 3], [5, 11, 5]],
+            },
+
         },
         'Master': {
             'Basic': { # 15/15/13
                 'attack': 190, 'defense': 217, 'stamina': 167},
+            'Inadequance': { # 15/15/13
+                'ivs': [[15, 15, 15], [15, 15, 14], [15, 15, 13], [15, 15, 12]],
+            },
+
         },
     },
     'Annihilape': {
