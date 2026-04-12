@@ -130,7 +130,13 @@ class AboutScreen:
                 intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 self.app._impl.native.startActivity(intent)
             except Exception as e:
-                print(f"Could not open URL on Android: {e}")
+                import asyncio
+                asyncio.create_task(
+                    self.app.main_window.info_dialog(
+                        "Could not open link",
+                        f"Try opening this URL manually:\n{url}"
+                    )
+                )
         else:
             import webbrowser
             webbrowser.open(url)

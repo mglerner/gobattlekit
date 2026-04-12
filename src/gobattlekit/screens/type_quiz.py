@@ -40,8 +40,10 @@ class TypeQuizScreen:
 
     def __init__(self, app):
         self.app = app
+        self._advance_task = None
 
     def build(self):
+        self._cancel_advance_task()
         self.score = 0
         self.total = 0
         self.streak = 0
@@ -159,7 +161,7 @@ class TypeQuizScreen:
             self.score_label.text = self._score_text()
             self.feedback_label.text = f"❌ The answer was {self.right_answer}."
             self._highlight_correct_button()
-        asyncio.create_task(self._advance_question())
+        self._advance_task = asyncio.create_task(self._advance_question())
 
     def _disable_buttons(self):
         for btn in self.answer_buttons.values():
@@ -177,7 +179,13 @@ class TypeQuizScreen:
             return f"Score: {self.score} / {self.total} 🔥{self.streak}"
         return f"Score: {self.score} / {self.total}"
 
+    def _cancel_advance_task(self):
+        if self._advance_task and not self._advance_task.done():
+            self._advance_task.cancel()
+        self._advance_task = None
+
     def _end_quiz(self, widget):
+        self._cancel_advance_task()
         stats = {
             'score': self.score,
             'max_score': self.total,

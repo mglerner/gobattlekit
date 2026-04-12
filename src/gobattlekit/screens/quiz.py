@@ -32,8 +32,10 @@ class QuizScreen:
     def __init__(self, app):
         self.app = app
         self.fastmoves, self.chargedmoves = get_moves()
+        self._advance_task = None
 
     def build(self, league):
+        self._cancel_advance_task()
         self.league = league
         self.mons = [m for m in get_rankings(league)
                      if len(set(m['moveset'][1:])) > 1]
@@ -230,7 +232,7 @@ class QuizScreen:
                 f"{self.charged_name} costs {energy_needed} energy."
             )
             self._disable_buttons()
-            asyncio.create_task(self._advance_question())
+            self._advance_task = asyncio.create_task(self._advance_question())
         else:
             self.streak = 0
             if self.attempts >= MAX_ATTEMPTS:
@@ -258,7 +260,7 @@ class QuizScreen:
                     )
                 self._highlight_correct_button()
                 self._disable_buttons()
-                asyncio.create_task(self._advance_question(delay=2.5))
+                self._advance_task = asyncio.create_task(self._advance_question(delay=2.5))
             else:
                 remaining = MAX_ATTEMPTS - self.attempts
                 self.feedback_label.text = (
@@ -294,7 +296,13 @@ class QuizScreen:
             return f"Score: {self.score} / {self.max_score} 🔥{self.streak}"
         return f"Score: {self.score} / {self.max_score}"
 
+    def _cancel_advance_task(self):
+        if self._advance_task and not self._advance_task.done():
+            self._advance_task.cancel()
+        self._advance_task = None
+
     def _end_quiz(self, widget):
+        self._cancel_advance_task()
         stats = {
             'score': self.score,
             'max_score': self.max_score,

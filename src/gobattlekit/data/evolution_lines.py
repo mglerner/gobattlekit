@@ -34,7 +34,12 @@ def generate_evolution_lines(gamemaster):
         id_map = {m['id']: m for m in members}
         lines = []
 
+        visited = set()
+
         def traverse(species_id, current_line):
+            if species_id in visited:
+                return
+            visited.add(species_id)
             member = id_map.get(species_id)
             if not member:
                 return
