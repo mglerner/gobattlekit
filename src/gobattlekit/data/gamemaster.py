@@ -31,7 +31,7 @@ def get_rankings(league):
 def counters_to_charge(fast_move, charged_move, fastmoves, chargedmoves):
     """
     How many fast moves to fully charge a charged move?
-    Returns an int, or the string 'more' if it would take more than 10.
+    Returns an int, or the string 'more' if it would take more than 20.
     """
     if fast_move not in fastmoves:
         raise KeyError(f"Fast move not found: {fast_move}")
@@ -48,6 +48,10 @@ def charge_sequence(fast_move, charged_move, fastmoves, chargedmoves, num_charge
     charge moves, accounting for energy carry-over.
     Returns a list of ints, e.g. [5, 4, 5, 4]
     """
+    if fast_move not in fastmoves:
+        raise KeyError(f"Fast move not found: {fast_move}")
+    if charged_move not in chargedmoves:
+        raise KeyError(f"Charged move not found: {charged_move}")
     energy_per_fast = fastmoves[fast_move]['energyGain']
     energy_needed = chargedmoves[charged_move]['energy']
     
@@ -104,6 +108,7 @@ ALL_TIMING_PATTERNS = [
     (2, 3),      # 2, 5, 8, ...
     (2, 5),      # 2, 7, 12, ...
     (3, 4),      # 3, 7, 11, ...
+    (3, 5),      # 3, 8, 13, ...
     (4, 5),      # 4, 9, 14, ...
     None,        # timing doesn't matter
 ]
@@ -114,8 +119,6 @@ def format_timing_pattern(pattern, num_terms=4):
     if pattern is None:
         return "Timing doesn't matter"
     start, step = pattern
-    if step is None:
-        return f"{start}, ..."
     terms = [start + i * step for i in range(num_terms)]
     return ", ".join(str(t) for t in terms) + ", ..."
 
