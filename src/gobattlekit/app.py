@@ -7,7 +7,7 @@ import asyncio
 import pathlib
 from .screens.about import AboutScreen
 from .screens.help import HelpScreen
-from.screens.iv_credits import IVCreditsScreen
+from .screens.iv_credits import IVCreditsScreen
 _original_setlocale = locale.setlocale
 def _safe_setlocale(category, loc=None):
     try:

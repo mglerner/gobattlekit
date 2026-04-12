@@ -44,6 +44,10 @@ class EditThresholdsScreen:
         self._editing_original = None
         self._clear_all_pending = False
 
+    def _reset_clear_all_state(self):
+        """Reset the clear-all confirmation state."""
+        self._clear_all_pending = False
+
     def _ensure_species_list(self):
         if self._all_species is None:
             try:
@@ -117,6 +121,7 @@ class EditThresholdsScreen:
             style=btn_nav(height=44)
         ))
 
+        self._reset_clear_all_state()
         self._show_threshold_list()
         return self.container
 

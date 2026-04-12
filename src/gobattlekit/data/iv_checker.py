@@ -187,13 +187,21 @@ def parse_csv(csv_path):
         reader = csv.DictReader(f)
         for row in reader:
             try:
+                atk_iv = int(row['Atk IV'])
+                def_iv = int(row['Def IV'])
+                sta_iv = int(row['Sta IV'])
+                cp = int(row['CP'])
+                if not (0 <= atk_iv <= 15 and 0 <= def_iv <= 15 and 0 <= sta_iv <= 15):
+                    continue
+                if cp <= 0:
+                    continue
                 mons.append({
                     'name': row['Name'].strip(),
                     'form': row['Form'].strip(),
-                    'cp': int(row['CP']),
-                    'atk_iv': int(row['Atk IV']),
-                    'def_iv': int(row['Def IV']),
-                    'sta_iv': int(row['Sta IV']),
+                    'cp': cp,
+                    'atk_iv': atk_iv,
+                    'def_iv': def_iv,
+                    'sta_iv': sta_iv,
                     'level': float(row['Level Min']),
                     'is_shadow': row['Shadow/Purified'].strip() == '1',
                     'lucky': row['Lucky'].strip() == '1',

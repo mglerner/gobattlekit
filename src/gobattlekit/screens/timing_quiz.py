@@ -29,6 +29,7 @@ class TimingQuizScreen:
     def __init__(self, app):
         self.app = app
         self.fastmoves, _ = get_moves()
+        self._advance_task = None
         all_mons = []
         for league in ('great', 'ultra', 'master'):
             all_mons.extend(get_rankings(league))
@@ -39,6 +40,7 @@ class TimingQuizScreen:
         })
 
     def build(self):
+        self._cancel_advance_task()
         self.score = 0
         self.total = 0
         self.attempts = 0
@@ -178,7 +180,7 @@ class TimingQuizScreen:
             self.score_label.text = self._score_text()
             self.feedback_label.text = f"✅ Correct! +{pts} point{'s' if pts != 1 else ''}"
             self._disable_buttons()
-            asyncio.create_task(self._advance_question())
+            self._advance_task = asyncio.create_task(self._advance_question())
         else:
             self.streak = 0
             if self.attempts >= MAX_ATTEMPTS:
@@ -189,7 +191,7 @@ class TimingQuizScreen:
                 self.feedback_label.text = f"❌ The answer was: {correct_str}."
                 self._highlight_correct_button()
                 self._disable_buttons()
-                asyncio.create_task(self._advance_question())
+                self._advance_task = asyncio.create_task(self._advance_question())
             else:
                 remaining = MAX_ATTEMPTS - self.attempts
                 self.feedback_label.text = (
@@ -219,7 +221,13 @@ class TimingQuizScreen:
             return f"Score: {self.score} / {self.total} 🔥{self.streak}"
         return f"Score: {self.score} / {self.total}"
 
+    def _cancel_advance_task(self):
+        if self._advance_task and not self._advance_task.done():
+            self._advance_task.cancel()
+        self._advance_task = None
+
     def _end_quiz(self, widget):
+        self._cancel_advance_task()
         stats = {
             'score': self.score,
             'max_score': self.total,
