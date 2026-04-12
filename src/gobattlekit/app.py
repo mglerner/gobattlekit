@@ -98,13 +98,19 @@ class GoBattleKit(toga.App):
                     if new:
                         latest = max(new, key=lambda p: p.stat().st_mtime)
                         print("Inbox: new CSV found:", latest)
-                        # Delete all other CSVs, keep only the latest
-                        for f in csvs:
-                            if f != latest:
-                                f.unlink()
-                        seen = {latest}
                         self.show_iv_checker(skip_intro=True)
                         self.iv_checker_screen.load_csv(str(latest))
+                        # Also update user IV checker so it picks up new data
+                        self.user_iv_checker_screen.load_csv(str(latest))
+                        # Delete all inbox CSVs now that we've copied to cache;
+                        # this ensures a re-shared file with the same name is
+                        # detected as new next time.
+                        for f in csvs:
+                            try:
+                                f.unlink()
+                            except Exception:
+                                pass
+                        seen = set()
             except Exception as e:
                 print("Inbox poll error:", e)            
 
