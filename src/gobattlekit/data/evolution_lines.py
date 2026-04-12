@@ -38,19 +38,25 @@ def generate_evolution_lines(gamemaster):
 
         def traverse(species_id, current_line):
             if species_id in visited:
-                return
+                return False
             visited.add(species_id)
             member = id_map.get(species_id)
             if not member:
-                return
+                return False
             name = id_to_name.get(species_id, species_id)
             current_line = current_line + [name]
             evos = member['evolutions']
             if not evos:
                 lines.append(current_line)
             else:
+                any_traversed = False
                 for evo_id in evos:
-                    traverse(evo_id, current_line)
+                    if traverse(evo_id, current_line):
+                        any_traversed = True
+                if not any_traversed:
+                    # All evolutions were visited/missing — treat as leaf
+                    lines.append(current_line)
+            return True
 
         for root in roots:
             traverse(root['id'], [])
