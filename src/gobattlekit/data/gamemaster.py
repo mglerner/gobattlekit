@@ -1,21 +1,40 @@
 #!/usr/bin/env python
 
+import logging
 import math
 from .fetcher import load_gamemaster, load_rankings
 
+logger = logging.getLogger(__name__)
+
 def get_moves():
-    """Parse fast and charged moves from the gamemaster."""
+    """Parse fast and charged moves from the gamemaster.
+
+    Skips moves missing required fields rather than crashing the whole parse;
+    logs a summary if anything was dropped so schema drift in pvpoke's data
+    is visible instead of silently swallowing moves.
+    """
     gm = load_gamemaster()
-    fastmoves = {
-        i['moveId']: i
-        for i in gm['moves']
-        if i['energyGain'] != 0
-    }
-    chargedmoves = {
-        i['moveId']: i
-        for i in gm['moves']
-        if i['energyGain'] == 0
-    }
+    fastmoves = {}
+    chargedmoves = {}
+    skipped = 0
+    for move in gm.get('moves', []):
+        move_id = move.get('moveId')
+        energy_gain = move.get('energyGain')
+        if move_id is None or energy_gain is None:
+            skipped += 1
+            continue
+        if energy_gain != 0:
+            fastmoves[move_id] = move
+        else:
+            if 'energy' not in move:
+                skipped += 1
+                continue
+            chargedmoves[move_id] = move
+    if skipped:
+        logger.warning(
+            "Skipped %d malformed moves while parsing gamemaster "
+            "(missing moveId / energyGain / energy)", skipped,
+        )
     return fastmoves, chargedmoves
 
 def get_rankings(league):

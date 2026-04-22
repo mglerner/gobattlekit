@@ -4,10 +4,16 @@ Fetch and cache PvPoke game data.
 """
 import urllib.request
 import json
+import logging
+import os
 import pathlib
 import time
 import ssl
 import certifi
+
+logger = logging.getLogger(__name__)
+
+FETCH_TIMEOUT = 10  # seconds — keep tight so iOS watchdog can't kill us
 
 CACHE_DIR = pathlib.Path.home() / "Documents" / "gobattlekit_cache"
 CACHE_TTL = 86400  # refresh once a day
@@ -53,9 +59,13 @@ def _fetch_json(key):
     # Try to fetch fresh data
     try:
         ssl_context = ssl.create_default_context(cafile=certifi.where())
-        with urllib.request.urlopen(URLS[key], context=ssl_context) as r:
+        with urllib.request.urlopen(URLS[key], context=ssl_context, timeout=FETCH_TIMEOUT) as r:
             data = json.loads(r.read().decode())
-        cache_file.write_text(json.dumps(data))
+        # Atomic write: write to .tmp then os.replace so a kill mid-write
+        # can't leave a truncated cache file behind.
+        tmp = cache_file.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(data))
+        os.replace(tmp, cache_file)
 
         # If this is the gamemaster, regenerate evolution lines
         if key == 'gamemaster':
@@ -63,12 +73,12 @@ def _fetch_json(key):
                 from .evolution_lines import generate_evolution_lines, save_evolution_lines
                 evo_lines = generate_evolution_lines(data)
                 save_evolution_lines(evo_lines)
-            except Exception as e:
-                print(f"Could not regenerate evolution lines: {e}")
+            except Exception:
+                logger.exception("Could not regenerate evolution lines")
         return data
-    
-    except Exception as e:
-        print(f"Fetch error for {key}: {e}")
+
+    except Exception:
+        logger.exception("Fetch error for %s", key)
 
     # Fall back to stale cache if available
     if cache_file.exists():

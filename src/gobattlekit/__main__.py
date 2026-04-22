@@ -1,13 +1,6 @@
 #!/usr/bin/env python
-import locale
-_original_setlocale = locale.setlocale
-def _safe_setlocale(category, loc=None):
-    try:
-        return _original_setlocale(category, loc)
-    except locale.Error:
-        return _original_setlocale(category, "C")
-locale.setlocale = _safe_setlocale
-
+# Locale patch and logging setup live in gobattlekit.app at module scope, so
+# importing app applies them before any screen code runs.
 from gobattlekit.app import main
 main().main_loop()
 
