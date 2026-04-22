@@ -4,8 +4,11 @@ IV checker — compute battle stats from IVs and check against thresholds.
 Ported from the PoGoIVChecker notebook.
 """
 import csv
+import logging
 import math
 from .fetcher import load_gamemaster
+
+logger = logging.getLogger(__name__)
 
 FORM_MAP = {
     '': None,
@@ -154,7 +157,7 @@ def compute_rank_table(species, base_atk, base_def, base_sta,
     if cache_key in _rank_cache:
         return _rank_cache[cache_key]
 
-    print(f"Computing rank table for {species} (max_level={max_level})...")
+    logger.info("Computing rank table for %s (max_level=%s)...", species, max_level)
     combos = []
     for a in range(16):
         for d in range(16):
