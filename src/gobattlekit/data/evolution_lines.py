@@ -4,8 +4,12 @@ Evolution line generation and loading.
 Generates from gamemaster JSON, caches to disk.
 """
 import json
+import logging
+import os
 from pathlib import Path
 from .fetcher import CACHE_DIR
+
+logger = logging.getLogger(__name__)
 
 BUNDLED_PATH = Path(__file__).parent / 'evolution_lines.json'
 CACHED_PATH = CACHE_DIR / 'evolution_lines.json'
@@ -73,13 +77,15 @@ def generate_evolution_lines(gamemaster):
 
 
 def save_evolution_lines(evolution_lines):
-    """Save evolution lines to cache dir."""
+    """Save evolution lines to cache dir atomically (temp + os.replace)."""
     try:
         CACHE_DIR.mkdir(exist_ok=True, parents=True)
-        CACHED_PATH.write_text(json.dumps(evolution_lines, indent=2))
-        print(f"Saved {len(evolution_lines)} evolution lines to cache.")
-    except Exception as e:
-        print(f"Could not save evolution lines: {e}")
+        tmp = CACHED_PATH.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(evolution_lines, indent=2))
+        os.replace(tmp, CACHED_PATH)
+        logger.info("Saved %d evolution lines to cache.", len(evolution_lines))
+    except Exception:
+        logger.exception("Could not save evolution lines")
 
 
 def load_evolution_lines():
@@ -87,11 +93,11 @@ def load_evolution_lines():
     if CACHED_PATH.exists():
         try:
             return json.loads(CACHED_PATH.read_text())
-        except Exception as e:
-            print(f"Could not load cached evolution lines: {e}")
+        except Exception:
+            logger.exception("Could not load cached evolution lines")
     # Fall back to bundled
     try:
         return json.loads(BUNDLED_PATH.read_text())
-    except Exception as e:
-        print(f"Could not load bundled evolution lines: {e}")
+    except Exception:
+        logger.exception("Could not load bundled evolution lines")
         return {}

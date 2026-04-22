@@ -20,7 +20,8 @@ See DEVELOPER_NOTES.md — always use `./prepare_ios.sh` instead of `briefcase c
 - `src/gobattlekit/app.py` — main app, screen navigation
 
 ## Current priorities
-1. Haptic feedback (unexplored)
-2. Write unit tests
-3. Google Play beta testing (later)
-4. App Store submission (later)
+1. Pre-App-Store fixes — see `CODE_REVIEW.md` for the 4-session plan and progress checklist (session 1 complete; session 2 next)
+2. Haptic feedback (unexplored)
+3. Write unit tests
+4. Google Play beta testing (later)
+5. App Store submission (later)

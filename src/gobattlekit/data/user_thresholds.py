@@ -4,7 +4,11 @@ User-defined IV thresholds — load, save, and manage.
 Stored as JSON in the cache directory.
 """
 import json
+import logging
+import os
 from .fetcher import CACHE_DIR
+
+logger = logging.getLogger(__name__)
 
 USER_THRESHOLDS_FILE = CACHE_DIR / 'user_thresholds.json'
 
@@ -15,18 +19,20 @@ def load_user_thresholds():
         return {}
     try:
         return json.loads(USER_THRESHOLDS_FILE.read_text())
-    except Exception as e:
-        print(f"Could not load user thresholds: {e}")
+    except Exception:
+        logger.exception("Could not load user thresholds")
         return {}
 
 
 def save_user_thresholds(thresholds):
-    """Save user thresholds to JSON."""
+    """Save user thresholds to JSON atomically (temp + os.replace)."""
     try:
         CACHE_DIR.mkdir(exist_ok=True, parents=True)
-        USER_THRESHOLDS_FILE.write_text(json.dumps(thresholds, indent=2))
-    except Exception as e:
-        print(f"Could not save user thresholds: {e}")
+        tmp = USER_THRESHOLDS_FILE.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(thresholds, indent=2))
+        os.replace(tmp, USER_THRESHOLDS_FILE)
+    except Exception:
+        logger.exception("Could not save user thresholds")
 
 
 def add_threshold(species, league, name, attack, defense, stamina, onlytop=0):

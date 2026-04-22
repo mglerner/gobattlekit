@@ -3,11 +3,19 @@
 Main Toga application for GoBattleKit.
 """
 import locale
+import logging
 import asyncio
 import pathlib
-from .screens.about import AboutScreen
-from .screens.help import HelpScreen
-from .screens.iv_credits import IVCreditsScreen
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+# iOS ships locales that Python's setlocale rejects with locale.Error.
+# Toga/stdlib code calls setlocale at import/startup time, so we patch it
+# here before any screen imports run. See DEVELOPER_NOTES.md.
 _original_setlocale = locale.setlocale
 def _safe_setlocale(category, loc=None):
     try:
@@ -15,6 +23,10 @@ def _safe_setlocale(category, loc=None):
     except locale.Error:
         return _original_setlocale(category, "C")
 locale.setlocale = _safe_setlocale
+
+from .screens.about import AboutScreen
+from .screens.help import HelpScreen
+from .screens.iv_credits import IVCreditsScreen
 
 from .platform import ON_ANDROID, ON_IOS, ON_MOBILE
 
@@ -97,7 +109,7 @@ class GoBattleKit(toga.App):
                     new = [f for f in csvs if f not in seen]
                     if new:
                         latest = max(new, key=lambda p: p.stat().st_mtime)
-                        print("Inbox: new CSV found:", latest)
+                        logger.info("Inbox: new CSV found: %s", latest)
                         self.show_iv_checker(skip_intro=True)
                         self.iv_checker_screen.load_csv(str(latest))
                         # Also update user IV checker so it picks up new data
@@ -111,8 +123,10 @@ class GoBattleKit(toga.App):
                             except Exception:
                                 pass
                         seen = set()
-            except Exception as e:
-                print("Inbox poll error:", e)            
+            except Exception:
+                # asyncio.CancelledError derives from BaseException, so it
+                # correctly propagates out of this except and ends the task.
+                logger.exception("Inbox poll error")
 
     def _show_with_intro(self, feature_key, on_continue):
         """Show intro screen if user hasn't opted out, otherwise go direct."""

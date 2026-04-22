@@ -3,19 +3,36 @@
 Simple JSON-based preferences persistence.
 """
 import json
+import logging
 import os
 from .fetcher import CACHE_DIR
+
+logger = logging.getLogger(__name__)
 
 _PREFS_FILE = CACHE_DIR / "preferences.json"
 
 
 def _load_all():
+    if not _PREFS_FILE.exists():
+        return {}
     try:
-        if _PREFS_FILE.exists():
-            return json.loads(_PREFS_FILE.read_text())
-    except Exception:
-        pass
-    return {}
+        return json.loads(_PREFS_FILE.read_text())
+    except json.JSONDecodeError:
+        # File is corrupt (partial write from a prior kill, disk bitrot,
+        # manual edit gone wrong). Rename it aside so a later save doesn't
+        # clobber what might still be recoverable, and start fresh.
+        corrupt_path = _PREFS_FILE.with_suffix(".json.corrupt")
+        try:
+            os.replace(_PREFS_FILE, corrupt_path)
+            logger.warning("Preferences file was corrupt; moved to %s", corrupt_path)
+        except OSError:
+            logger.exception("Could not move corrupt preferences file aside")
+        return {}
+    except OSError:
+        # Permission / I/O issue — fall back to defaults rather than crash,
+        # but make the failure visible in logs.
+        logger.exception("Could not read preferences")
+        return {}
 
 
 def _save_all(data):
@@ -26,8 +43,8 @@ def _save_all(data):
         tmp = _PREFS_FILE.with_suffix(".json.tmp")
         tmp.write_text(json.dumps(data))
         os.replace(tmp, _PREFS_FILE)
-    except Exception as e:
-        print(f"Could not save preferences: {e}")
+    except Exception:
+        logger.exception("Could not save preferences")
 
 
 def get_pref(key, default=None):
