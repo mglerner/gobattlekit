@@ -2,6 +2,7 @@
 """
 Edit Thresholds screen — add, view, and delete user-defined IV thresholds.
 """
+import logging
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
@@ -18,6 +19,8 @@ from ..theme import (
     btn_help, show_widget, hide_widget
 )
 
+logger = logging.getLogger(__name__)
+
 
 class EditThresholdsScreen:
     """Screen for managing user-defined IV thresholds."""
@@ -33,6 +36,7 @@ class EditThresholdsScreen:
     def __init__(self, app):
         self.app = app
         self._all_species = None
+        self._species_list_error = None
         self._filtered_species = []
         self._selected_species = None
         self._selected_league = "Great"
@@ -53,9 +57,11 @@ class EditThresholdsScreen:
             try:
                 pokemon_index = get_pokemon_index()
                 self._all_species = get_all_species(pokemon_index)
+                self._species_list_error = None
             except Exception as e:
-                print(f"Could not load species list: {e}")
+                logger.exception("Could not load species list")
                 self._all_species = []
+                self._species_list_error = str(e)
         return self._all_species
 
     def _set_outer_buttons_enabled(self, enabled):
@@ -457,6 +463,12 @@ class EditThresholdsScreen:
     def _rebuild_species_list(self):
         for child in list(self.species_list_box.children):
             self.species_list_box.remove(child)
+        if not self._all_species and self._species_list_error:
+            self.species_list_box.add(toga.Label(
+                f"Could not load species list: {self._species_list_error}",
+                style=Pack(font_size=13, color=COLOR_YELLOW, margin=8)
+            ))
+            return
         for species in self._filtered_species[:50]:
             self.species_list_box.add(toga.Button(
                 species,

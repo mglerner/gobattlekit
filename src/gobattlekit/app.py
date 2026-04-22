@@ -6,6 +6,7 @@ import locale
 import logging
 import asyncio
 import pathlib
+import shutil
 
 logging.basicConfig(
     level=logging.INFO,
@@ -51,6 +52,8 @@ class GoBattleKit(toga.App):
     def startup(self):
         """Set up the application."""
         from .data.fetcher import NoDataError
+        self._active_screen = None
+        self._poll_task = None
         try:
             self.home_screen = HomeScreen(self)
             self.about_screen = AboutScreen(self)
@@ -66,9 +69,10 @@ class GoBattleKit(toga.App):
             self.iv_credits_screen = IVCreditsScreen(self)
             self.main_window = toga.MainWindow(title=self.formal_name)
             self.main_window.content = self.home_screen.build()
+            self._active_screen = "home"
             self.main_window.show()
 
-            self.on_running = lambda app: asyncio.create_task(self._poll_inbox(None))
+            self.on_running = self._start_inbox_poll
             ## # Auto-load saved CSV if available
             ## from .data.fetcher import SAVED_CSV
             ## if SAVED_CSV.exists():
@@ -88,51 +92,89 @@ class GoBattleKit(toga.App):
             self.main_window.content = error_box
             self.main_window.show()
 
-    async def _poll_inbox(self, widget):
+    def _start_inbox_poll(self, app):
+        """on_running hook — launch the poll task and hold a reference."""
+        self._poll_task = asyncio.create_task(self._poll_inbox())
+        logger.info("Inbox poll task scheduled")
+
+    async def _poll_inbox(self):
         """Poll the iOS inbox directory for CSV files shared from other apps."""
-        import asyncio
-        seen = set()
-        # Pre-populate seen with any files already in inbox at startup
-        # so we don't re-triger on files that were there before we launched
+        logger.info("Inbox poll started")
         try:
-            inbox = pathlib.Path.home() / 'Documents' / 'Inbox'
-            if inbox.exists():
-                seen = set(inbox.glob('*.csv'))
-        except Exception:
-            pass
-        while True:
-            await asyncio.sleep(3)
+            seen = set()
+            # Pre-populate seen with any files already in inbox at startup
+            # so we don't re-triger on files that were there before we launched
             try:
                 inbox = pathlib.Path.home() / 'Documents' / 'Inbox'
                 if inbox.exists():
-                    csvs = list(inbox.glob('*.csv'))
-                    new = [f for f in csvs if f not in seen]
-                    if new:
-                        latest = max(new, key=lambda p: p.stat().st_mtime)
-                        logger.info("Inbox: new CSV found: %s", latest)
-                        self.show_iv_checker(skip_intro=True)
-                        self.iv_checker_screen.load_csv(str(latest))
-                        # Also update user IV checker so it picks up new data
-                        self.user_iv_checker_screen.load_csv(str(latest))
-                        # Delete all inbox CSVs now that we've copied to cache;
-                        # this ensures a re-shared file with the same name is
-                        # detected as new next time.
-                        for f in csvs:
-                            try:
-                                f.unlink()
-                            except Exception:
-                                pass
-                        seen = set()
+                    seen = set(inbox.glob('*.csv'))
             except Exception:
-                # asyncio.CancelledError derives from BaseException, so it
-                # correctly propagates out of this except and ends the task.
-                logger.exception("Inbox poll error")
+                pass
+            while True:
+                await asyncio.sleep(3)
+                try:
+                    inbox = pathlib.Path.home() / 'Documents' / 'Inbox'
+                    if inbox.exists():
+                        csvs = list(inbox.glob('*.csv'))
+                        new = [f for f in csvs if f not in seen]
+                        if new:
+                            latest = max(new, key=lambda p: p.stat().st_mtime)
+                            logger.info("Inbox: new CSV found: %s", latest)
+                            self._handle_new_inbox_csv(latest)
+                            # Delete all inbox CSVs now that we've copied to cache;
+                            # this ensures a re-shared file with the same name is
+                            # detected as new next time.
+                            for f in csvs:
+                                try:
+                                    f.unlink()
+                                except Exception:
+                                    pass
+                            seen = set()
+                except Exception:
+                    # asyncio.CancelledError derives from BaseException, so it
+                    # correctly propagates out of this except and ends the task.
+                    logger.exception("Inbox poll error")
+        finally:
+            logger.info("Inbox poll exited")
+
+    def _handle_new_inbox_csv(self, latest):
+        """Dispatch a newly arrived inbox CSV based on the user's current screen.
+
+        If the user is on home or either IV checker, jump to the IV checker and
+        reload. Otherwise (mid-quiz, editing thresholds, etc.) just stage the
+        CSV to the cache without touching screen state — next IV navigation
+        will pick it up.
+        """
+        from .data.fetcher import SAVED_CSV, CACHE_DIR
+        foreground = self._active_screen in ("home", "iv_checker", "user_iv_checker")
+        if foreground:
+            self.show_iv_checker(skip_intro=True)
+            self.iv_checker_screen.load_csv(str(latest))
+            # Also update user IV checker so it picks up new data
+            self.user_iv_checker_screen.load_csv(str(latest))
+            return
+        logger.info(
+            "Inbox CSV arrived while on %s; staging without navigating",
+            self._active_screen,
+        )
+        try:
+            CACHE_DIR.mkdir(exist_ok=True, parents=True)
+            src = pathlib.Path(str(latest))
+            if src.resolve() != SAVED_CSV.resolve():
+                shutil.copy2(src, SAVED_CSV)
+        except Exception:
+            logger.exception("Could not stage inbox CSV")
+            return
+        # Invalidate in-memory state so next navigation re-reads SAVED_CSV.
+        self.iv_checker_screen.csv_path = None
+        self.user_iv_checker_screen.csv_path = None
 
     def _show_with_intro(self, feature_key, on_continue):
         """Show intro screen if user hasn't opted out, otherwise go direct."""
         if get_pref(f"skip_intro_{feature_key}"):
             on_continue()
         else:
+            self._active_screen = "intro"
             self.main_window.content = self.intro_screen.build(
                 feature_key, on_continue
             )
@@ -140,6 +182,7 @@ class GoBattleKit(toga.App):
     def show_quiz(self, league, skip_intro=False):
         """Switch to the move count quiz screen for the given league."""
         if skip_intro:
+            self._active_screen = "quiz"
             self.main_window.content = self.quiz_screen.build(league)
         else:
             self._show_with_intro(
@@ -150,6 +193,7 @@ class GoBattleKit(toga.App):
     def show_timing_quiz(self, skip_intro=False):
         """Switch to the move timing quiz screen."""
         if skip_intro:
+            self._active_screen = "timing_quiz"
             self.main_window.content = self.timing_quiz_screen.build()
         else:
             self._show_with_intro(
@@ -160,6 +204,7 @@ class GoBattleKit(toga.App):
     def show_type_quiz(self, skip_intro=False):
         """Switch to the type effectiveness quiz screen."""
         if skip_intro:
+            self._active_screen = "type_quiz"
             self.main_window.content = self.type_quiz_screen.build()
         else:
             self._show_with_intro(
@@ -170,6 +215,7 @@ class GoBattleKit(toga.App):
     def show_iv_checker(self, skip_intro=False):
         """Switch to the IV checker screen."""
         if skip_intro:
+            self._active_screen = "iv_checker"
             self.main_window.content = self.iv_checker_screen.build()
             # Auto-load saved CSV if not already loaded
             from .data.fetcher import SAVED_CSV
@@ -184,6 +230,7 @@ class GoBattleKit(toga.App):
     def show_user_iv_checker(self, skip_intro=False):
         """Switch to the user IV checker screen."""
         if skip_intro:
+            self._active_screen = "user_iv_checker"
             self.main_window.content = self.user_iv_checker_screen.build()
             from .data.fetcher import SAVED_CSV
             if not self.user_iv_checker_screen.csv_path and SAVED_CSV.exists():
@@ -199,30 +246,36 @@ class GoBattleKit(toga.App):
 
     def show_edit_thresholds(self):
         """Switch to the edit thresholds screen."""
-        self.main_window.content = self.edit_thresholds_screen.build()            
+        self._active_screen = "edit_thresholds"
+        self.main_window.content = self.edit_thresholds_screen.build()
 
     def show_home(self):
         """Switch back to the home screen."""
+        self._active_screen = "home"
         self.main_window.content = self.home_screen.build()
 
     def show_about(self):
+        self._active_screen = "about"
         self.main_window.content = self.about_screen.build()
 
     def show_help(self, topic=None, back_screen=None, back_label="← Home"):
         """Switch to the help screen."""
+        self._active_screen = "help"
         self.main_window.content = self.help_screen.build(
             topic=topic, back_screen=back_screen,
             back_label=back_label
         )
 
     def show_quiz_summary(self,stats):
+        self._active_screen = "quiz_summary"
         self.main_window.content = self.quiz_summary_screen.build(stats)
 
     def show_iv_credits(self, back_screen=None, back_label="← IV Checker"):
+        self._active_screen = "iv_credits"
         self.main_window.content = self.iv_credits_screen.build(
             back_screen=back_screen,
             back_label=back_label
-        )        
+        )
 
 
 def main():

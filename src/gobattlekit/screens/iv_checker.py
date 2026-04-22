@@ -2,6 +2,7 @@
 """
 IV checker screen — import PokeGenie CSV and check against thresholds.
 """
+import logging
 import shutil
 import pathlib
 import toga
@@ -20,6 +21,8 @@ from ..theme import (
     btn_nav, btn_destructive, btn_destructive_icon, btn_help,
     show_widget, hide_widget, paragraph_text,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class IVCheckerScreen:
@@ -310,10 +313,10 @@ class IVCheckerScreen:
         ))
 
     def _save_manual_inputs_and_pick_species(self):
-        self._manual_atk = getattr(self, '_manual_atk_input', toga.TextInput()).value.strip() or '0'
-        self._manual_def = getattr(self, '_manual_def_input', toga.TextInput()).value.strip() or '0'
-        self._manual_sta = getattr(self, '_manual_sta_input', toga.TextInput()).value.strip() or '0'
-        self._manual_cp = getattr(self, '_manual_cp_input', toga.TextInput()).value.strip() or ''
+        self._manual_atk = self._manual_atk_input.value.strip() or '0'
+        self._manual_def = self._manual_def_input.value.strip() or '0'
+        self._manual_sta = self._manual_sta_input.value.strip() or '0'
+        self._manual_cp = self._manual_cp_input.value.strip() or ''
         self._show_manual_species_picker()
 
     def _show_manual_species_picker(self):
@@ -442,15 +445,21 @@ class IVCheckerScreen:
     # ------------------------------------------------------------------
 
     def load_csv(self, path):
-        self.csv_path = str(path).replace('file://', '')
+        src_path = str(path).replace('file://', '')
         try:
             CACHE_DIR.mkdir(exist_ok=True, parents=True)
-            src = pathlib.Path(self.csv_path)
+            src = pathlib.Path(src_path)
             if src.resolve() != SAVED_CSV.resolve():
                 shutil.copy2(src, SAVED_CSV)
             self.csv_path = str(SAVED_CSV)
         except Exception as e:
-            print(f"Could not save CSV to cache: {e}")
+            logger.exception("Could not save CSV to cache")
+            self.csv_path = None
+            if hasattr(self, 'status_label_file'):
+                self.status_label_file.text = ""
+                self._show_clear_btn(False)
+                self.status_label_stats.text = f"Could not load CSV: {e}"
+            return
         self._run_check()
 
     async def _import_csv(self, widget):
@@ -484,29 +493,31 @@ class IVCheckerScreen:
                         dest = CACHE_DIR / 'pokegenie_import.csv'
                         ContentResolver = self.app._impl.native.getContentResolver()
                         stream = ContentResolver.openInputStream(uri)
-                        ByteArrayOutputStream = jclass('java.io.ByteArrayOutputStream')
-                        baos = ByteArrayOutputStream()
-                        buf = bytearray(4096)
-                        while True:
-                            n = stream.read(buf)
-                            if n < 0:
-                                break
-                            baos.write(buf, 0, n)
-                        data = bytes(baos.toByteArray())
-                        dest.write_bytes(data)
-                        stream.close()
+                        try:
+                            ByteArrayOutputStream = jclass('java.io.ByteArrayOutputStream')
+                            baos = ByteArrayOutputStream()
+                            buf = bytearray(4096)
+                            while True:
+                                n = stream.read(buf)
+                                if n < 0:
+                                    break
+                                baos.write(buf, 0, n)
+                            data = bytes(baos.toByteArray())
+                            dest.write_bytes(data)
+                        finally:
+                            stream.close()
                         self.load_csv(str(dest))
                     else:
-                        print("Android file picker: no file selected")
+                        logger.info("Android file picker: no file selected")
                 except Exception as e:
-                    print(f"Android CSV import callback error: {e}")
+                    logger.exception("Android CSV import callback error")
                     self.status_label_file.text = ""
                     self.status_label_stats.text = f"Error importing: {e}"
 
             self.app._impl.start_activity(intent, on_complete=on_complete)
 
         except Exception as e:
-            print(f"Android CSV import error: {e}")
+            logger.exception("Android CSV import error")
             self.status_label_file.text = ""
             self.status_label_stats.text = f"Error importing: {e}"
 
@@ -838,8 +849,8 @@ class IVCheckerScreen:
                 SAVED_CSV.unlink()
             if USER_GENERATED_CSV.exists():
                 USER_GENERATED_CSV.unlink()
-        except Exception as e:
-            print(f"Could not delete cached CSV: {e}")
+        except Exception:
+            logger.exception("Could not delete cached CSV")
         self.status_label_file.text = ""
         self.status_label_stats.text = self.NO_CSV_MESSAGE
         self._show_clear_btn(False)
