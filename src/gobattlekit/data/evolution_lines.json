@@ -811,6 +811,9 @@
     "Girafarig",
     "Farigiraf"
   ],
+  "Girafarig (Shadow)": [
+    "Girafarig (Shadow)"
+  ],
   "Forretress": [
     "Pineco",
     "Forretress"
@@ -910,6 +913,9 @@
   "Wyrdeer": [
     "Stantler",
     "Wyrdeer"
+  ],
+  "Stantler (Shadow)": [
+    "Stantler (Shadow)"
   ],
   "Tyranitar": [
     "Larvitar",
@@ -1378,7 +1384,7 @@
     "Wormadam (Plant)"
   ],
   "Mothim": [
-    "Burmy (Trash)",
+    "Burmy (Plant)",
     "Mothim"
   ],
   "Wormadam (Sandy)": [
@@ -1404,6 +1410,9 @@
   "Cherrim (Sunshine)": [
     "Cherubi",
     "Cherrim (Sunshine)"
+  ],
+  "Shellos": [
+    "Shellos"
   ],
   "Drifblim": [
     "Drifloon",
@@ -1981,6 +1990,10 @@
     "Helioptile",
     "Heliolisk"
   ],
+  "Heliolisk (Shadow)": [
+    "Helioptile (Shadow)",
+    "Heliolisk (Shadow)"
+  ],
   "Tyrantrum": [
     "Tyrunt",
     "Tyrantrum"
@@ -2101,6 +2114,10 @@
     "Dewpider",
     "Araquanid"
   ],
+  "Araquanid (Shadow)": [
+    "Dewpider (Shadow)",
+    "Araquanid (Shadow)"
+  ],
   "Lurantis": [
     "Fomantis",
     "Lurantis"
@@ -2117,6 +2134,10 @@
     "Stufful",
     "Bewear"
   ],
+  "Bewear (Shadow)": [
+    "Stufful (Shadow)",
+    "Bewear (Shadow)"
+  ],
   "Tsareena": [
     "Bounsweet",
     "Steenee",
@@ -2129,6 +2150,9 @@
   "Palossand": [
     "Sandygast",
     "Palossand"
+  ],
+  "Type (Null)": [
+    "Type (Null)"
   ],
   "Kommo-o": [
     "Jangmo-o",
