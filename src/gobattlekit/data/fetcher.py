@@ -3,6 +3,7 @@
 Fetch and cache PvPoke game data.
 """
 import urllib.request
+import urllib.error
 import json
 import logging
 import os
@@ -40,15 +41,38 @@ class NoDataError(Exception):
     """Raised when data cannot be fetched and no cache is available."""
     pass
 
+def _read_validators(meta_file):
+    """Read the stored ETag / Last-Modified for a cached file, if any."""
+    try:
+        return json.loads(meta_file.read_text())
+    except Exception:
+        return {}
+
+def _write_validators(meta_file, headers):
+    """Persist the server's ETag / Last-Modified alongside the cache."""
+    validators = {}
+    if headers.get("ETag"):
+        validators["etag"] = headers["ETag"]
+    if headers.get("Last-Modified"):
+        validators["last_modified"] = headers["Last-Modified"]
+    try:
+        meta_file.write_text(json.dumps(validators))
+    except Exception:
+        logger.exception("Could not write cache validators to %s", meta_file)
+
 def _fetch_json(key):
     """Fetch a JSON file from pvpoke, using a local cache.
 
-    Uses cached data if it is less than CACHE_TTL seconds old.
+    Uses cached data if it is less than CACHE_TTL seconds old. Once the cache
+    is stale, makes a conditional request (If-None-Match / If-Modified-Since);
+    on a 304 Not Modified it just refreshes the cache mtime instead of
+    re-downloading and re-deriving data.
     Falls back to stale cache if network is unavailable.
     Raises NoDataError if neither network nor cache is available.
     """
     CACHE_DIR.mkdir(exist_ok=True, parents=True)
     cache_file = CACHE_DIR / f"{key}.json"
+    meta_file = CACHE_DIR / f"{key}.meta.json"
 
     # Use cache if fresh enough
     if cache_file.exists():
@@ -56,11 +80,31 @@ def _fetch_json(key):
         if age < CACHE_TTL:
             return json.loads(cache_file.read_text())
 
-    # Try to fetch fresh data
+    # Try to fetch fresh data, using conditional headers if we have them so the
+    # server can answer 304 Not Modified when the file is unchanged.
     try:
+        headers = {}
+        if cache_file.exists():
+            validators = _read_validators(meta_file)
+            if validators.get("etag"):
+                headers["If-None-Match"] = validators["etag"]
+            if validators.get("last_modified"):
+                headers["If-Modified-Since"] = validators["last_modified"]
+
         ssl_context = ssl.create_default_context(cafile=certifi.where())
-        with urllib.request.urlopen(URLS[key], context=ssl_context, timeout=FETCH_TIMEOUT) as r:
-            data = json.loads(r.read().decode())
+        request = urllib.request.Request(URLS[key], headers=headers)
+        try:
+            with urllib.request.urlopen(request, context=ssl_context, timeout=FETCH_TIMEOUT) as r:
+                data = json.loads(r.read().decode())
+                _write_validators(meta_file, r.headers)
+        except urllib.error.HTTPError as e:
+            if e.code == 304:
+                # Remote unchanged: reset the cache mtime so we don't re-check
+                # for another CACHE_TTL, and serve the existing cache.
+                os.utime(cache_file, None)
+                return json.loads(cache_file.read_text())
+            raise
+
         # Atomic write: write to .tmp then os.replace so a kill mid-write
         # can't leave a truncated cache file behind.
         tmp = cache_file.with_suffix(".json.tmp")
