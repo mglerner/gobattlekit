@@ -15,16 +15,28 @@ this block first to know what's done and what's next.
 - [x] #18 `platform.py` loose substring → `==`
 - [x] #19 `app.py:114` bare except
 
-### Session 2 — Screens + async polling  _(not started)_
-- [ ] #16 `iv_checker.py:313-316` `getattr` fallback cleanup
-- [ ] #17 `iv_checker.py` silent `print`s → logger (uses session 1's logger)
-- [ ] #13 `edit_thresholds.py:57` surface species-list load failure
-- [ ] #7 `iv_checker.py:445` `load_csv` path reassignment bug
-- [ ] #8 `iv_checker.py:486-497` Android input-stream FD leak (try/finally)
-- [ ] #9 `app.py:59` polling task reference + lifecycle
-- [ ] #10 `app.py:100-104` poll must not mutate inactive screens
+### Session 2 — Screens + async polling  _(complete; iOS-verified on 0.0.27, 2026-06-07)_
+- [x] #16 `iv_checker.py:313-316` `getattr` fallback cleanup
+- [x] #17 `iv_checker.py` silent `print`s → logger (uses session 1's logger)
+- [x] #13 `edit_thresholds.py:57` surface species-list load failure
+- [x] #7 `iv_checker.py:445` `load_csv` path reassignment bug
+- [x] #9 `app.py:59` polling task reference + lifecycle
+- [x] #10 `app.py:100-104` poll must not mutate inactive screens
+      — device testing on 0.0.26 found a bug in the *foreground* share path:
+      `user_iv_checker_screen.load_csv()` was called on a screen whose
+      `build()` had never run → `AttributeError: status_label_file`. Caught by
+      the poll's try/except (no hard crash) but the inbox file was never
+      cleaned up, so it re-fired every 3s → IV Checker screen flickered.
+      **Fixed:** foreground branch now invalidates the user screen's
+      `csv_path` instead of calling `load_csv` (matches staging branch); poll
+      cleanup moved into a `finally` so a bad CSV can't loop. Both share paths
+      (foreground + staging) re-verified on 0.0.27 — no flicker, no errors.
+- [~] #8 `iv_checker.py:486-497` Android input-stream FD leak (try/finally)
+      — code landed; iOS doesn't exercise this path, so still unverified on
+      Android. Android testing is nice-to-have, not a submission blocker.
 
-Requires device testing on iOS (inbox flow) after. Android nice-to-have.
+iOS inbox/CSV-share: staging path verified; foreground path fixed and awaiting
+re-test. Android CSV import (file picker) still untested.
 
 ### Session 3 — Design decisions  _(needs user input first)_
 - [ ] #1 **P0** Eevee/branched pre-evo mapping — needs design call: when a

@@ -120,16 +120,22 @@ class GoBattleKit(toga.App):
                         if new:
                             latest = max(new, key=lambda p: p.stat().st_mtime)
                             logger.info("Inbox: new CSV found: %s", latest)
-                            self._handle_new_inbox_csv(latest)
-                            # Delete all inbox CSVs now that we've copied to cache;
-                            # this ensures a re-shared file with the same name is
-                            # detected as new next time.
-                            for f in csvs:
-                                try:
-                                    f.unlink()
-                                except Exception:
-                                    pass
-                            seen = set()
+                            try:
+                                self._handle_new_inbox_csv(latest)
+                            finally:
+                                # Delete all inbox CSVs even if dispatch raised.
+                                # Done in a finally so a single bad/unparseable
+                                # CSV can't make the poll re-detect and re-fail it
+                                # every 3 seconds (which manifests as the IV
+                                # checker screen flickering on a re-navigation
+                                # loop). Deleting also lets a re-shared file with
+                                # the same name be detected as new next time.
+                                for f in csvs:
+                                    try:
+                                        f.unlink()
+                                    except Exception:
+                                        pass
+                                seen = set()
                 except Exception:
                     # asyncio.CancelledError derives from BaseException, so it
                     # correctly propagates out of this except and ends the task.
@@ -150,8 +156,13 @@ class GoBattleKit(toga.App):
         if foreground:
             self.show_iv_checker(skip_intro=True)
             self.iv_checker_screen.load_csv(str(latest))
-            # Also update user IV checker so it picks up new data
-            self.user_iv_checker_screen.load_csv(str(latest))
+            # The user IV checker isn't built or visible here, so calling
+            # load_csv on it crashes — its widgets don't exist yet. Instead
+            # invalidate its cached path so it re-reads SAVED_CSV the next
+            # time the user navigates to it (same pattern as the staging
+            # branch below). load_csv on iv_checker_screen above already
+            # wrote the new data to SAVED_CSV.
+            self.user_iv_checker_screen.csv_path = None
             return
         logger.info(
             "Inbox CSV arrived while on %s; staging without navigating",
