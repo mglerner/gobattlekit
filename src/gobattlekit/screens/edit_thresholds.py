@@ -47,10 +47,15 @@ class EditThresholdsScreen:
         self._form_onlytop = self.FORM_DEFAULTS['onlytop']
         self._editing_original = None
         self._clear_all_pending = False
+        self._clear_all_btn = None
 
     def _reset_clear_all_state(self):
-        """Reset the clear-all confirmation state."""
+        """Reset the clear-all confirmation state (flag AND button label —
+        an armed 'Tap again to confirm' must not survive navigation, or a
+        single later tap wipes all targets)."""
         self._clear_all_pending = False
+        if self._clear_all_btn is not None:
+            self._clear_all_btn.text = "Clear All"
 
     def _ensure_species_list(self):
         if self._all_species is None:
@@ -140,6 +145,7 @@ class EditThresholdsScreen:
             self.content_box.remove(child)
 
         self._set_outer_buttons_enabled(True)
+        self._reset_clear_all_state()
 
         self._selected_species = None
         self._selected_league = "Great"
