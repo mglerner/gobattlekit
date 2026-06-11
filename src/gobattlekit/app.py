@@ -108,15 +108,13 @@ class GoBattleKit(toga.App):
         """Poll the iOS inbox directory for CSV files shared from other apps."""
         logger.info("Inbox poll started")
         try:
+            # NOTE: do NOT pre-seed with files already in the inbox. When a
+            # share LAUNCHES the app (cold start), iOS places the file in
+            # Documents/Inbox before startup() runs — pre-seeding silently
+            # swallowed exactly that share (AP1). Anything sitting in the
+            # inbox is either a fresh share or a leftover from a crash;
+            # both should be imported.
             seen = set()
-            # Pre-populate seen with any files already in inbox at startup
-            # so we don't re-triger on files that were there before we launched
-            try:
-                inbox = pathlib.Path.home() / 'Documents' / 'Inbox'
-                if inbox.exists():
-                    seen = set(inbox.glob('*.csv'))
-            except Exception:
-                pass
             while True:
                 await asyncio.sleep(3)
                 try:
@@ -125,7 +123,18 @@ class GoBattleKit(toga.App):
                         csvs = list(inbox.glob('*.csv'))
                         new = [f for f in csvs if f not in seen]
                         if new:
+                            # PokeGenie exports are full snapshots, so when
+                            # several arrive in one tick the newest
+                            # supersedes the rest — but say so in the log
+                            # instead of discarding them silently (AP6).
                             latest = max(new, key=lambda p: p.stat().st_mtime)
+                            if len(new) > 1:
+                                logger.warning(
+                                    "Inbox: %d new CSVs in one tick; importing "
+                                    "newest (%s), discarding %s",
+                                    len(new), latest.name,
+                                    [f.name for f in new if f != latest],
+                                )
                             logger.info("Inbox: new CSV found: %s", latest)
                             try:
                                 self._handle_new_inbox_csv(latest)
