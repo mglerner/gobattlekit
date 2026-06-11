@@ -70,24 +70,27 @@ class QuizSummaryScreen:
         ))
         container.add(streak_card)
 
-        # Breakdown card — move count quiz only
-        if 'first_charge_total' in stats and stats['first_charge_total'] > 0:
-            fc_correct = stats.get('first_charge_correct', 0)
-            fc_total = stats.get('first_charge_total', 0)
-            seq_correct = stats.get('sequence_correct', 0)
-            seq_total = stats.get('sequence_total', 0)
-
+        # Breakdown card — move count quiz only. Shown when EITHER question
+        # type was answered: gating on first_charge_total alone hid the
+        # sequence stats for sessions that happened to serve only sequence
+        # questions (SQ2).
+        fc_correct = stats.get('first_charge_correct', 0)
+        fc_total = stats.get('first_charge_total', 0)
+        seq_correct = stats.get('sequence_correct', 0)
+        seq_total = stats.get('sequence_total', 0)
+        if fc_total > 0 or seq_total > 0:
             breakdown_card = toga.Box(style=card_box(margin_bottom=12))
             breakdown_card.add(toga.Label(
                 "Question Breakdown",
                 style=Pack(font_size=14, font_weight="bold",
                            margin_bottom=8, color=COLOR_YELLOW)
             ))
-            breakdown_card.add(toga.Label(
-                f"First charge move: {fc_correct} / {fc_total}",
-                style=Pack(font_size=15, margin_bottom=4,
-                           color=COLOR_TEXT_LIGHT)
-            ))
+            if fc_total > 0:
+                breakdown_card.add(toga.Label(
+                    f"First charge move: {fc_correct} / {fc_total}",
+                    style=Pack(font_size=15, margin_bottom=4,
+                               color=COLOR_TEXT_LIGHT)
+                ))
             if seq_total > 0:
                 breakdown_card.add(toga.Label(
                     f"Sequence: {seq_correct} / {seq_total}",
