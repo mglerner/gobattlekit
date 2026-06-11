@@ -241,8 +241,17 @@ def append_user_generated(csv_path, name, atk_iv, def_iv, sta_iv, cp, level):
 
 def check_thresholds(csv_path, thresholds, league='great', max_level=40,
                      evolution_lines=None, include_empty=False):
+    """Check every mon in the given CSV(s) against the thresholds.
+
+    csv_path may be a single path or a list of paths; rows from all files
+    are merged (the IV screens pass both the PokeGenie export and
+    user_generated.csv so manual entries count alongside an import).
+    """
     pokemon_index = get_pokemon_index()
-    mons = parse_csv(csv_path)
+    paths = [csv_path] if isinstance(csv_path, (str, bytes)) else list(csv_path)
+    mons = []
+    for p in paths:
+        mons.extend(parse_csv(p))
     max_cp = LEAGUE_CAPS.get(league, 1500.99)
     results = {}
 
