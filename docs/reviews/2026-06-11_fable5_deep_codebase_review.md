@@ -1271,15 +1271,22 @@ pogo-simulator — any dependency change gets flagged, not installed.
   — keeps explicit-IV matchup cards) vs text-format emitter in
   pogo-simulator. Affects both repos; the pogo-simulator side must not be
   touched while the overnight chain runs.
+  → **DECIDED 2026-06-11 (Michael): JSON import in gobattlekit.**
 - **Pre-evo propagation intent (SI2/SI3):** the evidence says delete the
   `_do_import` propagation block and the edit-path cleanup loop (restoring
   the c5fe1a8 design). But if the "(0) hits" species-list behavior was the
   motivation for 648ea8d, that need should be met another way — confirm
   before removing. Interacts with the Session-3 Eevee design call (the
   propagation currently hijacks branched lines' shared base forms).
+  → **DECIDED 2026-06-11 (Michael): delete outright** — no derived
+  pre-evo display rows; pre-evo hits stay visible via the existing
+  "(pre-evo name)" annotation under the final form. The fix should also
+  clean up already-propagated entries in existing `user_thresholds.json`
+  files (a propagated entry is identifiable: same league/name as a
+  final-form entry, species is a non-final member of that final's line).
 - **Session-3 Eevee P0 design** (already queued): all-finals vs best vs
   user-picks. gopvpsim's solved implementation (all-candidates loop) is the
-  natural reference and the migration-friendly choice.
+  natural reference and the migration-friendly choice. → **STILL OPEN.**
 
 **Batch 1 — test infrastructure (prerequisite for everything else):**
 1. TS1: patch consumers (`gobattlekit.data.iv_checker.load_gamemaster`,
