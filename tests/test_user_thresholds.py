@@ -11,7 +11,8 @@ from gobattlekit.data import user_thresholds
 from gobattlekit.data.user_thresholds import (
     load_user_thresholds, save_user_thresholds, add_threshold,
     delete_threshold, clear_all_thresholds, replace_threshold,
-    prune_propagated_pre_evos,
+    prune_propagated_pre_evos, parse_threshold_json, parse_threshold_text,
+    format_threshold_text, import_threshold_entries,
 )
 
 
@@ -117,6 +118,146 @@ class TestReplaceThreshold:
             mp.setattr(user_thresholds.os, 'replace', boom)
             assert save_user_thresholds({'A': {}}) is False
         assert save_user_thresholds({'A': {}}) is True
+
+
+class TestScannerJsonContract:
+    """The live cross-project contract: pogo-simulator's dive pages emit
+    'Copy for IV scanner' JSON fragments (its commit b97113f) in exactly
+    the schema parse_threshold_json accepts (TS2, IV1)."""
+
+    # Verbatim shapes from the b97113f emitter: composite cards export
+    # stat floors; matchup cards export explicit member IV lists.
+    COMPOSITE = ('{"Azumarill": {"Great": {"High Bulk": '
+                 '{"attack": 0, "defense": 143.03, "stamina": 138}}}}')
+    IVS_CARD = ('{"Azumarill": {"Great": {"Beats the mirror": '
+                '{"attack": 0, "defense": 0, "stamina": 0, '
+                '"ivs": [[8, 15, 15], [9, 15, 15]]}}}}')
+
+    def test_composite_card_parses(self):
+        entries = parse_threshold_json(self.COMPOSITE)
+        assert entries == [('Azumarill', 'Great', 'High Bulk',
+                            {'attack': 0, 'defense': 143.03, 'stamina': 138})]
+
+    def test_ivs_card_parses(self):
+        [(species, league, name, spec)] = parse_threshold_json(self.IVS_CARD)
+        assert spec['ivs'] == [[8, 15, 15], [9, 15, 15]]
+
+    def test_import_round_trips_through_check_thresholds(self, tmp_path):
+        """End to end: fragment → import → stored → check_thresholds
+        matches by explicit IVs."""
+        from gobattlekit.data.iv_checker import check_thresholds
+        import_threshold_entries(parse_threshold_json(self.IVS_CARD))
+
+        header = 'Name,Form,CP,Atk IV,Def IV,Sta IV,Level Min,Shadow/Purified,Lucky\n'
+        csv = tmp_path / 'mons.csv'
+        csv.write_text(header
+                       + 'Azumarill,,1400,8,15,15,20,0,0\n'   # in the list
+                       + 'Azumarill,,1400,0,15,15,20,0,0\n',  # not in the list
+                       encoding='utf-8-sig')
+        results = check_thresholds(str(csv), load_user_thresholds(),
+                                   league='great', max_level=40)
+        assert len(results['Azumarill']) == 1
+        assert results['Azumarill'][0]['mon']['atk_iv'] == 8
+
+    def test_import_merges_without_clobbering(self):
+        add_threshold('Registeel', 'ultra', 'Mine', 0, 200.0, 180)
+        import_threshold_entries(parse_threshold_json(self.COMPOSITE))
+        data = load_user_thresholds()
+        assert data['Registeel']['Ultra']['Mine']['defense'] == 200.0
+        assert data['Azumarill']['Great']['High Bulk']['stamina'] == 138
+
+    @pytest.mark.parametrize("bad,fragment", [
+        ("not json", "GoBattleKit Threshold v1"),
+        ("not an object", '["Azumarill"]'),
+        ("unknown league", '{"Azumarill": {"Holiday": {"X": {"attack": 0, "defense": 0, "stamina": 0}}}}'),
+        ("unknown key", '{"Azumarill": {"Great": {"X": {"atack": 1, "defense": 0, "stamina": 0}}}}'),
+        ("string floor", '{"Azumarill": {"Great": {"X": {"attack": "122", "defense": 0, "stamina": 0}}}}'),
+        ("negative floor", '{"Azumarill": {"Great": {"X": {"attack": -1, "defense": 0, "stamina": 0}}}}'),
+        ("iv out of range", '{"Azumarill": {"Great": {"X": {"attack": 0, "defense": 0, "stamina": 0, "ivs": [[16, 0, 0]]}}}}'),
+        ("iv pair not triple", '{"Azumarill": {"Great": {"X": {"attack": 0, "defense": 0, "stamina": 0, "ivs": [[1, 2]]}}}}'),
+        ("empty ivs", '{"Azumarill": {"Great": {"X": {"attack": 0, "defense": 0, "stamina": 0, "ivs": []}}}}'),
+        ("empty name", '{"Azumarill": {"Great": {" ": {"attack": 0, "defense": 0, "stamina": 0}}}}'),
+    ])
+    def test_rejects_malformed(self, bad, fragment):
+        with pytest.raises(ValueError):
+            parse_threshold_json(fragment)
+
+    def test_lowercase_league_normalized(self):
+        entries = parse_threshold_json(
+            '{"Azumarill": {"great": {"X": {"attack": 0, "defense": 0, "stamina": 0}}}}'
+        )
+        assert entries[0][1] == 'Great'
+
+
+class TestThresholdTextFormat:
+    """The 'GoBattleKit Threshold v1' user-to-user share format (TS10)."""
+
+    def test_round_trip_floors(self):
+        t = {'attack': 122.5, 'defense': 110.0, 'stamina': 128, 'onlytop': 25}
+        text = format_threshold_text('Azumarill', 'Great', 'Mirror', t)
+        species, league, name, spec = parse_threshold_text(text)
+        assert (species, league, name) == ('Azumarill', 'Great', 'Mirror')
+        assert spec == t
+
+    def test_round_trip_ivs(self):
+        t = {'attack': 0, 'defense': 0, 'stamina': 0, 'ivs': [[8, 15, 15]]}
+        text = format_threshold_text('Azumarill', 'Great', 'Mirror', t)
+        _, _, _, spec = parse_threshold_text(text)
+        assert spec['ivs'] == [[8, 15, 15]]
+
+    def test_rejects_bad_header_and_missing_fields(self):
+        with pytest.raises(ValueError):
+            parse_threshold_text("Something else\nSpecies: Azumarill")
+        with pytest.raises(ValueError):
+            parse_threshold_text("GoBattleKit Threshold v1\nSpecies: Azumarill")
+
+    def test_rejects_unknown_league(self):
+        t = {'attack': 0, 'defense': 0, 'stamina': 0}
+        text = format_threshold_text('Azumarill', 'Holiday', 'X', t)
+        with pytest.raises(ValueError):
+            parse_threshold_text(text)
+
+    def test_old_versions_unaffected_by_ivs_line(self):
+        """The Ivs line is additive: a parser that ignores unknown lines
+        (the pre-ivs app) still reads the floors."""
+        t = {'attack': 5.0, 'defense': 0, 'stamina': 0, 'ivs': [[1, 2, 3]]}
+        text = format_threshold_text('Azumarill', 'Great', 'X', t)
+        assert 'Attack: 5.0' in text and text.startswith('GoBattleKit Threshold v1')
+
+
+class TestIvsFirstClass:
+    def test_add_threshold_stores_ivs(self):
+        add_threshold('Azumarill', 'great', 'X', 0, 0, 0, ivs=[[8, 15, 15]])
+        data = load_user_thresholds()
+        assert data['Azumarill']['Great']['X']['ivs'] == [[8, 15, 15]]
+
+    def test_replace_preserves_ivs(self):
+        """Editing floors must not silently drop an explicit IV list (IV2)."""
+        add_threshold('Azumarill', 'great', 'X', 0, 0, 0, ivs=[[8, 15, 15]])
+        ok = replace_threshold('Azumarill', 'great', 'X',
+                               'Azumarill', 'great', 'X', 0, 100.0, 0)
+        assert ok
+        entry = load_user_thresholds()['Azumarill']['Great']['X']
+        assert entry['defense'] == 100.0
+        assert entry['ivs'] == [[8, 15, 15]]
+
+    def test_malformed_stored_target_skipped_not_fatal(self, tmp_path):
+        """A string-valued floor in the stored file must not break the
+        whole check (IV5)."""
+        from gobattlekit.data.iv_checker import check_thresholds
+        thresholds = {
+            'Azumarill': {'Great': {
+                'Broken': {'attack': '122'},
+                'Fine': {'attack': 0, 'defense': 0, 'stamina': 0},
+            }},
+        }
+        header = 'Name,Form,CP,Atk IV,Def IV,Sta IV,Level Min,Shadow/Purified,Lucky\n'
+        csv = tmp_path / 'mons.csv'
+        csv.write_text(header + 'Azumarill,,1400,8,15,15,20,0,0\n',
+                       encoding='utf-8-sig')
+        results = check_thresholds(str(csv), thresholds, league='great',
+                                   max_level=40)
+        assert results['Azumarill'][0]['matched'] == ['Fine']
 
 
 class TestPrunePropagatedPreEvos:
