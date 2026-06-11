@@ -1,4 +1,6 @@
 """Shared fixtures for data layer tests."""
+import urllib.request
+
 import pytest
 from unittest.mock import patch
 
@@ -112,7 +114,46 @@ def mini_gamemaster():
 
 
 @pytest.fixture(autouse=True)
+def isolate_app_data(tmp_path, monkeypatch):
+    """Tripwire: no test may touch the real app cache or the network.
+
+    Every CACHE_DIR-derived path constant is captured at import time by its
+    own module, so each one must be redirected individually — redirecting
+    fetcher.CACHE_DIR alone is NOT enough (that was the TS7 trap). The
+    urlopen block turns any network leak into a loud failure instead of a
+    test that silently passes against live data.
+    """
+    from gobattlekit.data import fetcher, evolution_lines, user_thresholds, preferences
+
+    cache = tmp_path / "gobattlekit_cache"
+    monkeypatch.setattr(fetcher, "CACHE_DIR", cache)
+    monkeypatch.setattr(fetcher, "SAVED_CSV", cache / "pokegenie_export.csv")
+    monkeypatch.setattr(fetcher, "USER_GENERATED_CSV", cache / "user_generated.csv")
+    monkeypatch.setattr(evolution_lines, "CACHED_PATH", cache / "evolution_lines.json")
+    monkeypatch.setattr(user_thresholds, "USER_THRESHOLDS_FILE", cache / "user_thresholds.json")
+    monkeypatch.setattr(user_thresholds, "CACHE_DIR", cache)
+    monkeypatch.setattr(preferences, "_PREFS_FILE", cache / "preferences.json")
+    monkeypatch.setattr(preferences, "CACHE_DIR", cache)
+
+    def _no_network(*args, **kwargs):
+        raise AssertionError(
+            "Test attempted real network access via urllib.request.urlopen. "
+            "Mock it (see test_fetcher.py) or fix the load_gamemaster patch target."
+        )
+
+    monkeypatch.setattr(urllib.request, "urlopen", _no_network)
+
+
+@pytest.fixture(autouse=True)
 def mock_load_gamemaster():
-    """Patch load_gamemaster globally so tests never hit the network."""
-    with patch('gobattlekit.data.fetcher.load_gamemaster', return_value=MINI_GAMEMASTER):
+    """Serve MINI_GAMEMASTER to every consumer of load_gamemaster.
+
+    The name is bound by from-import in its consumers, so the patch must
+    target the consumer modules' bindings, not (only) the fetcher's.
+    Patching the fetcher alone leaves the real function reachable — the
+    suite then runs against the live cache/network (finding TS1).
+    """
+    with patch('gobattlekit.data.fetcher.load_gamemaster', return_value=MINI_GAMEMASTER), \
+         patch('gobattlekit.data.iv_checker.load_gamemaster', return_value=MINI_GAMEMASTER), \
+         patch('gobattlekit.data.gamemaster.load_gamemaster', return_value=MINI_GAMEMASTER):
         yield
