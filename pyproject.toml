@@ -209,3 +209,12 @@ requires = [
     "toga-web~=0.5.0",
 ]
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Divergence pins (e.g. the Eevee branched pre-evo xfail) must fail loudly
+# when they start passing, so the pin gets flipped instead of rotting.
+xfail_strict = true
+filterwarnings = [
+    "error::DeprecationWarning",
+]
+
