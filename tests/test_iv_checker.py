@@ -488,3 +488,32 @@ class TestCheckThresholds:
         # Check Great league but thresholds only define Ultra
         results = check_thresholds(path, thresholds, league='great', max_level=40)
         assert 'Azumarill' not in results
+
+    @pytest.mark.xfail(
+        reason="P0 CODE_REVIEW.md #1: pre_evo_to_final is single-valued, so a "
+               "branched pre-evo (Eevee, Tyrogue, ...) maps to only the "
+               "last-iterated final. Flip this to a plain test when the "
+               "Session-3 design lands.",
+        strict=True,
+    )
+    def test_branched_pre_evo_matches_all_finals(self, tmp_path):
+        """A pre-evo whose line branches (modeled here as Marill evolving into
+        both Azumarill and Registeel, standing in for Eevee's 8 lines) must be
+        checked against EVERY final form that has thresholds."""
+        path = self._write_csv(tmp_path, 'Marill,,200,8,15,15,20,0,0\n')
+        thresholds = {
+            'Azumarill': {
+                'Great': {'Bulky': {'attack': 0, 'defense': 0, 'stamina': 0}},
+            },
+            'Registeel': {
+                'Great': {'Tanky': {'attack': 0, 'defense': 0, 'stamina': 0}},
+            },
+        }
+        evo_lines = {
+            'Azumarill': ['Marill', 'Azumarill'],
+            'Registeel': ['Marill', 'Registeel'],
+        }
+        results = check_thresholds(path, thresholds, league='great', max_level=40,
+                                   evolution_lines=evo_lines)
+        assert 'Azumarill' in results
+        assert 'Registeel' in results
