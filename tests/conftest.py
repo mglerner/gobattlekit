@@ -145,6 +145,18 @@ def isolate_app_data(tmp_path, monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def clear_rank_cache():
+    """_rank_cache is keyed (species, max_level, max_cp) WITHOUT base stats,
+    so a table computed with synthetic stats in one test would poison every
+    later check_thresholds call for the same species — order-dependent
+    failures. Clear it around every test."""
+    from gobattlekit.data.iv_checker import _rank_cache
+    _rank_cache.clear()
+    yield
+    _rank_cache.clear()
+
+
+@pytest.fixture(autouse=True)
 def mock_load_gamemaster():
     """Serve MINI_GAMEMASTER to every consumer of load_gamemaster.
 
