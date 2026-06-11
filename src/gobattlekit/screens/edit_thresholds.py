@@ -516,11 +516,6 @@ class EditThresholdsScreen:
         if self._editing_original:
             orig_species, orig_league, orig_name = self._editing_original
             delete_threshold(orig_species, orig_league, orig_name)
-            for final, line in EVOLUTION_LINES.items():
-                if final == orig_species:
-                    for pre_evo in line[:-1]:
-                        delete_threshold(pre_evo, orig_league, orig_name)
-                    break
             self._editing_original = None
 
         add_threshold(self._selected_species, league, name,
