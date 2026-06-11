@@ -40,11 +40,13 @@ class IVCheckerScreen:
         self._manual_def = '0'
         self._manual_sta = '0'
         self._manual_cp = ''
+        self._clear_csv_pending = False
 
     def _get_thresholds(self):
         return DEFAULT_THRESHOLDS
 
     def build(self):
+        self._clear_csv_pending = False
         self.container = toga.Box(style=CONTAINER)
 
         self.container.add(toga.Label(
@@ -445,6 +447,7 @@ class IVCheckerScreen:
     # ------------------------------------------------------------------
 
     def load_csv(self, path):
+        self._clear_csv_pending = False
         src_path = str(path).replace('file://', '')
         try:
             CACHE_DIR.mkdir(exist_ok=True, parents=True)
@@ -842,6 +845,17 @@ class IVCheckerScreen:
     # ------------------------------------------------------------------
 
     def _clear_csv(self, widget):
+        # Two-tap confirm (same pattern as Edit Targets' Clear All): this
+        # permanently deletes BOTH the imported PokeGenie CSV and all
+        # manually entered Pokémon, so one stray tap must not be enough.
+        if not self._clear_csv_pending:
+            self._clear_csv_pending = True
+            self.status_label_stats.text = (
+                "Tap ✕ again to delete the imported CSV and all manually "
+                "entered Pokémon."
+            )
+            return
+        self._clear_csv_pending = False
         self.csv_path = None
         self.results = {}
         try:
