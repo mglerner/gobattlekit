@@ -19,8 +19,20 @@ def load_user_thresholds():
         return {}
     try:
         return json.loads(USER_THRESHOLDS_FILE.read_text())
-    except Exception:
-        logger.exception("Could not load user thresholds")
+    except json.JSONDecodeError:
+        # File is corrupt (partial write from a prior kill, manual edit gone
+        # wrong). Rename it aside so the next save_user_thresholds() can't
+        # clobber what might still be recoverable, and start fresh — same
+        # pattern as preferences.py.
+        corrupt_path = USER_THRESHOLDS_FILE.with_suffix(".json.corrupt")
+        try:
+            os.replace(USER_THRESHOLDS_FILE, corrupt_path)
+            logger.warning("User thresholds file was corrupt; moved to %s", corrupt_path)
+        except OSError:
+            logger.exception("Could not move corrupt user thresholds file aside")
+        return {}
+    except OSError:
+        logger.exception("Could not read user thresholds")
         return {}
 
 
