@@ -55,6 +55,13 @@ class GoBattleKit(toga.App):
         self._active_screen = None
         self._poll_task = None
         try:
+            # One-time migration: drop targets written by the (removed)
+            # import-path pre-evo propagation — they shadowed the correct
+            # evolution-line mapping and never matched (SI2).
+            from .data.user_thresholds import prune_propagated_pre_evos
+            from .data.thresholds import EVOLUTION_LINES
+            if prune_propagated_pre_evos(EVOLUTION_LINES):
+                logger.info("Pruned propagated pre-evolution user targets")
             self.home_screen = HomeScreen(self)
             self.about_screen = AboutScreen(self)
             self.quiz_screen = QuizScreen(self)

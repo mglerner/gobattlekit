@@ -11,6 +11,7 @@ from gobattlekit.data import user_thresholds
 from gobattlekit.data.user_thresholds import (
     load_user_thresholds, save_user_thresholds, add_threshold,
     delete_threshold, clear_all_thresholds, replace_threshold,
+    prune_propagated_pre_evos,
 )
 
 
@@ -116,3 +117,47 @@ class TestReplaceThreshold:
             mp.setattr(user_thresholds.os, 'replace', boom)
             assert save_user_thresholds({'A': {}}) is False
         assert save_user_thresholds({'A': {}}) is True
+
+
+class TestPrunePropagatedPreEvos:
+    """One-time cleanup of entries written by the import path's pre-evo
+    propagation (SI2, removed per the 2026-06-11 Batch-0 decision).
+
+    A propagated entry is identified conservatively: a pre-evo species
+    carrying the same league+name AND identical spec values as its final
+    form's entry — exactly what the propagation block wrote."""
+
+    EVO_LINES = {
+        'Azumarill': ['Marill', 'Azumarill'],
+        'Registeel': ['Registeel'],
+    }
+
+    def test_removes_propagated_copy(self):
+        spec = {'attack': 0, 'defense': 143.0, 'stamina': 138}
+        add_threshold('Azumarill', 'great', 'Imported', **spec)
+        add_threshold('Marill', 'great', 'Imported', **spec)  # propagated copy
+        changed = prune_propagated_pre_evos(self.EVO_LINES)
+        assert changed
+        data = load_user_thresholds()
+        assert 'Marill' not in data
+        assert 'Imported' in data['Azumarill']['Great']
+
+    def test_keeps_user_created_pre_evo_target_with_different_values(self):
+        add_threshold('Azumarill', 'great', 'Default', 0, 143.0, 138)
+        # Same league+name but the user's own numbers — NOT a propagated copy.
+        add_threshold('Marill', 'great', 'Default', 0, 50.0, 60)
+        changed = prune_propagated_pre_evos(self.EVO_LINES)
+        assert not changed
+        data = load_user_thresholds()
+        assert data['Marill']['Great']['Default'] == {
+            'attack': 0, 'defense': 50.0, 'stamina': 60,
+        }
+
+    def test_keeps_pre_evo_target_without_final_counterpart(self):
+        add_threshold('Marill', 'great', 'My Marill', 0, 50.0, 60)
+        assert not prune_propagated_pre_evos(self.EVO_LINES)
+        assert 'Marill' in load_user_thresholds()
+
+    def test_noop_on_empty(self):
+        assert not prune_propagated_pre_evos(self.EVO_LINES)
+        assert load_user_thresholds() == {}
