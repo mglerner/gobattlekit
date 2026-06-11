@@ -33,6 +33,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
         return load_user_thresholds()
 
     def build(self):
+        self._clear_csv_pending = False
         self.container = toga.Box(style=CONTAINER)
 
         self.container.add(toga.Label(
