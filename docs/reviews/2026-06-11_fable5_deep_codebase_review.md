@@ -1,8 +1,16 @@
 # Fable 5 deep codebase review — gobattlekit — 2026-06-11
 
-> **Status:** Phase 1 (review only) complete; no fixes applied. Phase 2
-> (gated batches, failing test first, one commit per logical unit) starts
-> after Michael reads this doc — sequencing proposal in §J.
+> **Status (end of day 2026-06-11):** Phase 2 batches 1–5 are FIXED and
+> committed (18 commits, aaef81c..4bd57ba): test isolation (TS1/TS6/TS7/
+> TS3-pin/TS12), user-data-loss (SI4/SI3/SI10/SI15/DL8), wrong-results
+> (SI1/SI2+prune/AP1/AP6/SQ1/SQ2), fetcher hardening (DL1/DL2/DL3/DL6 +
+> DL4's parse-once memo), and the JSON contract (IV1/IV2/IV5/IV6/IV9/TS2;
+> scanner-JSON import is live). Suite: 133 → 176 passed + 1 strict xfail
+> (the Eevee pin). Still open: the Eevee P0 (Session 3 design), AP2/DL4
+> off-main-thread startup + everything device-gated (SI5, SI7, AP5,
+> Batch 6), the App Store pass (Session 4), and the §I dead-code register
+> (gated). Read the per-finding sections below as the point-in-time
+> Phase-1 snapshot.
 
 **Method.** Modeled on the same-day pogo-simulator deep review
 (`../pogo-simulator/docs/reviews/2026-06-11_fable5_deep_codebase_review.md`).
