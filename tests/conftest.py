@@ -133,6 +133,7 @@ def isolate_app_data(tmp_path):
 
     mp = pytest.MonkeyPatch()
     cache = tmp_path / "gobattlekit_cache"
+    mp.setattr(fetcher, "_parsed_cache", {})
     mp.setattr(fetcher, "CACHE_DIR", cache)
     mp.setattr(fetcher, "SAVED_CSV", cache / "pokegenie_export.csv")
     mp.setattr(fetcher, "USER_GENERATED_CSV", cache / "user_generated.csv")
