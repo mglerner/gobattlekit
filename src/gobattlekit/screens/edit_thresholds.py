@@ -8,7 +8,8 @@ from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from ..data.user_thresholds import (
     load_user_thresholds, add_threshold, delete_threshold,
-    replace_threshold, clear_all_thresholds,
+    replace_threshold, clear_all_thresholds, parse_threshold_json,
+    parse_threshold_text, format_threshold_text, import_threshold_entries,
     get_all_species
 )
 from ..data.iv_checker import get_pokemon_index
@@ -538,62 +539,24 @@ class EditThresholdsScreen:
     # ------------------------------------------------------------------
 
     def _format_threshold(self, species, league, name, t):
-        lines = [
-            "GoBattleKit Threshold v1",
-            f"Species: {species}",
-            f"League: {league.replace(' League', '')}",
-            f"Name: {name}",
-            f"Attack: {t.get('attack', 0)}",
-            f"Defense: {t.get('defense', 0)}",
-            f"Stamina: {t.get('stamina', 0)}",
-            f"OnlyTop: {t.get('onlytop', 0)}",
-        ]
-        return "\n".join(lines)
+        return format_threshold_text(species, league, name, t)
 
-    def _parse_threshold(self, text):
-        lines = [l.strip() for l in text.strip().splitlines()]
-        if not lines or lines[0] != "GoBattleKit Threshold v1":
-            raise ValueError("Not a valid GoBattleKit threshold.")
+    def _check_species_known(self, entries):
+        """Best-effort species validation against the gamemaster.
 
-        data = {}
-        for line in lines[1:]:
-            if ':' not in line:
-                continue
-            key, _, value = line.partition(':')
-            data[key.strip()] = value.strip()
-
-        required = ('Species', 'League', 'Name', 'Attack', 'Defense', 'Stamina', 'OnlyTop')
-        for field in required:
-            if field not in data:
-                raise ValueError(f"Missing field: {field}")
-
-        species = data['Species']
+        A fetcher failure here must not crash the import (it previously
+        escaped the ValueError handler) — offline imports proceed
+        unvalidated rather than failing.
+        """
         try:
             from ..data.iv_checker import get_pokemon_index
             pokemon_index = get_pokemon_index()
+        except Exception:
+            logger.warning("Could not load species list; importing unvalidated")
+            return
+        for species, _league, _name, _spec in entries:
             if species not in pokemon_index:
                 raise ValueError(f"Unknown species: {species}")
-        except ImportError:
-            pass
-
-        league = data['League'].capitalize()
-        name = data['Name']
-        if not name:
-            raise ValueError("Name cannot be empty.")
-
-        try:
-            attack = float(data['Attack'])
-            defense = float(data['Defense'])
-            stamina = int(float(data['Stamina']))
-            onlytop = int(float(data['OnlyTop']))
-        except ValueError:
-            raise ValueError("Invalid stat values.")
-
-        t = {'attack': attack, 'defense': defense, 'stamina': stamina}
-        if onlytop > 0:
-            t['onlytop'] = onlytop
-
-        return species, league, name, t
 
     def _show_share_screen(self, species, league, name, t):
         for child in list(self.content_box.children):
@@ -639,12 +602,12 @@ class EditThresholdsScreen:
         self.content_box.add(self._import_error)
 
         self.content_box.add(toga.Label(
-            "Paste a GoBattleKit target:",
+            "Paste a shared target or scanner JSON:",
             style=Pack(font_size=14, margin_bottom=8, color=COLOR_TEXT_LIGHT)
         ))
 
         self._import_input = toga.MultilineTextInput(
-            placeholder="GoBattleKit Threshold v1\nSpecies: ...",
+            placeholder='GoBattleKit Threshold v1\nSpecies: ...\n— or —\n{"Azumarill": {"Great": ...}}',
             style=Pack(flex=1, font_size=14, color="white")
         )
         self.content_box.add(self._import_input)
@@ -661,14 +624,19 @@ class EditThresholdsScreen:
             self._import_error.text = "Please paste a target first."
             return
         try:
-            species, league, name, t = self._parse_threshold(text)
-            # No pre-evo propagation here: check_thresholds maps pre-evos to
-            # their final form via evolution_lines on its own, and stored
-            # pre-evo copies actively shadowed that path (SI2; the same
-            # block was removed from the save path in c5fe1a8).
-            add_threshold(species, league, name,
-                          t['attack'], t['defense'], t['stamina'],
-                          t.get('onlytop', 0))
+            # Two paste formats: scanner JSON from pogo-simulator's dive
+            # pages ("Copy for IV scanner", possibly several targets per
+            # fragment) and the v1 share text. No pre-evo propagation in
+            # either: check_thresholds maps pre-evos to their final form
+            # via evolution_lines on its own, and stored pre-evo copies
+            # actively shadowed that path (SI2; same block was removed
+            # from the save path in c5fe1a8).
+            if text.startswith('{'):
+                entries = parse_threshold_json(text)
+            else:
+                entries = [parse_threshold_text(text)]
+            self._check_species_known(entries)
+            import_threshold_entries(entries)
             self._show_threshold_list()
         except ValueError as e:
             self._import_error.text = str(e)
