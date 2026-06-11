@@ -37,14 +37,20 @@ def load_user_thresholds():
 
 
 def save_user_thresholds(thresholds):
-    """Save user thresholds to JSON atomically (temp + os.replace)."""
+    """Save user thresholds to JSON atomically (temp + os.replace).
+
+    Returns True on success, False on failure — callers performing
+    destructive sequences must check it before assuming the data landed.
+    """
     try:
         CACHE_DIR.mkdir(exist_ok=True, parents=True)
         tmp = USER_THRESHOLDS_FILE.with_suffix(".json.tmp")
         tmp.write_text(json.dumps(thresholds, indent=2))
         os.replace(tmp, USER_THRESHOLDS_FILE)
+        return True
     except Exception:
         logger.exception("Could not save user thresholds")
+        return False
 
 
 def add_threshold(species, league, name, attack, defense, stamina, onlytop=0):
@@ -61,6 +67,34 @@ def add_threshold(species, league, name, attack, defense, stamina, onlytop=0):
     thresholds[species][league_label][name] = entry
     save_user_thresholds(thresholds)
     return thresholds
+
+
+def replace_threshold(orig_species, orig_league, orig_name,
+                      species, league, name, attack, defense, stamina,
+                      onlytop=0):
+    """Replace one threshold entry with another as a SINGLE load-modify-save
+    transaction. The previous delete-then-add sequence saved twice; a failure
+    of the second save lost the original entry with no trace (SI10).
+
+    Returns True if the save succeeded; on False, the on-disk file is
+    untouched.
+    """
+    thresholds = load_user_thresholds()
+    orig_label = orig_league.capitalize()
+    try:
+        del thresholds[orig_species][orig_label][orig_name]
+        if not thresholds[orig_species][orig_label]:
+            del thresholds[orig_species][orig_label]
+        if not thresholds[orig_species]:
+            del thresholds[orig_species]
+    except KeyError:
+        pass
+    entry = {'attack': attack, 'defense': defense, 'stamina': stamina}
+    if onlytop > 0:
+        entry['onlytop'] = onlytop
+    league_label = league.capitalize()
+    thresholds.setdefault(species, {}).setdefault(league_label, {})[name] = entry
+    return save_user_thresholds(thresholds)
 
 
 def delete_threshold(species, league, name):

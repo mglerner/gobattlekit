@@ -7,7 +7,8 @@ import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from ..data.user_thresholds import (
-    load_user_thresholds, add_threshold, delete_threshold, clear_all_thresholds,
+    load_user_thresholds, add_threshold, delete_threshold,
+    replace_threshold, clear_all_thresholds,
     get_all_species
 )
 from ..data.iv_checker import get_pokemon_index
@@ -515,8 +516,18 @@ class EditThresholdsScreen:
 
         if self._editing_original:
             orig_species, orig_league, orig_name = self._editing_original
-            delete_threshold(orig_species, orig_league, orig_name)
+            # Single transaction: a failed save leaves the original intact
+            # instead of losing it between a delete-save and an add-save.
+            ok = replace_threshold(orig_species, orig_league, orig_name,
+                                   self._selected_species, league, name,
+                                   attack, defense, stamina, onlytop)
+            if not ok:
+                self.form_error.text = ("Could not save changes — your "
+                                        "original target is unchanged.")
+                return
             self._editing_original = None
+            self._show_threshold_list()
+            return
 
         add_threshold(self._selected_species, league, name,
                       attack, defense, stamina, onlytop)

@@ -8,7 +8,7 @@ import json
 from gobattlekit.data import user_thresholds
 from gobattlekit.data.user_thresholds import (
     load_user_thresholds, save_user_thresholds, add_threshold,
-    delete_threshold, clear_all_thresholds,
+    delete_threshold, clear_all_thresholds, replace_threshold,
 )
 
 
@@ -66,3 +66,49 @@ class TestSaveAndDelete:
         add_threshold('Azumarill', 'great', 'Bulky', 0, 0, 0)
         assert clear_all_thresholds() == {}
         assert load_user_thresholds() == {}
+
+
+class TestReplaceThreshold:
+    """Editing must be one transaction: the old delete-then-add sequence
+    could lose the original when the second save failed (SI10)."""
+
+    def test_replace_moves_entry(self):
+        add_threshold('Azumarill', 'great', 'Bulky', 0, 0, 0)
+        ok = replace_threshold(
+            'Azumarill', 'great', 'Bulky',
+            'Azumarill', 'ultra', 'Bulkier', 0, 150.0, 140, onlytop=5,
+        )
+        assert ok
+        data = load_user_thresholds()
+        assert 'Great' not in data.get('Azumarill', {})
+        assert data['Azumarill']['Ultra']['Bulkier'] == {
+            'attack': 0, 'defense': 150.0, 'stamina': 140, 'onlytop': 5,
+        }
+
+    def test_failed_save_preserves_original_on_disk(self, monkeypatch):
+        add_threshold('Azumarill', 'great', 'Bulky', 0, 143.0, 138)
+
+        def boom(*args, **kwargs):
+            raise OSError("disk full")
+        monkeypatch.setattr(user_thresholds.os, 'replace', boom)
+
+        ok = replace_threshold(
+            'Azumarill', 'great', 'Bulky',
+            'Registeel', 'great', 'Tanky', 0, 0, 0,
+        )
+        assert not ok
+        monkeypatch.undo()
+        # The original entry is untouched on disk — nothing was half-applied.
+        data = load_user_thresholds()
+        assert data['Azumarill']['Great']['Bulky'] == {
+            'attack': 0, 'defense': 143.0, 'stamina': 138,
+        }
+        assert 'Registeel' not in data
+
+    def test_save_reports_failure(self, monkeypatch):
+        def boom(*args, **kwargs):
+            raise OSError("disk full")
+        monkeypatch.setattr(user_thresholds.os, 'replace', boom)
+        assert save_user_thresholds({'A': {}}) is False
+        monkeypatch.undo()
+        assert save_user_thresholds({'A': {}}) is True
