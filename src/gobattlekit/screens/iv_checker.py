@@ -529,8 +529,15 @@ class IVCheckerScreen:
             self._display_species_list()
             return
         try:
+            # Always include manual entries alongside the loaded CSV —
+            # otherwise a loaded PokeGenie export makes 'Check this
+            # Pokémon' a silent no-op (SI1).
+            paths = [self.csv_path]
+            if (USER_GENERATED_CSV.exists()
+                    and str(USER_GENERATED_CSV) != self.csv_path):
+                paths.append(str(USER_GENERATED_CSV))
             self.results = check_thresholds(
-                self.csv_path,
+                paths,
                 self._get_thresholds(),
                 league=self.league,
                 max_level=51,

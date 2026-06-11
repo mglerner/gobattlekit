@@ -207,8 +207,14 @@ class UserIVCheckerScreen(IVCheckerScreen):
                 ))
                 return
 
+            # Manual entries count alongside the loaded CSV (SI1) — same
+            # merge as the base class's _run_check.
+            paths = [self.csv_path]
+            if (USER_GENERATED_CSV.exists()
+                    and str(USER_GENERATED_CSV) != self.csv_path):
+                paths.append(str(USER_GENERATED_CSV))
             self.results = check_thresholds(
-                self.csv_path,
+                paths,
                 user_thresholds,
                 league=self.league,
                 max_level=51,

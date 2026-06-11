@@ -489,6 +489,25 @@ class TestCheckThresholds:
         results = check_thresholds(path, thresholds, league='great', max_level=40)
         assert 'Azumarill' not in results
 
+    def test_accepts_multiple_csv_paths(self, tmp_path):
+        """check_thresholds must merge several CSVs — the IV screens pass
+        both the PokeGenie export and user_generated.csv, so manual entries
+        are no longer invisible while an export is loaded (SI1)."""
+        p1 = tmp_path / 'export.csv'
+        p1.write_text(self.HEADER + 'Azumarill,,1400,8,15,15,20,0,0\n',
+                      encoding='utf-8-sig')
+        p2 = tmp_path / 'manual.csv'
+        p2.write_text(self.HEADER + 'Registeel,,1279,2,15,14,20,0,0\n',
+                      encoding='utf-8-sig')
+        thresholds = {
+            'Azumarill': {'Great': {'Bulky': {'attack': 0, 'defense': 0, 'stamina': 0}}},
+            'Registeel': {'Great': {'Tanky': {'attack': 0, 'defense': 0, 'stamina': 0}}},
+        }
+        results = check_thresholds([str(p1), str(p2)], thresholds,
+                                   league='great', max_level=40)
+        assert 'Azumarill' in results
+        assert 'Registeel' in results
+
     @pytest.mark.xfail(
         reason="P0 CODE_REVIEW.md #1: pre_evo_to_final is single-valued, so a "
                "branched pre-evo (Eevee, Tyrogue, ...) maps to only the "
