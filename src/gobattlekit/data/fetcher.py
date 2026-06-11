@@ -49,16 +49,39 @@ def _read_validators(meta_file):
         return {}
 
 def _write_validators(meta_file, headers):
-    """Persist the server's ETag / Last-Modified alongside the cache."""
+    """Persist the server's ETag / Last-Modified alongside the cache.
+
+    Atomic (temp + os.replace) like the payload write, and only ever called
+    AFTER the payload replace succeeds — a new ETag beside old data would
+    pin the stale cache behind 304s indefinitely.
+    """
     validators = {}
     if headers.get("ETag"):
         validators["etag"] = headers["ETag"]
     if headers.get("Last-Modified"):
         validators["last_modified"] = headers["Last-Modified"]
     try:
-        meta_file.write_text(json.dumps(validators))
+        tmp = meta_file.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(validators))
+        os.replace(tmp, meta_file)
     except Exception:
         logger.exception("Could not write cache validators to %s", meta_file)
+
+# In-memory memo of parsed cache files, keyed by data key. The gamemaster
+# is ~14MB; without this every consumer call (get_moves, get_pokemon_index,
+# ...) re-read and re-parsed it from disk. Entries are validated by mtime.
+# Consumers must treat returned data as read-only.
+_parsed_cache = {}
+
+def _read_cache(cache_file, key):
+    """Parse a cache file, memoized by mtime. Raises on corrupt content."""
+    mtime = cache_file.stat().st_mtime
+    hit = _parsed_cache.get(key)
+    if hit is not None and hit[0] == mtime:
+        return hit[1]
+    data = json.loads(cache_file.read_text())
+    _parsed_cache[key] = (mtime, data)
+    return data
 
 def _fetch_json(key):
     """Fetch a JSON file from pvpoke, using a local cache.
@@ -78,7 +101,19 @@ def _fetch_json(key):
     if cache_file.exists():
         age = time.time() - cache_file.stat().st_mtime
         if age < CACHE_TTL:
-            return json.loads(cache_file.read_text())
+            try:
+                return _read_cache(cache_file, key)
+            except (json.JSONDecodeError, OSError):
+                # Corrupt cache (e.g. truncated by a pre-0.0.26 non-atomic
+                # write). Discard it — including the validators, so the
+                # refetch below is unconditional and can't 304 back onto
+                # the corrupt file — and fall through to a full fetch.
+                logger.warning("Corrupt cache for %s; discarding and refetching", key)
+                try:
+                    cache_file.unlink()
+                    meta_file.unlink(missing_ok=True)
+                except OSError:
+                    logger.exception("Could not remove corrupt cache for %s", key)
 
     # Try to fetch fresh data, using conditional headers if we have them so the
     # server can answer 304 Not Modified when the file is unchanged.
@@ -96,20 +131,24 @@ def _fetch_json(key):
         try:
             with urllib.request.urlopen(request, context=ssl_context, timeout=FETCH_TIMEOUT) as r:
                 data = json.loads(r.read().decode())
-                _write_validators(meta_file, r.headers)
+                response_headers = r.headers
         except urllib.error.HTTPError as e:
             if e.code == 304:
                 # Remote unchanged: reset the cache mtime so we don't re-check
                 # for another CACHE_TTL, and serve the existing cache.
                 os.utime(cache_file, None)
-                return json.loads(cache_file.read_text())
+                return _read_cache(cache_file, key)
             raise
 
         # Atomic write: write to .tmp then os.replace so a kill mid-write
-        # can't leave a truncated cache file behind.
+        # can't leave a truncated cache file behind. Validators are written
+        # strictly AFTER the payload lands — the reverse order let a kill
+        # window pin old data behind 304s forever.
         tmp = cache_file.with_suffix(".json.tmp")
         tmp.write_text(json.dumps(data))
         os.replace(tmp, cache_file)
+        _write_validators(meta_file, response_headers)
+        _parsed_cache[key] = (cache_file.stat().st_mtime, data)
 
         # If this is the gamemaster, regenerate evolution lines
         if key == 'gamemaster':
@@ -117,6 +156,13 @@ def _fetch_json(key):
                 from .evolution_lines import generate_evolution_lines, save_evolution_lines
                 evo_lines = generate_evolution_lines(data)
                 save_evolution_lines(evo_lines)
+                # Refresh the in-memory snapshot IN PLACE so modules that
+                # did `from .thresholds import EVOLUTION_LINES` at import
+                # time see the regenerated lines this session, not after
+                # the next app restart.
+                from . import thresholds
+                thresholds.EVOLUTION_LINES.clear()
+                thresholds.EVOLUTION_LINES.update(evo_lines)
             except Exception:
                 logger.exception("Could not regenerate evolution lines")
         return data
@@ -126,7 +172,10 @@ def _fetch_json(key):
 
     # Fall back to stale cache if available
     if cache_file.exists():
-        return json.loads(cache_file.read_text())
+        try:
+            return _read_cache(cache_file, key)
+        except (json.JSONDecodeError, OSError):
+            logger.exception("Stale cache for %s is corrupt", key)
 
     # No network and no cache
     raise NoDataError(
