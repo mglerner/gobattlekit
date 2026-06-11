@@ -304,16 +304,23 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
         matched = []
         iv_tuple = (mon['atk_iv'], mon['def_iv'], mon['sta_iv'])
         for target_name, target in thresholds[final_species][league_label].items():
-            if not (stats['attack'] >= target.get('attack', 0) and
-                    stats['defense'] >= target.get('defense', 0) and
-                    stats['stamina'] >= target.get('stamina', 0)):
+            try:
+                if not (stats['attack'] >= target.get('attack', 0) and
+                        stats['defense'] >= target.get('defense', 0) and
+                        stats['stamina'] >= target.get('stamina', 0)):
+                    continue
+                if 'ivs' in target:
+                    if not any(tuple(iv) == iv_tuple for iv in target['ivs']):
+                        continue
+                if 'onlytop' in target:
+                    if stats['rank'] > target['onlytop']:
+                        continue
+            except TypeError:
+                # One malformed target (e.g. a string-valued floor from a
+                # hand-edited file) must not break the whole check.
+                logger.warning("Skipping malformed target %s/%s/%s",
+                               final_species, league_label, target_name)
                 continue
-            if 'ivs' in target:
-                if not any(tuple(iv) == iv_tuple for iv in target['ivs']):
-                    continue
-            if 'onlytop' in target:
-                if stats['rank'] > target['onlytop']:
-                    continue
             matched.append(target_name)
 
         if matched:

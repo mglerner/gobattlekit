@@ -53,7 +53,170 @@ def save_user_thresholds(thresholds):
         return False
 
 
-def add_threshold(species, league, name, attack, defense, stamina, onlytop=0):
+VALID_LEAGUES = ('Great', 'Ultra', 'Master')
+
+# The complete target-spec vocabulary shared with check_thresholds — and
+# with pogo-simulator's "Copy for IV scanner" export (its commit b97113f),
+# which emits exactly this schema.
+_SPEC_KEYS = {'attack', 'defense', 'stamina', 'ivs', 'onlytop'}
+
+
+def _validate_spec(spec, where):
+    """Validate one target spec; returns a normalized copy.
+
+    Raises ValueError with a user-displayable message. Unknown keys are
+    rejected rather than ignored: a typo'd key would otherwise silently
+    become a match-everything floor via target.get(..., 0).
+    """
+    if not isinstance(spec, dict):
+        raise ValueError(f"{where}: target must be an object.")
+    unknown = sorted(set(spec) - _SPEC_KEYS)
+    if unknown:
+        raise ValueError(f"{where}: unknown keys: {', '.join(unknown)}.")
+    out = {}
+    for k in ('attack', 'defense', 'stamina'):
+        v = spec.get(k, 0)
+        if isinstance(v, bool) or not isinstance(v, (int, float)) or v < 0:
+            raise ValueError(f"{where}: '{k}' must be a non-negative number.")
+        out[k] = int(v) if k == 'stamina' else v
+    onlytop = spec.get('onlytop', 0)
+    if isinstance(onlytop, bool) or not isinstance(onlytop, (int, float)) or onlytop < 0:
+        raise ValueError(f"{where}: 'onlytop' must be a non-negative integer.")
+    if onlytop:
+        out['onlytop'] = int(onlytop)
+    if 'ivs' in spec:
+        ivs = spec['ivs']
+        if (not isinstance(ivs, list) or not ivs
+                or not all(isinstance(t, (list, tuple)) and len(t) == 3 for t in ivs)
+                or not all(isinstance(x, int) and 0 <= x <= 15 for t in ivs for x in t)):
+            raise ValueError(
+                f"{where}: 'ivs' must be a list of [atk, def, sta] triples (0-15)."
+            )
+        out['ivs'] = [list(t) for t in ivs]
+    return out
+
+
+def parse_threshold_json(text):
+    """Parse a scanner-JSON fragment: {species: {League: {name: target}}}.
+
+    This is the format pogo-simulator's dive pages emit via "Copy for IV
+    scanner". Returns a list of (species, league_label, name, spec) tuples.
+    Raises ValueError with a displayable message on any problem — nothing
+    is silently dropped or coerced.
+    """
+    try:
+        obj = json.loads(text)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Not valid JSON: {e}") from e
+    if not isinstance(obj, dict) or not obj:
+        raise ValueError("Expected {species: {League: {name: target}}}.")
+    entries = []
+    for species, leagues in obj.items():
+        if not isinstance(leagues, dict) or not leagues:
+            raise ValueError(f"{species}: expected {{League: {{name: target}}}}.")
+        for league, names in leagues.items():
+            league_label = str(league).capitalize()
+            if league_label not in VALID_LEAGUES:
+                raise ValueError(
+                    f"{species}: unknown league '{league}' "
+                    f"(expected one of {', '.join(VALID_LEAGUES)})."
+                )
+            if not isinstance(names, dict) or not names:
+                raise ValueError(f"{species}/{league_label}: expected {{name: target}}.")
+            for name, spec in names.items():
+                if not str(name).strip():
+                    raise ValueError(f"{species}/{league_label}: target name cannot be empty.")
+                entries.append((
+                    str(species), league_label, str(name),
+                    _validate_spec(spec, f"{species}/{league_label}/{name}"),
+                ))
+    return entries
+
+
+def format_threshold_text(species, league, name, t):
+    """Render a target as the shareable 'GoBattleKit Threshold v1' text."""
+    lines = [
+        "GoBattleKit Threshold v1",
+        f"Species: {species}",
+        f"League: {league.replace(' League', '')}",
+        f"Name: {name}",
+        f"Attack: {t.get('attack', 0)}",
+        f"Defense: {t.get('defense', 0)}",
+        f"Stamina: {t.get('stamina', 0)}",
+        f"OnlyTop: {t.get('onlytop', 0)}",
+    ]
+    if t.get('ivs'):
+        # Optional line; older app versions ignore unknown lines, so they
+        # import such a share as floors-only (the pre-ivs behavior).
+        lines.append(f"Ivs: {json.dumps(t['ivs'])}")
+    return "\n".join(lines)
+
+
+def parse_threshold_text(text):
+    """Parse the 'GoBattleKit Threshold v1' share text.
+
+    Returns (species, league_label, name, spec). Raises ValueError on any
+    problem. Species existence is NOT checked here — that needs the
+    gamemaster and is the caller's (best-effort) job.
+    """
+    lines = [l.strip() for l in text.strip().splitlines()]
+    if not lines or lines[0] != "GoBattleKit Threshold v1":
+        raise ValueError("Not a valid GoBattleKit threshold.")
+
+    data = {}
+    for line in lines[1:]:
+        if ':' not in line:
+            continue
+        key, _, value = line.partition(':')
+        data[key.strip()] = value.strip()
+
+    required = ('Species', 'League', 'Name', 'Attack', 'Defense', 'Stamina', 'OnlyTop')
+    for field in required:
+        if field not in data:
+            raise ValueError(f"Missing field: {field}")
+
+    species = data['Species']
+    league_label = data['League'].capitalize()
+    if league_label not in VALID_LEAGUES:
+        raise ValueError(
+            f"Unknown league '{data['League']}' "
+            f"(expected one of {', '.join(VALID_LEAGUES)})."
+        )
+    name = data['Name']
+    if not name:
+        raise ValueError("Name cannot be empty.")
+
+    try:
+        spec = {
+            'attack': float(data['Attack']),
+            'defense': float(data['Defense']),
+            'stamina': int(float(data['Stamina'])),
+            'onlytop': int(float(data['OnlyTop'])),
+        }
+    except ValueError:
+        raise ValueError("Invalid stat values.")
+    if 'Ivs' in data:
+        try:
+            spec['ivs'] = json.loads(data['Ivs'])
+        except json.JSONDecodeError:
+            raise ValueError("Invalid Ivs list.")
+    return species, league_label, name, _validate_spec(spec, name)
+
+
+def import_threshold_entries(entries):
+    """Merge parsed (species, league_label, name, spec) entries into the
+    stored thresholds in ONE transaction. Returns the entry count; raises
+    ValueError if the save fails (nothing half-applied)."""
+    thresholds = load_user_thresholds()
+    for species, league_label, name, spec in entries:
+        thresholds.setdefault(species, {}).setdefault(league_label, {})[name] = spec
+    if not save_user_thresholds(thresholds):
+        raise ValueError("Could not save imported targets.")
+    return len(entries)
+
+
+def add_threshold(species, league, name, attack, defense, stamina, onlytop=0,
+                  ivs=None):
     """Add a threshold entry for a species/league. Saves immediately."""
     thresholds = load_user_thresholds()
     if species not in thresholds:
@@ -64,6 +227,8 @@ def add_threshold(species, league, name, attack, defense, stamina, onlytop=0):
     entry = {'attack': attack, 'defense': defense, 'stamina': stamina}
     if onlytop > 0:
         entry['onlytop'] = onlytop
+    if ivs:
+        entry['ivs'] = [list(t) for t in ivs]
     thresholds[species][league_label][name] = entry
     save_user_thresholds(thresholds)
     return thresholds
@@ -81,6 +246,7 @@ def replace_threshold(orig_species, orig_league, orig_name,
     """
     thresholds = load_user_thresholds()
     orig_label = orig_league.capitalize()
+    orig_entry = thresholds.get(orig_species, {}).get(orig_label, {}).get(orig_name)
     try:
         del thresholds[orig_species][orig_label][orig_name]
         if not thresholds[orig_species][orig_label]:
@@ -92,6 +258,11 @@ def replace_threshold(orig_species, orig_league, orig_name,
     entry = {'attack': attack, 'defense': defense, 'stamina': stamina}
     if onlytop > 0:
         entry['onlytop'] = onlytop
+    if orig_entry and 'ivs' in orig_entry:
+        # The edit form has no IV-list UI; carry the explicit list through
+        # so editing the floors doesn't silently turn an explicit-IV target
+        # into match-everything floors (IV2).
+        entry['ivs'] = orig_entry['ivs']
     league_label = league.capitalize()
     thresholds.setdefault(species, {}).setdefault(league_label, {})[name] = entry
     return save_user_thresholds(thresholds)
