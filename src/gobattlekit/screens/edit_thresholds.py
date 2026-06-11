@@ -12,7 +12,6 @@ from ..data.user_thresholds import (
     get_all_species
 )
 from ..data.iv_checker import get_pokemon_index
-from ..data.thresholds import EVOLUTION_LINES
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
     btn_primary, btn_secondary, btn_back, btn_nav, btn_league,
@@ -663,16 +662,13 @@ class EditThresholdsScreen:
             return
         try:
             species, league, name, t = self._parse_threshold(text)
+            # No pre-evo propagation here: check_thresholds maps pre-evos to
+            # their final form via evolution_lines on its own, and stored
+            # pre-evo copies actively shadowed that path (SI2; the same
+            # block was removed from the save path in c5fe1a8).
             add_threshold(species, league, name,
                           t['attack'], t['defense'], t['stamina'],
                           t.get('onlytop', 0))
-            for final, line in EVOLUTION_LINES.items():
-                if final == species:
-                    for pre_evo in line[:-1]:
-                        add_threshold(pre_evo, league, name,
-                                      t['attack'], t['defense'], t['stamina'],
-                                      t.get('onlytop', 0))
-                    break
             self._show_threshold_list()
         except ValueError as e:
             self._import_error.text = str(e)

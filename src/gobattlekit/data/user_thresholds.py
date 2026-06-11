@@ -114,6 +114,47 @@ def delete_threshold(species, league, name):
     return thresholds
 
 
+def prune_propagated_pre_evos(evolution_lines):
+    """One-time cleanup for entries written by the (removed) import-path
+    pre-evolution propagation.
+
+    Those copies never matched anything — they pitted the FINAL form's
+    scaled-stat floors against the PRE-EVO's base stats — and worse, their
+    presence shadowed the correct evolution-line mapping in
+    check_thresholds. Identification is conservative: a pre-evo species
+    entry is pruned only when its final form carries the same league+name
+    with IDENTICAL spec values (exactly what the propagation wrote).
+
+    Returns True if anything was removed (and saved).
+    """
+    thresholds = load_user_thresholds()
+    pre_evo_to_finals = {}
+    for final, line in evolution_lines.items():
+        for member in line:
+            if member != final:
+                pre_evo_to_finals.setdefault(member, []).append(final)
+
+    changed = False
+    for species in list(thresholds.keys()):
+        for final in pre_evo_to_finals.get(species, []):
+            if final not in thresholds:
+                continue
+            for league_label in list(thresholds[species].keys()):
+                final_entries = thresholds.get(final, {}).get(league_label, {})
+                for name in list(thresholds[species][league_label].keys()):
+                    if thresholds[species][league_label][name] == final_entries.get(name):
+                        del thresholds[species][league_label][name]
+                        changed = True
+                if not thresholds[species][league_label]:
+                    del thresholds[species][league_label]
+        if species in thresholds and not thresholds[species]:
+            del thresholds[species]
+
+    if changed:
+        save_user_thresholds(thresholds)
+    return changed
+
+
 def clear_all_thresholds():
     """Delete all user thresholds."""
     save_user_thresholds({})
