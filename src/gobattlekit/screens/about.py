@@ -6,6 +6,7 @@ import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN
 from ..platform import ON_ANDROID
+from ..links import open_url
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
     btn_secondary, btn_nav, btn_help
@@ -121,22 +122,4 @@ class AboutScreen:
         return container
 
     def _open_url(self, url):
-        """Open a URL, handling platform differences."""
-        if ON_ANDROID:
-            try:
-                from java import jclass
-                Intent = jclass('android.content.Intent')
-                Uri = jclass('android.net.Uri')
-                intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                self.app._impl.native.startActivity(intent)
-            except Exception as e:
-                import asyncio
-                asyncio.create_task(
-                    self.app.main_window.info_dialog(
-                        "Could not open link",
-                        f"Try opening this URL manually:\n{url}"
-                    )
-                )
-        else:
-            import webbrowser
-            webbrowser.open(url)
+        open_url(self.app, url)
