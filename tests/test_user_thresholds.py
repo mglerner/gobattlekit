@@ -5,6 +5,8 @@ isolate_app_data fixture in conftest.py.
 """
 import json
 
+import pytest
+
 from gobattlekit.data import user_thresholds
 from gobattlekit.data.user_thresholds import (
     load_user_thresholds, save_user_thresholds, add_threshold,
@@ -85,19 +87,21 @@ class TestReplaceThreshold:
             'attack': 0, 'defense': 150.0, 'stamina': 140, 'onlytop': 5,
         }
 
-    def test_failed_save_preserves_original_on_disk(self, monkeypatch):
+    def test_failed_save_preserves_original_on_disk(self):
         add_threshold('Azumarill', 'great', 'Bulky', 0, 143.0, 138)
 
         def boom(*args, **kwargs):
             raise OSError("disk full")
-        monkeypatch.setattr(user_thresholds.os, 'replace', boom)
-
-        ok = replace_threshold(
-            'Azumarill', 'great', 'Bulky',
-            'Registeel', 'great', 'Tanky', 0, 0, 0,
-        )
+        # Scoped context, NOT the shared monkeypatch fixture + undo():
+        # undo() reverts the autouse isolation too and leaks onto the
+        # real app cache.
+        with pytest.MonkeyPatch.context() as mp:
+            mp.setattr(user_thresholds.os, 'replace', boom)
+            ok = replace_threshold(
+                'Azumarill', 'great', 'Bulky',
+                'Registeel', 'great', 'Tanky', 0, 0, 0,
+            )
         assert not ok
-        monkeypatch.undo()
         # The original entry is untouched on disk — nothing was half-applied.
         data = load_user_thresholds()
         assert data['Azumarill']['Great']['Bulky'] == {
@@ -105,10 +109,10 @@ class TestReplaceThreshold:
         }
         assert 'Registeel' not in data
 
-    def test_save_reports_failure(self, monkeypatch):
+    def test_save_reports_failure(self):
         def boom(*args, **kwargs):
             raise OSError("disk full")
-        monkeypatch.setattr(user_thresholds.os, 'replace', boom)
-        assert save_user_thresholds({'A': {}}) is False
-        monkeypatch.undo()
+        with pytest.MonkeyPatch.context() as mp:
+            mp.setattr(user_thresholds.os, 'replace', boom)
+            assert save_user_thresholds({'A': {}}) is False
         assert save_user_thresholds({'A': {}}) is True
