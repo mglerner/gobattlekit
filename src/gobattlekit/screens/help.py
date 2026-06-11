@@ -50,7 +50,7 @@ HELP_CONTENT = {
         ("", "Set your own IV targets to check your Pokémon against. For example, add Medicham with a minimum Attack of 105 to find your best Great League Medicham candidates."),
         ("Adding a target", "Tap Edit My Targets → Add Target, choose a species and league, set minimum stats (0 means any), and tap Save Target. Make sure a CSV is imported or Pokémon are entered manually to see results. Your data is remembered between sessions."),
         ("Target buttons", "Each target has four buttons:\n✎ Edit - modify the target's stats or label\n⧉ Duplicate - copy the target as a starting point for a new one\n📤 Share - export the target as text to share with friends\n✕ Delete - remove the target"),
-        ("Import from Text", "Lets you paste a target shared by someone else. This is useful for importing targets from the PvP community."),
+        ("Import from Text", "Lets you paste a target shared by someone else, or a \"Copy for IV scanner\" snippet from a deep-dive page. This is useful for importing targets from the PvP community."),
         ("PokeGenie note", "Importing a CSV from PokeGenie requires the iVision subscription. Alternatively, use manual entry to add Pokémon one at a time."),
     ],
     "Move Count Quizzes": [
