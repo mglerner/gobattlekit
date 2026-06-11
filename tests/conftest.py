@@ -114,7 +114,7 @@ def mini_gamemaster():
 
 
 @pytest.fixture(autouse=True)
-def isolate_app_data(tmp_path, monkeypatch):
+def isolate_app_data(tmp_path):
     """Tripwire: no test may touch the real app cache or the network.
 
     Every CACHE_DIR-derived path constant is captured at import time by its
@@ -122,18 +122,25 @@ def isolate_app_data(tmp_path, monkeypatch):
     fetcher.CACHE_DIR alone is NOT enough (that was the TS7 trap). The
     urlopen block turns any network leak into a loud failure instead of a
     test that silently passes against live data.
+
+    Deliberately uses its OWN MonkeyPatch instance rather than the shared
+    `monkeypatch` fixture: pytest hands one instance to everything in a
+    test, so a test calling monkeypatch.undo() would strip this isolation
+    too and leak onto the real ~/Documents cache (it happened — a test's
+    undo() overwrote the real user_thresholds.json).
     """
     from gobattlekit.data import fetcher, evolution_lines, user_thresholds, preferences
 
+    mp = pytest.MonkeyPatch()
     cache = tmp_path / "gobattlekit_cache"
-    monkeypatch.setattr(fetcher, "CACHE_DIR", cache)
-    monkeypatch.setattr(fetcher, "SAVED_CSV", cache / "pokegenie_export.csv")
-    monkeypatch.setattr(fetcher, "USER_GENERATED_CSV", cache / "user_generated.csv")
-    monkeypatch.setattr(evolution_lines, "CACHED_PATH", cache / "evolution_lines.json")
-    monkeypatch.setattr(user_thresholds, "USER_THRESHOLDS_FILE", cache / "user_thresholds.json")
-    monkeypatch.setattr(user_thresholds, "CACHE_DIR", cache)
-    monkeypatch.setattr(preferences, "_PREFS_FILE", cache / "preferences.json")
-    monkeypatch.setattr(preferences, "CACHE_DIR", cache)
+    mp.setattr(fetcher, "CACHE_DIR", cache)
+    mp.setattr(fetcher, "SAVED_CSV", cache / "pokegenie_export.csv")
+    mp.setattr(fetcher, "USER_GENERATED_CSV", cache / "user_generated.csv")
+    mp.setattr(evolution_lines, "CACHED_PATH", cache / "evolution_lines.json")
+    mp.setattr(user_thresholds, "USER_THRESHOLDS_FILE", cache / "user_thresholds.json")
+    mp.setattr(user_thresholds, "CACHE_DIR", cache)
+    mp.setattr(preferences, "_PREFS_FILE", cache / "preferences.json")
+    mp.setattr(preferences, "CACHE_DIR", cache)
 
     def _no_network(*args, **kwargs):
         raise AssertionError(
@@ -141,7 +148,11 @@ def isolate_app_data(tmp_path, monkeypatch):
             "Mock it (see test_fetcher.py) or fix the load_gamemaster patch target."
         )
 
-    monkeypatch.setattr(urllib.request, "urlopen", _no_network)
+    mp.setattr(urllib.request, "urlopen", _no_network)
+    try:
+        yield
+    finally:
+        mp.undo()
 
 
 @pytest.fixture(autouse=True)
