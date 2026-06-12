@@ -38,13 +38,14 @@ this block first to know what's done and what's next.
 iOS inbox/CSV-share: staging path verified; foreground path fixed and awaiting
 re-test. Android CSV import (file picker) still untested.
 
-### Session 3 — Design decisions  _(needs user input first)_
-- [ ] #1 **P0** Eevee/branched pre-evo mapping — needs design call: when a
-      CSV row is a branched pre-evo (Eevee, Tyrogue, Wurmple, Slowpoke, etc.),
-      do we check against all finals / show best / require user to pick?
-- [ ] #11 `theme.py:14` `COLOR_BG` light-mode behavior — needs design call:
-      dark-only, or adapt per system theme?
-- [ ] #12 Document paragraph-sizing assumptions in `theme.py:234,238`
+### Session 3 — Design decisions  _(complete, 2026-06-12)_
+- [x] #1 **P0** Eevee/branched pre-evo mapping — decided: check against
+      ALL finals (matches gopvpsim); implemented in commit 37241a4, the
+      strict-xfail pin flipped to a passing test.
+- [x] #11 `theme.py` `COLOR_BG` light-mode behavior — decided: dark-only,
+      enforced via `UIUserInterfaceStyle=Dark` in pyproject.toml (38d5766).
+- [x] #12 Paragraph-sizing assumptions — documented in DEVELOPER_NOTES
+      ("Wrapping paragraph text") and at the constants in theme.py.
 
 ### Session 4 — App Store readiness
 - [ ] #6 `pyproject.toml` / Info.plist verification against real `briefcase build iOS`
