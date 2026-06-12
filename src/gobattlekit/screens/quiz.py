@@ -123,6 +123,9 @@ class QuizScreen:
         return QUESTION_TYPE_FIRST if random.random() < FIRST_WEIGHT else QUESTION_TYPE_SEQUENCE
 
     def _load_question(self):
+        # Guards against a natively queued duplicate tap double-resolving
+        # the question (double score + orphaned advance task).
+        self._question_over = False
         mon = random.choice(self.mons)
         self.fast_id = mon['moveset'][0]
         self.charged_id = random.choice(mon['moveset'][1:])
@@ -220,8 +223,11 @@ class QuizScreen:
             correct_btn.style.background_color = COLOR_ACCENT
 
     def _check_answer(self, chosen):
+        if self._question_over:
+            return
         self.attempts += 1
         if chosen == self.right_answer:
+            self._question_over = True
             self.total_questions += 1
             pts = POINTS.get(self.attempts, 1)
             self.score += pts
@@ -251,6 +257,7 @@ class QuizScreen:
         else:
             self.streak = 0
             if self.attempts >= MAX_ATTEMPTS:
+                self._question_over = True
                 self.total_questions += 1
                 self.max_score += 3
                 if self.question_type == QUESTION_TYPE_FIRST:
