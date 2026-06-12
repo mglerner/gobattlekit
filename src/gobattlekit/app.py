@@ -7,6 +7,7 @@ import logging
 import asyncio
 import pathlib
 import shutil
+import time
 
 logging.basicConfig(
     level=logging.INFO,
@@ -101,6 +102,12 @@ class GoBattleKit(toga.App):
 
     def _start_inbox_poll(self, app):
         """on_running hook — launch the poll task and hold a reference."""
+        if not ON_IOS:
+            # The Documents/Inbox share mechanism is iOS-only; on desktop
+            # this loop would watch (and delete CSVs from!) the user's real
+            # ~/Documents/Inbox.
+            logger.info("Inbox poll skipped (not iOS)")
+            return
         self._poll_task = asyncio.create_task(self._poll_inbox())
         logger.info("Inbox poll task scheduled")
 
@@ -120,8 +127,16 @@ class GoBattleKit(toga.App):
                 try:
                     inbox = pathlib.Path.home() / 'Documents' / 'Inbox'
                     if inbox.exists():
-                        csvs = list(inbox.glob('*.csv'))
-                        new = [f for f in csvs if f not in seen]
+                        # suffix.lower(): a shared '.CSV' must match too.
+                        csvs = [f for f in inbox.iterdir()
+                                if f.suffix.lower() == '.csv']
+                        # Skip files modified within the last second — iOS
+                        # may still be copying them in; they're picked up
+                        # on the next tick.
+                        now = time.time()
+                        ready = [f for f in csvs
+                                 if now - f.stat().st_mtime > 1.0]
+                        new = [f for f in ready if f not in seen]
                         if new:
                             # PokeGenie exports are full snapshots, so when
                             # several arrive in one tick the newest
@@ -139,19 +154,23 @@ class GoBattleKit(toga.App):
                             try:
                                 self._handle_new_inbox_csv(latest)
                             finally:
-                                # Delete all inbox CSVs even if dispatch raised.
-                                # Done in a finally so a single bad/unparseable
-                                # CSV can't make the poll re-detect and re-fail it
-                                # every 3 seconds (which manifests as the IV
-                                # checker screen flickering on a re-navigation
-                                # loop). Deleting also lets a re-shared file with
-                                # the same name be detected as new next time.
-                                for f in csvs:
+                                # Delete the processed inbox CSVs even if
+                                # dispatch raised. Done in a finally so a
+                                # single bad/unparseable CSV can't make the
+                                # poll re-detect and re-fail it every 3
+                                # seconds (which manifests as the IV checker
+                                # screen flickering on a re-navigation
+                                # loop). Deleting also lets a re-shared file
+                                # with the same name be detected as new next
+                                # time. A file whose unlink FAILS stays in
+                                # 'seen' so it can't resurrect that loop.
+                                for f in ready:
                                     try:
                                         f.unlink()
                                     except Exception:
-                                        pass
-                                seen = set()
+                                        logger.exception(
+                                            "Could not delete inbox CSV %s", f)
+                                seen = {f for f in ready if f.exists()}
                 except Exception:
                     # asyncio.CancelledError derives from BaseException, so it
                     # correctly propagates out of this except and ends the task.
