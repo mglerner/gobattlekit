@@ -208,12 +208,20 @@ def label_section(margin_top=8, margin_bottom=8):
 # ------------------------------------------------------------------
 
 def card_box(margin_bottom=8):
-    """A subtle card box for hit results."""
+    """A subtle card box for hit results.
+
+    Per-side margins are explicit: the old `padding=8` was Toga's
+    deprecated alias for MARGIN (Pack has no inner padding), and being
+    applied after margin_bottom it silently overrode it — every caller
+    asking for margin_bottom=12 actually got 8.
+    """
     return Pack(
         direction=COLUMN,
         background_color=COLOR_CARD_BG,
+        margin_top=8,
+        margin_left=8,
+        margin_right=8,
         margin_bottom=margin_bottom,
-        padding=8,
     )
 
 # ------------------------------------------------------------------
