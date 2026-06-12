@@ -147,6 +147,49 @@ class TestGenerateEvolutionLines:
         assert 'Loop' in lines
         assert lines['Loop'] == ['Loop']
 
+    def test_shared_final_across_multiple_roots(self):
+        """Burmy-style: three parentless roots all evolve into the same
+        final (plus per-root variants). The shared final must list EVERY
+        root as a pre-evo — the family-wide visited set previously kept
+        only the first root's chain (CP13), so Burmy (Sandy)/(Trash)
+        never mapped to Mothim."""
+        gm = {
+            'pokemon': [
+                {
+                    'speciesId': 'burmy_plant',
+                    'speciesName': 'Burmy (Plant)',
+                    'family': {'id': 'burmy', 'parent': None,
+                               'evolutions': ['wormadam_plant', 'mothim']},
+                },
+                {
+                    'speciesId': 'burmy_sandy',
+                    'speciesName': 'Burmy (Sandy)',
+                    'family': {'id': 'burmy', 'parent': None,
+                               'evolutions': ['wormadam_sandy', 'mothim']},
+                },
+                {
+                    'speciesId': 'wormadam_plant',
+                    'speciesName': 'Wormadam (Plant)',
+                    'family': {'id': 'burmy', 'parent': 'burmy_plant', 'evolutions': []},
+                },
+                {
+                    'speciesId': 'wormadam_sandy',
+                    'speciesName': 'Wormadam (Sandy)',
+                    'family': {'id': 'burmy', 'parent': 'burmy_sandy', 'evolutions': []},
+                },
+                {
+                    'speciesId': 'mothim',
+                    'speciesName': 'Mothim',
+                    'family': {'id': 'burmy', 'parent': 'burmy_plant', 'evolutions': []},
+                },
+            ],
+        }
+        lines = generate_evolution_lines(gm)
+        assert lines['Wormadam (Plant)'] == ['Burmy (Plant)', 'Wormadam (Plant)']
+        assert lines['Wormadam (Sandy)'] == ['Burmy (Sandy)', 'Wormadam (Sandy)']
+        assert set(lines['Mothim'][:-1]) == {'Burmy (Plant)', 'Burmy (Sandy)'}
+        assert lines['Mothim'][-1] == 'Mothim'
+
     def test_empty_gamemaster(self):
         gm = {'pokemon': []}
         lines = generate_evolution_lines(gm)

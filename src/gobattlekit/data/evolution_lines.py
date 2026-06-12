@@ -57,8 +57,20 @@ def generate_evolution_lines(gamemaster):
                 for evo_id in evos:
                     if traverse(evo_id, current_line):
                         any_traversed = True
+                    else:
+                        # An already-visited LEAF evolution still ends this
+                        # path: a final shared by several roots (Burmy →
+                        # Mothim) must map every root, not only the first
+                        # one walked. Non-leaf visited evolutions stay
+                        # blocked — that's the cycle guard.
+                        evo = id_map.get(evo_id)
+                        if (evo_id in visited and evo is not None
+                                and not evo['evolutions']):
+                            evo_name = id_to_name.get(evo_id, evo_id)
+                            lines.append(current_line + [evo_name])
+                            any_traversed = True
                 if not any_traversed:
-                    # All evolutions were visited/missing — treat as leaf
+                    # All evolutions were cyclic/missing — treat as leaf
                     lines.append(current_line)
             return True
 
@@ -69,8 +81,17 @@ def generate_evolution_lines(gamemaster):
     evolution_lines = {}
     for fam_id, members in families.items():
         for line in build_lines(members):
-            if line:
-                final = line[-1]
+            if not line:
+                continue
+            final = line[-1]
+            if final in evolution_lines:
+                # Final reachable along several paths: merge pre-evo
+                # members (first-seen order); the final stays last.
+                existing = evolution_lines[final]
+                merged = existing[:-1] + [m for m in line[:-1]
+                                          if m not in existing]
+                evolution_lines[final] = merged + [final]
+            else:
                 evolution_lines[final] = line
 
     return evolution_lines
