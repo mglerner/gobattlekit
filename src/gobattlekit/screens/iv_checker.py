@@ -549,9 +549,14 @@ class IVCheckerScreen:
             self.status_label_stats.text = self._stats_line()
             self._display_species_list()
         except Exception as e:
+            logger.exception("check_thresholds failed")
             self.status_label_file.text = ""
             self._show_clear_btn(False)
             self.status_label_stats.text = f"Error reading CSV: {e}"
+            # Don't leave the previous check's hits on screen next to an
+            # error claiming the read failed.
+            self.results = {}
+            self._display_species_list()
 
     # ------------------------------------------------------------------
     # Species list view
@@ -872,6 +877,13 @@ class IVCheckerScreen:
                 USER_GENERATED_CSV.unlink()
         except Exception:
             logger.exception("Could not delete cached CSV")
+        # Both IV screens read the same files — invalidate the sibling so it
+        # doesn't keep rendering hits from (or a path to) deleted CSVs.
+        for sibling in (self.app.iv_checker_screen,
+                        self.app.user_iv_checker_screen):
+            if sibling is not self:
+                sibling.csv_path = None
+                sibling.results = {}
         self.status_label_file.text = ""
         self.status_label_stats.text = self.NO_CSV_MESSAGE
         self._show_clear_btn(False)

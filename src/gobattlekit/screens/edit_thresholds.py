@@ -66,8 +66,11 @@ class EditThresholdsScreen:
                 self._species_list_error = None
             except Exception as e:
                 logger.exception("Could not load species list")
-                self._all_species = []
+                # Leave _all_species as None so the next visit RETRIES —
+                # caching [] here turned one transient failure (e.g. first
+                # launch offline) into a permanently empty picker.
                 self._species_list_error = str(e)
+                return []
         return self._all_species
 
     def _set_outer_buttons_enabled(self, enabled):
