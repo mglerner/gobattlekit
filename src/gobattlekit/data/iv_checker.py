@@ -290,6 +290,17 @@ def parse_csv(csv_path):
                     continue
                 if cp <= 0:
                     continue
+                # Gender is '♂' / '♀' / '' (optional column — older
+                # PokeGenie exports may not have it). Needed to match
+                # gender-differentiated species like Oinkologne /
+                # Meowstic / Indeedee (gopvpsim parity).
+                gender_raw = (row.get('Gender') or '').strip()
+                if gender_raw == '♂':
+                    gender = 'male'
+                elif gender_raw == '♀':
+                    gender = 'female'
+                else:
+                    gender = ''
                 mons.append({
                     'name': row['Name'].strip(),
                     'form': row['Form'].strip(),
@@ -300,6 +311,7 @@ def parse_csv(csv_path):
                     'level': float(row['Level Min']),
                     'is_shadow': row['Shadow/Purified'].strip() == '1',
                     'lucky': row['Lucky'].strip() == '1',
+                    'gender': gender,
                 })
             except (KeyError, ValueError):
                 continue
@@ -378,6 +390,20 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=51,
             if league_label not in thresholds[final_species]:
                 continue
             league_targets = thresholds[final_species][league_label]
+
+            # Gender filter for gender-differentiated species (Oinkologne /
+            # Meowstic / Indeedee): an 'X (Female)' target matches only
+            # female mons; a bare 'X' with an 'X (Female)' sibling in the
+            # gamemaster matches only male. Blank gender is permissive
+            # (older exports lack the column). Mirrors gopvpsim.
+            mon_gender = mon.get('gender', '')
+            if mon_gender:
+                if final_species.endswith(' (Female)'):
+                    if mon_gender != 'female':
+                        continue
+                elif f'{final_species} (Female)' in pokemon_index:
+                    if mon_gender != 'male':
+                        continue
 
             base = pokemon_index[final_species]
             stats = ivs_to_stats(

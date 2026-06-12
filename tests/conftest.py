@@ -51,6 +51,20 @@ MINI_GAMEMASTER = {
                 'evolutions': [],
             },
         },
+        # Gender-differentiated pair (Oinkologne-style): the bare name is
+        # the male form; the (Female) sibling has its own stats.
+        {
+            'speciesId': 'oinkologne',
+            'speciesName': 'Oinkologne',
+            'baseStats': {'atk': 105, 'def': 132, 'hp': 225},
+            'family': {'id': 'lechonk', 'parent': 'lechonk', 'evolutions': []},
+        },
+        {
+            'speciesId': 'oinkologne_female',
+            'speciesName': 'Oinkologne (Female)',
+            'baseStats': {'atk': 100, 'def': 137, 'hp': 225},
+            'family': {'id': 'lechonk', 'parent': 'lechonk', 'evolutions': []},
+        },
     ],
     'moves': [
         # Fast moves (energyGain != 0)
