@@ -184,28 +184,14 @@ class GoBattleKit(toga.App):
     def _handle_new_inbox_csv(self, latest):
         """Dispatch a newly arrived inbox CSV based on the user's current screen.
 
-        If the user is on home or either IV checker, jump to the IV checker and
-        reload. Otherwise (mid-quiz, editing thresholds, etc.) just stage the
-        CSV to the cache without touching screen state — next IV navigation
-        will pick it up.
+        Always stage the CSV to the cache and invalidate both IV screens'
+        in-memory state FIRST; then, if the user is on home or either IV
+        checker, navigate so the screen's auto-load picks up the new file
+        (one parse — the old flow navigated first, auto-loading the stale
+        export, then re-parsed the new one). Mid-quiz or editing, just
+        stage — the next IV navigation picks it up.
         """
         from .data.fetcher import SAVED_CSV, CACHE_DIR
-        foreground = self._active_screen in ("home", "iv_checker", "user_iv_checker")
-        if foreground:
-            self.show_iv_checker(skip_intro=True)
-            self.iv_checker_screen.load_csv(str(latest))
-            # The user IV checker isn't built or visible here, so calling
-            # load_csv on it crashes — its widgets don't exist yet. Instead
-            # invalidate its cached path so it re-reads SAVED_CSV the next
-            # time the user navigates to it (same pattern as the staging
-            # branch below). load_csv on iv_checker_screen above already
-            # wrote the new data to SAVED_CSV.
-            self.user_iv_checker_screen.csv_path = None
-            return
-        logger.info(
-            "Inbox CSV arrived while on %s; staging without navigating",
-            self._active_screen,
-        )
         try:
             CACHE_DIR.mkdir(exist_ok=True, parents=True)
             src = pathlib.Path(str(latest))
@@ -214,9 +200,19 @@ class GoBattleKit(toga.App):
         except Exception:
             logger.exception("Could not stage inbox CSV")
             return
-        # Invalidate in-memory state so next navigation re-reads SAVED_CSV.
         self.iv_checker_screen.csv_path = None
         self.user_iv_checker_screen.csv_path = None
+
+        if self._active_screen == "user_iv_checker":
+            # Refresh in place — don't yank the user to the default checker.
+            self.show_user_iv_checker(skip_intro=True)
+        elif self._active_screen in ("home", "iv_checker"):
+            self.show_iv_checker(skip_intro=True)
+        else:
+            logger.info(
+                "Inbox CSV arrived while on %s; staged without navigating",
+                self._active_screen,
+            )
 
     def _show_with_intro(self, feature_key, on_continue):
         """Show intro screen if user hasn't opted out, otherwise go direct."""
