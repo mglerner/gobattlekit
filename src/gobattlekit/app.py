@@ -33,7 +33,7 @@ from .screens.about import AboutScreen
 from .screens.help import HelpScreen
 from .screens.iv_credits import IVCreditsScreen
 
-from .platform import ON_ANDROID, ON_IOS, ON_MOBILE
+from .platform import ON_IOS
 
 import toga
 from toga.style import Pack

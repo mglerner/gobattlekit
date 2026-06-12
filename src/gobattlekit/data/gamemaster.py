@@ -164,12 +164,3 @@ def format_timing_pattern(pattern, num_terms=4):
     terms = [start + i * step for i in range(num_terms)]
     return ", ".join(str(t) for t in terms) + ", ..."
 
-
-def get_fast_moves_for_ranked_mons(rankings_by_league):
-    """Return set of fast move IDs that appear on ranked mons across all leagues."""
-    move_ids = set()
-    for mons in rankings_by_league:
-        for mon in mons:
-            if mon.get('moveset'):
-                move_ids.add(mon['moveset'][0])
-    return move_ids

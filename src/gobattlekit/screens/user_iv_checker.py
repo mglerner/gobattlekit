@@ -13,10 +13,10 @@ from ..data.user_thresholds import load_user_thresholds
 from ..data.iv_checker import check_thresholds
 from ..data.thresholds import EVOLUTION_LINES
 from ..data.fetcher import SAVED_CSV, USER_GENERATED_CSV, get_csv_path, CACHE_DIR
-from ..platform import ON_ANDROID, ON_IOS, ON_MOBILE
+from ..platform import ON_IOS
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_BG,
-    btn_primary, btn_secondary, btn_back, btn_nav, btn_league, btn_icon,
+    btn_primary, btn_secondary, btn_nav, btn_league, btn_icon,
     btn_destructive, btn_destructive_icon, btn_help,
     show_widget, hide_widget
 )

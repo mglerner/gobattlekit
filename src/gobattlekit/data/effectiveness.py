@@ -80,12 +80,3 @@ effectiveness = {
     },
     }
 
-effectiveness_to_emoji = {
-    'double resisted':'🚫',
-    'not very effective':'😐',
-    'neutral':'🆗',
-    'super effective':'💥',
-    }
-emoji_to_effectiveness = {}
-for (k,v) in effectiveness_to_emoji.items():
-    emoji_to_effectiveness[v] = k

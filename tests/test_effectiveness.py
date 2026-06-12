@@ -4,8 +4,6 @@ import pytest
 from gobattlekit.data.effectiveness import (
     effectiveness,
     effectiveness_to_words,
-    effectiveness_to_emoji,
-    emoji_to_effectiveness,
 )
 
 TYPES = [
@@ -97,16 +95,5 @@ class TestEffectivenessLabels:
         for val in VALID_VALUES:
             assert val in effectiveness_to_words
 
-    def test_all_word_values_have_emoji(self):
-        for word in effectiveness_to_words.values():
-            assert word in effectiveness_to_emoji
-
-    def test_emoji_reverse_map(self):
-        for word, emoji in effectiveness_to_emoji.items():
-            assert emoji in emoji_to_effectiveness
-            assert emoji_to_effectiveness[emoji] == word
-
     def test_four_categories(self):
         assert len(effectiveness_to_words) == 4
-        assert len(effectiveness_to_emoji) == 4
-        assert len(emoji_to_effectiveness) == 4
