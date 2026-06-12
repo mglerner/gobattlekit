@@ -55,9 +55,26 @@ class GoBattleKit(toga.App):
 
     def startup(self):
         """Set up the application."""
-        from .data.fetcher import NoDataError
         self._active_screen = None
         self._poll_task = None
+        self._loop_running = False
+        self.on_running = self._on_running
+        self.main_window = toga.MainWindow(title=self.formal_name)
+        self._try_init()
+        self.main_window.show()
+
+    def _on_running(self, app):
+        self._loop_running = True
+        if self._active_screen is not None:
+            self._start_inbox_poll(app)
+
+    def _try_init(self):
+        """Build all screens and show home; on ANY failure show a
+        recoverable error screen.
+
+        Catching only NoDataError here turned every other startup failure
+        (e.g. unexpected data-shape errors) into an unhandled crash loop.
+        """
         try:
             # One-time migration: drop targets written by the (removed)
             # import-path pre-evo propagation — they shadowed the correct
@@ -78,33 +95,47 @@ class GoBattleKit(toga.App):
             self.intro_screen = IntroScreen(self)
             self.help_screen = HelpScreen(self)
             self.iv_credits_screen = IVCreditsScreen(self)
-            self.main_window = toga.MainWindow(title=self.formal_name)
             self.main_window.content = self.home_screen.build()
             self._active_screen = "home"
-            self.main_window.show()
+            if self._loop_running:
+                # Retry after the app was already running — the on_running
+                # hook has fired, start the poll directly.
+                self._start_inbox_poll(self)
+        except Exception as e:
+            logger.exception("Startup failed")
+            self._show_startup_error(e)
 
-            self.on_running = self._start_inbox_poll
-            ## # Auto-load saved CSV if available
-            ## from .data.fetcher import SAVED_CSV
-            ## if SAVED_CSV.exists():
-            ##     self.iv_checker_screen.load_csv(str(SAVED_CSV))
-        except NoDataError as e:
-            self.main_window = toga.MainWindow(title=self.formal_name)
-            error_box = toga.Box(style=Pack(direction=COLUMN, margin=40))
-            error_box.add(toga.Label(
-                "Could not load game data",
-                style=Pack(font_size=24, font_weight="bold",
-                           text_align="center", margin_bottom=20)
-            ))
-            error_box.add(toga.Label(
-                str(e),
-                style=Pack(font_size=16, text_align="center")
-            ))
-            self.main_window.content = error_box
-            self.main_window.show()
+    def _show_startup_error(self, exc):
+        from .data.fetcher import NoDataError
+        from .theme import paragraph_text, btn_primary
+        if isinstance(exc, NoDataError):
+            title = "Could not load game data"
+            body = str(exc)
+        else:
+            title = "Something went wrong"
+            body = (f"GoBattleKit hit an unexpected error while starting "
+                    f"up:\n\n{exc}\n\nTap Try Again — if this keeps "
+                    f"happening, reinstalling the app may help.")
+        error_box = toga.Box(style=Pack(direction=COLUMN, margin=40))
+        error_box.add(toga.Label(
+            title,
+            style=Pack(font_size=24, font_weight="bold",
+                       text_align="center", margin_bottom=20)
+        ))
+        # paragraph_text, not Label: Labels never wrap (DEVELOPER_NOTES)
+        # and these messages are full sentences.
+        error_box.add(paragraph_text(body, font_size=16))
+        error_box.add(toga.Button(
+            "Try Again",
+            on_press=lambda w: self._try_init(),
+            style=btn_primary(height=48, font_size=16, margin_top=20)
+        ))
+        self.main_window.content = error_box
 
     def _start_inbox_poll(self, app):
-        """on_running hook — launch the poll task and hold a reference."""
+        """Launch the poll task (once) and hold a reference."""
+        if self._poll_task is not None:
+            return
         if not ON_IOS:
             # The Documents/Inbox share mechanism is iOS-only; on desktop
             # this loop would watch (and delete CSVs from!) the user's real
