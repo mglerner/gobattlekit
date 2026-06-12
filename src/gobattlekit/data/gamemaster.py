@@ -41,10 +41,21 @@ def get_rankings(league):
     """
     Get top 100 ranked Pokemon for a league, sorted best first.
     league is one of: 'great', 'ultra', 'master'
+
+    Skips malformed entries (non-dict, missing/non-numeric rating) with a
+    logged summary instead of crashing the sort — same schema-drift policy
+    as get_moves.
     """
     rankings = load_rankings(league)
-    rankings.sort(key=lambda x: x['rating'], reverse=True)
-    return rankings[:100]
+    valid = [m for m in rankings
+             if isinstance(m, dict)
+             and isinstance(m.get('rating'), (int, float))
+             and not isinstance(m.get('rating'), bool)]
+    if len(valid) != len(rankings):
+        logger.warning("Skipped %d malformed rankings entries for %s",
+                       len(rankings) - len(valid), league)
+    valid.sort(key=lambda x: x['rating'], reverse=True)
+    return valid[:100]
 
 
 def counters_to_charge(fast_move, charged_move, fastmoves, chargedmoves):
