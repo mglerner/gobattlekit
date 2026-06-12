@@ -201,11 +201,12 @@ class IVCheckerScreen:
 
         self.results_box.add(paragraph_text(steps, font_size=14, margin_bottom=12))
 
-        self.results_box.add(toga.Label(
+        # paragraph_text, not Label — this sentence is wider than a phone
+        # screen and Labels never wrap (DEVELOPER_NOTES).
+        self.results_box.add(paragraph_text(
             "Note: CSV export requires PokeGenie's iVision subscription. "
             "Without iVision, you can enter Pokémon manually instead.",
-            style=Pack(font_size=13, margin_bottom=12,
-                       color=COLOR_TEXT_LIGHT)
+            font_size=13, margin_bottom=12,
         ))
 
         if not ON_IOS:
@@ -247,11 +248,10 @@ class IVCheckerScreen:
         ))
 
         if error:
-            form_box.add(toga.Label(
-                error,
-                style=Pack(font_size=13, text_align="center",
-                           margin_bottom=8, color=COLOR_TEXT_LIGHT)
-            ))
+            # paragraph_text — validation messages run to several lines
+            # ("Could not find a level matching CP ...") and Labels never
+            # wrap.
+            form_box.add(paragraph_text(error, font_size=13, margin_bottom=8))
 
         species_row = toga.Box(style=Pack(direction=ROW, margin_bottom=8))
         species_row.add(toga.Label(
