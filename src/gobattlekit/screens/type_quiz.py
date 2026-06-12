@@ -48,7 +48,6 @@ class TypeQuizScreen:
         self.total = 0
         self.streak = 0
         self.max_streak = 0
-        self.total_questions = 0
         self._load_question()
 
         self.container = toga.Box(style=CONTAINER)
@@ -152,7 +151,6 @@ class TypeQuizScreen:
         if self._question_over:
             return
         self._question_over = True
-        self.total_questions += 1
         self._disable_buttons()
         if chosen == self.right_answer:
             self.score += 1
@@ -196,7 +194,6 @@ class TypeQuizScreen:
             'score': self.score,
             'max_score': self.total,
             'max_streak': self.max_streak,
-            'total_questions': self.total_questions,
             'league': 'type',
         }
         self.app.show_quiz_summary(stats)
