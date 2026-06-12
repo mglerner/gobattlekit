@@ -183,6 +183,16 @@ info."CFBundleDocumentTypes" = [
 info."LSSupportsOpeningDocumentsInPlace" = false
 info."UISupportedInterfaceOrientations" = ["UIInterfaceOrientationPortrait"]
 info."UISupportedInterfaceOrientations~ipad" = ["UIInterfaceOrientationPortrait", "UIInterfaceOrientationPortraitUpsideDown"]
+# App Store submission keys (review AP10). Without the encryption key,
+# every upload asks export-compliance questions interactively.
+info."ITSAppUsesNonExemptEncryption" = false
+info."LSApplicationCategoryType" = "public.app-category.utilities"
+# The app is dark-themed only (design decision 2026-06-12, review #11):
+# force dark so iOS light mode can't render dark text on dark cards.
+info."UIUserInterfaceStyle" = "Dark"
+# Still to verify against real `briefcase create iOS` output in the
+# App Store readiness session: explicit deployment target, build number
+# strategy (currently: bump `version` per upload, per DEVELOPER_NOTES).
 
 [tool.briefcase.app.gobattlekit.android]
 requires = [
