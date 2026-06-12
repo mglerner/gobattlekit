@@ -13,14 +13,23 @@
 > inbox-poll hardening (AP5/AP7/AP8/AP9), shell fixes (AP3+AP4
 > recoverable startup with retry, AP14, AP15, AP17), data robustness
 > (DL7, IV8 lazy rank tables), and build scripts (AP11, AP12). Suite:
-> 184 passed + 1 strict xfail. Still open — ALL gated on a decision or a
-> device: the Eevee P0 (Session 3 design), the §I dead-code register
-> (sign-off), COLOR_BG light mode (#11), the cross-project parity
-> divergences (CP3/CP5/CP7/CP8/CP11/CP13, IV7, IV10 — need a
-> which-side-changes call), AP2/DL4 off-main-thread startup,
-> SI5/SI8-residual/AP13/SQ7 (device/visual verification), and the
-> Session-4 App Store pass. Read the per-finding sections below as the
-> point-in-time Phase-1 snapshot.
+> 184 passed + 1 strict xfail. **Update 2026-06-12 (second pass):** the
+> decision-gated items are also fixed (12 commits, 37241a4..38d5766):
+> Eevee P0 all-finals design (xfail pin flipped), gopvpsim parity for
+> shadow multipliers/dense ranks/CP floor+caps/gender/evo-line shared
+> finals/cp_to_level (CP3/CP5/CP7/CP8/CP11/CP13/IV7/IV10; bundled
+> evolution_lines.json regenerated — Mothim gains all Burmy forms),
+> dead-code sweep per sign-off (SENTIMENTAL kept; bulk_prod and 'lucky'
+> kept as gopvpsim shape-contract), lazy quiz data loads (AP2/DL4's
+> watchdog exposure), and App Store config (AP10 keys, AP13
+> required-reason APIs, #11 force-dark). Suite: 191 passed, 0 xfails.
+> Still open: the Android/device session (SI5 Chaquopy buffer, SI7/SI8
+> visual checks, card_box spacing, full off-main-thread startup
+> verification), Session-4 human tasks (screenshots, metadata, age
+> rating, deployment-target/build-number verification at upload), and
+> the pogo-simulator-side flags (CP4 over-cap, their Burmy gap, their
+> hard numpy dep for the Option-2 migration). Read the per-finding
+> sections below as the point-in-time Phase-1 snapshot.
 
 **Method.** Modeled on the same-day pogo-simulator deep review
 (`../pogo-simulator/docs/reviews/2026-06-11_fable5_deep_codebase_review.md`).
