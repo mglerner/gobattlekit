@@ -133,7 +133,9 @@ class TimingQuizScreen:
                            background_color=answer_color_gradient(total_rows, row_index),
                            color=COLOR_TEXT_LIGHT)
             )
-            self.answer_buttons[i] = btn
+            # Keyed by the pattern VALUE (like quiz.py keys by answer), so
+            # highlight lookup can't desync from button layout.
+            self.answer_buttons[pattern] = btn
             if i % 2 == 0:
                 left_col.add(btn)
             else:
@@ -143,10 +145,10 @@ class TimingQuizScreen:
             "Timing doesn't matter",
             on_press=self._make_answer_handler(None),
             style=Pack(height=48, font_size=13, margin_bottom=4,
-                       background_color=answer_color_gradient(total_rows, total_rows),
+                       background_color=answer_color_gradient(total_rows, total_rows - 1),
                        color=COLOR_TEXT_LIGHT)
         )
-        self.answer_buttons[len(pattern_choices)] = tdm_btn
+        self.answer_buttons[None] = tdm_btn
         self.button_box.add(tdm_btn)
 
     def _make_answer_handler(self, pattern):
@@ -156,12 +158,9 @@ class TimingQuizScreen:
 
     def _highlight_correct_button(self):
         """Highlight the correct answer button in teal."""
-        if self.right_answer is None:
-            # correct answer is "Timing doesn't matter"
-            correct_btn = self.answer_buttons.get(len(self.timing_choices) - 1)
-        else:
-            idx = [p for p in self.timing_choices if p is not None].index(self.right_answer)
-            correct_btn = self.answer_buttons.get(idx)
+        # Buttons are keyed by pattern value (None = "Timing doesn't
+        # matter"), so this is a direct lookup.
+        correct_btn = self.answer_buttons.get(self.right_answer)
         if correct_btn:
             correct_btn.style.background_color = COLOR_ACCENT
 
