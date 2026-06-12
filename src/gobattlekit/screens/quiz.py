@@ -59,7 +59,6 @@ class QuizScreen:
         self.attempts = 0
         self.streak = 0
         self.max_streak = 0
-        self.total_questions = 0
         self.first_charge_correct = 0
         self.first_charge_total = 0
         self.sequence_correct = 0
@@ -228,7 +227,6 @@ class QuizScreen:
         self.attempts += 1
         if chosen == self.right_answer:
             self._question_over = True
-            self.total_questions += 1
             pts = POINTS.get(self.attempts, 1)
             self.score += pts
             self.max_score += 3
@@ -258,7 +256,6 @@ class QuizScreen:
             self.streak = 0
             if self.attempts >= MAX_ATTEMPTS:
                 self._question_over = True
-                self.total_questions += 1
                 self.max_score += 3
                 if self.question_type == QUESTION_TYPE_FIRST:
                     self.first_charge_total += 1
@@ -329,7 +326,6 @@ class QuizScreen:
             'score': self.score,
             'max_score': self.max_score,
             'max_streak': self.max_streak,
-            'total_questions': self.total_questions,
             'league': self.league,
             'first_charge_correct': self.first_charge_correct,
             'first_charge_total': self.first_charge_total,

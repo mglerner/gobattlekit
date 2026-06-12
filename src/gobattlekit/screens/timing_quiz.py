@@ -46,7 +46,6 @@ class TimingQuizScreen:
         self.attempts = 0
         self.streak = 0
         self.max_streak = 0
-        self.total_questions = 0
         self._load_question()
 
         self.container = toga.Box(style=CONTAINER)
@@ -173,7 +172,6 @@ class TimingQuizScreen:
         self.attempts += 1
         if chosen == self.right_answer:
             self._question_over = True
-            self.total_questions += 1
             pts = POINTS.get(self.attempts, 1)
             self.score += pts
             self.total += 3
@@ -184,20 +182,20 @@ class TimingQuizScreen:
                 self.streak = 0
             self.score_label.text = self._score_text()
             self.feedback_label.text = f"✅ Correct! +{pts} point{'s' if pts != 1 else ''}"
+            self._highlight_correct_button()
             self._disable_buttons()
             self._advance_task = asyncio.create_task(self._advance_question())
         else:
             self.streak = 0
             if self.attempts >= MAX_ATTEMPTS:
                 self._question_over = True
-                self.total_questions += 1
                 self.total += 3
                 self.score_label.text = self._score_text()
                 correct_str = format_timing_pattern(self.right_answer)
                 self.feedback_label.text = f"❌ The answer was: {correct_str}."
                 self._highlight_correct_button()
                 self._disable_buttons()
-                self._advance_task = asyncio.create_task(self._advance_question())
+                self._advance_task = asyncio.create_task(self._advance_question(delay=2.5))
             else:
                 remaining = MAX_ATTEMPTS - self.attempts
                 self.feedback_label.text = (
@@ -215,8 +213,8 @@ class TimingQuizScreen:
         for btn in self.answer_buttons.values():
             btn.enabled = False
 
-    async def _advance_question(self):
-        await asyncio.sleep(1.5)
+    async def _advance_question(self, delay=1.5):
+        await asyncio.sleep(delay)
         self._load_question()
         self._set_question_text()
         self.feedback_label.text = ""
@@ -238,7 +236,6 @@ class TimingQuizScreen:
             'score': self.score,
             'max_score': self.total,
             'max_streak': self.max_streak,
-            'total_questions': self.total_questions,
             'league': 'timing',
         }
         self.app.show_quiz_summary(stats)

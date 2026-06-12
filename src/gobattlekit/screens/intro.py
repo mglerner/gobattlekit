@@ -47,7 +47,7 @@ INTROS = {
         [
             ("", "Practice type matchups from Pokémon GO PvP."),
             ("How it works", "You'll be shown an attacking type and a "
-             "defending type (or type pair), and asked whether the attack "
+             "defending type, and asked whether the attack "
              "is super effective, not very effective, neutral, or double "
              "resisted."),
             ("Scoring", "Each question is worth 1 point — you get one "
