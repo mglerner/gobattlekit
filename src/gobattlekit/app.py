@@ -19,10 +19,13 @@ logger = logging.getLogger(__name__)
 # Toga/stdlib code calls setlocale at import/startup time, so we patch it
 # here before any screen imports run. See DEVELOPER_NOTES.md.
 _original_setlocale = locale.setlocale
-def _safe_setlocale(category, loc=None):
+_LocaleError = locale.Error  # bound early: the param below shadows the module
+def _safe_setlocale(category, locale=None):
+    # Keyword name matches the stdlib signature so callers using
+    # setlocale(cat, locale=...) don't get an unexpected-keyword TypeError.
     try:
-        return _original_setlocale(category, loc)
-    except locale.Error:
+        return _original_setlocale(category, locale)
+    except _LocaleError:
         return _original_setlocale(category, "C")
 locale.setlocale = _safe_setlocale
 
