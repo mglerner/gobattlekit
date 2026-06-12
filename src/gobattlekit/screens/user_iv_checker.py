@@ -2,8 +2,10 @@
 """
 User IV checker screen — same as IV checker but uses user-defined thresholds.
 """
-import toga
+import logging
 import pathlib
+
+import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from .iv_checker import IVCheckerScreen
@@ -18,6 +20,8 @@ from ..theme import (
     btn_destructive, btn_destructive_icon, btn_help,
     show_widget, hide_widget
 )
+
+logger = logging.getLogger(__name__)
 
 NO_TARGETS_MESSAGE = "No user IV targets defined. Tap 'Edit My Targets' to add some."
 GETTING_STARTED = (
@@ -226,6 +230,11 @@ class UserIVCheckerScreen(IVCheckerScreen):
             self.status_label_stats.text = self._stats_line()
             self._display_species_list()
         except Exception as e:
+            logger.exception("check_thresholds failed")
             self.status_label_file.text = ""
             self._show_clear_btn(False)
             self.status_label_stats.text = f"Error: {e}"
+            # Don't leave the previous check's hits on screen next to an
+            # error claiming the read failed.
+            self.results = {}
+            self._display_species_list()
