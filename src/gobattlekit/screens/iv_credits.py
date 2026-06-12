@@ -52,6 +52,19 @@ class IVCreditsScreen:
         for species in sorted(DEFAULT_THRESHOLDS.keys()):
             sources = DEFAULT_THRESHOLDS[species].get('sources')
             if not sources:
+                # Pipeline species carry per-target 'source' strings
+                # instead of a species-level credit — collect the
+                # distinct ones so they're credited too.
+                per_target = []
+                for targets in DEFAULT_THRESHOLDS[species].values():
+                    if not isinstance(targets, dict):
+                        continue
+                    for t in targets.values():
+                        src = t.get('source') if isinstance(t, dict) else None
+                        if src and src not in per_target:
+                            per_target.append(src)
+                sources = '; '.join(per_target)
+            if not sources:
                 continue
 
             videos = VIDEO_PATTERN.findall(sources)

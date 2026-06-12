@@ -45,6 +45,7 @@ HELP_CONTENT = {
         ("PokeGenie import", "Export your Pokémon from PokeGenie and share to GoBattleKit on iOS, or use Import on Android. Note: CSV export requires PokeGenie's iVision subscription."),
         ("Manual entry", "No iVision? Tap 'Enter a Pokémon manually' to add Pokémon one at a time. Enter the species, IVs (0-15 each), and CP. GoBattleKit will calculate the level and check against targets. Manually entered Pokémon are saved between sessions."),
         ("Results", "Results show each Pokémon's IVs, CP, and stats. SP (stat product) measures overall PvP performance - higher is better. Rank shows how this IV combination compares to all 4096 possible combinations for that species."),
+        ("Expert vs SIM targets", "Most default targets are hand-tuned by PvP experts. Targets marked SIM come from automated battle-simulation pipelines instead — useful, but less battle-tested. The 'SIM targets' button on the species list shows or hides them; hidden SIM targets are also left out of the hit counts."),
     ],
     "My PvP IV Targets": [
         ("", "Set your own IV targets to check your Pokémon against. For example, add Medicham with a minimum Attack of 105 to find your best Great League Medicham candidates."),

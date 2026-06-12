@@ -32,6 +32,9 @@ class EditThresholdsScreen:
         'def': '0.0',
         'sta': '0',
         'onlytop': '0',
+        'class': '',
+        'source': '',
+        'desc': '',
     }
 
     def __init__(self, app):
@@ -46,6 +49,9 @@ class EditThresholdsScreen:
         self._form_def = self.FORM_DEFAULTS['def']
         self._form_sta = self.FORM_DEFAULTS['sta']
         self._form_onlytop = self.FORM_DEFAULTS['onlytop']
+        self._form_class = self.FORM_DEFAULTS['class']
+        self._form_source = self.FORM_DEFAULTS['source']
+        self._form_desc = self.FORM_DEFAULTS['desc']
         self._editing_original = None
         self._clear_all_pending = False
         self._clear_all_btn = None
@@ -158,6 +164,9 @@ class EditThresholdsScreen:
         self._form_def = self.FORM_DEFAULTS['def']
         self._form_sta = self.FORM_DEFAULTS['sta']
         self._form_onlytop = self.FORM_DEFAULTS['onlytop']
+        self._form_class = self.FORM_DEFAULTS['class']
+        self._form_source = self.FORM_DEFAULTS['source']
+        self._form_desc = self.FORM_DEFAULTS['desc']
         self._editing_original = None
 
         thresholds = load_user_thresholds()
@@ -191,10 +200,14 @@ class EditThresholdsScreen:
                     if t.get('stamina', 0): parts.append(f"{t['stamina']}S")
                     if t.get('onlytop', 0): parts.append(f"top{t['onlytop']}")
                     stat_str = ', '.join(parts) if parts else 'any'
+                    # Quiet provenance marker — only explicitly 'generated'
+                    # entries (e.g. imported SIM pastes) get it, in plain
+                    # text, not the loud SIM badge of the default checker.
+                    sim = " (sim)" if t.get('class') == 'generated' else ""
 
                     row = toga.Box(style=Pack(direction=ROW, margin_bottom=4))
                     row.add(toga.Label(
-                        f"    {name} ({stat_str})",
+                        f"    {name} ({stat_str}){sim}",
                         style=Pack(flex=1, font_size=13, color=COLOR_TEXT_LIGHT)
                     ))
                     row.add(toga.Button(
@@ -235,6 +248,10 @@ class EditThresholdsScreen:
             self._form_def = str(t.get('defense', 0))
             self._form_sta = str(t.get('stamina', 0))
             self._form_onlytop = str(t.get('onlytop', 0))
+            # Provenance metadata duplicates verbatim — no laundering (Q2).
+            self._form_class = t.get('class', '')
+            self._form_source = t.get('source', '')
+            self._form_desc = t.get('desc', '')
             self._show_add_form()
         return handler
 
@@ -271,6 +288,9 @@ class EditThresholdsScreen:
         self._form_def = str(t.get('defense', 0))
         self._form_sta = str(t.get('stamina', 0))
         self._form_onlytop = str(t.get('onlytop', 0))
+        self._form_class = t.get('class', '')
+        self._form_source = t.get('source', '')
+        self._form_desc = t.get('desc', '')
         self._show_add_form()
 
     # ------------------------------------------------------------------
@@ -353,6 +373,16 @@ class EditThresholdsScreen:
 
         self._add_field_row("Only top N:", self._form_onlytop,
                             lambda w: self._show_text_entry("Only top N (0=all)", "onlytop"))
+
+        # Optional provenance metadata — exposed so imported SIM targets
+        # can be inspected, relabeled, or cleared like any other field.
+        self._add_field_row("Class:", self._form_class or "(none)",
+                            lambda w: self._show_text_entry(
+                                "Class (expert, generated, or blank)", "class"))
+        self._add_field_row("Source:", self._form_source or "(none)",
+                            lambda w: self._show_text_entry("Source", "source"))
+        self._add_field_row("Desc:", self._form_desc or "(none)",
+                            lambda w: self._show_text_entry("Description", "desc"))
 
         self.content_box.add(toga.Button(
             "← Cancel",
@@ -517,6 +547,14 @@ class EditThresholdsScreen:
             self.form_error.text = "Invalid stat values — use numbers only."
             return
 
+        cls = (self._form_class or '').strip().lower()
+        if cls and cls not in ('expert', 'generated'):
+            self.form_error.text = ("Class must be 'expert', 'generated', "
+                                    "or blank.")
+            return
+        source = (self._form_source or '').strip()
+        desc = (self._form_desc or '').strip()
+
         league = self._selected_league
 
         if self._editing_original:
@@ -525,7 +563,8 @@ class EditThresholdsScreen:
             # instead of losing it between a delete-save and an add-save.
             ok = replace_threshold(orig_species, orig_league, orig_name,
                                    self._selected_species, league, name,
-                                   attack, defense, stamina, onlytop)
+                                   attack, defense, stamina, onlytop,
+                                   cls=cls, source=source, desc=desc)
             if not ok:
                 self.form_error.text = ("Could not save changes — your "
                                         "original target is unchanged.")
@@ -535,7 +574,8 @@ class EditThresholdsScreen:
             return
 
         add_threshold(self._selected_species, league, name,
-                      attack, defense, stamina, onlytop)
+                      attack, defense, stamina, onlytop,
+                      cls=cls, source=source, desc=desc)
 
         self._show_threshold_list()
 
