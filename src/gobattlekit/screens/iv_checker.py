@@ -10,7 +10,7 @@ from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from ..data.iv_checker import (
     check_thresholds, get_pokemon_index, cp_to_level, append_user_generated,
-    compute_rank_table, ivs_to_stats, LEAGUE_CAPS
+    qualifying_ivs, LEAGUE_CAPS
 )
 from ..data.thresholds import DEFAULT_THRESHOLDS, EVOLUTION_LINES
 from ..data.fetcher import CACHE_DIR, SAVED_CSV, USER_GENERATED_CSV, get_csv_path
@@ -724,38 +724,12 @@ class IVCheckerScreen:
                 max_cp = LEAGUE_CAPS.get(self.league, 1500.99)
                 max_level = 51
 
-                rank_table = compute_rank_table(
-                    species,
-                    base['atk'], base['def'], base['hp'],
-                    max_level=max_level, max_cp=max_cp,
+                # Cached in the data layer — recomputing the ~8k-call scan
+                # on every ◀/▶ cycle froze the UI thread.
+                qualifying = qualifying_ivs(
+                    species, base['atk'], base['def'], base['hp'],
+                    target, max_level=max_level, max_cp=max_cp,
                 )
-
-                qualifying = []
-                for (a, d, s), rank in rank_table.items():
-                    stats = ivs_to_stats(
-                        a, d, s, start_level=1,
-                        base_atk=base['atk'], base_def=base['def'],
-                        base_sta=base['hp'],
-                        max_level=max_level, max_cp=max_cp,
-                    )
-                    if stats is None:
-                        continue
-                    if not (stats['attack'] >= target.get('attack', 0) and
-                            stats['defense'] >= target.get('defense', 0) and
-                            stats['stamina'] >= target.get('stamina', 0)):
-                        continue
-                    if 'ivs' in target and not any(
-                        tuple(iv) == (a, d, s) for iv in target['ivs']
-                    ):
-                        continue
-                    if 'onlytop' in target and rank > target['onlytop']:
-                        continue
-                    qualifying.append((rank, a, d, s, stats))
-
-                # Sort by rank, truncate to top 100.
-                qualifying.sort(key=lambda x: x[0])
-                qualifying = qualifying[:100]
-                # qualifying.sort(key=lambda x: (-x[1], -x[2], -x[3]))  # atk desc, def desc, sta desc
 
                 self.hits_box.add(toga.Label(
                     f"Requires: {req_str}",

@@ -158,14 +158,16 @@ def isolate_app_data(tmp_path):
 
 @pytest.fixture(autouse=True)
 def clear_rank_cache():
-    """_rank_cache is keyed (species, max_level, max_cp) WITHOUT base stats,
-    so a table computed with synthetic stats in one test would poison every
-    later check_thresholds call for the same species — order-dependent
-    failures. Clear it around every test."""
-    from gobattlekit.data.iv_checker import _rank_cache
+    """_rank_cache (and the derived _qualifying_cache) are keyed by species
+    name WITHOUT base stats, so a table computed with synthetic stats in
+    one test would poison every later check for the same species —
+    order-dependent failures. Clear them around every test."""
+    from gobattlekit.data.iv_checker import _rank_cache, _qualifying_cache
     _rank_cache.clear()
+    _qualifying_cache.clear()
     yield
     _rank_cache.clear()
+    _qualifying_cache.clear()
 
 
 @pytest.fixture(autouse=True)

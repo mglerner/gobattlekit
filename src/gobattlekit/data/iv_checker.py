@@ -4,6 +4,7 @@ IV checker — compute battle stats from IVs and check against thresholds.
 Ported from the PoGoIVChecker notebook.
 """
 import csv
+import json
 import logging
 import math
 from .fetcher import load_gamemaster
@@ -181,6 +182,53 @@ def compute_rank_table(species, base_atk, base_def, base_sta,
 
     _rank_cache[cache_key] = rank_table
     return rank_table
+
+
+_qualifying_cache = {}
+
+
+def qualifying_ivs(species, base_atk, base_def, base_sta, target,
+                   max_level, max_cp, top_n=100):
+    """Top-N IV combos satisfying a target spec, sorted by rank ascending.
+
+    Each entry is (rank, atk_iv, def_iv, sta_iv, stats). Cached per
+    (species, level/cp caps, target) — the scan is ~8k ivs_to_stats calls
+    and the IV screens run it synchronously on the UI thread.
+    """
+    key = (species, max_level, max_cp,
+           json.dumps(target, sort_keys=True, default=list))
+    if key in _qualifying_cache:
+        return _qualifying_cache[key]
+
+    rank_table = compute_rank_table(
+        species, base_atk, base_def, base_sta,
+        max_level=max_level, max_cp=max_cp,
+    )
+    qualifying = []
+    for (a, d, s), rank in rank_table.items():
+        stats = ivs_to_stats(
+            a, d, s, start_level=1,
+            base_atk=base_atk, base_def=base_def, base_sta=base_sta,
+            max_level=max_level, max_cp=max_cp,
+        )
+        if stats is None:
+            continue
+        if not (stats['attack'] >= target.get('attack', 0) and
+                stats['defense'] >= target.get('defense', 0) and
+                stats['stamina'] >= target.get('stamina', 0)):
+            continue
+        if 'ivs' in target and not any(
+            tuple(iv) == (a, d, s) for iv in target['ivs']
+        ):
+            continue
+        if 'onlytop' in target and rank > target['onlytop']:
+            continue
+        qualifying.append((rank, a, d, s, stats))
+
+    qualifying.sort(key=lambda x: x[0])
+    result = qualifying[:top_n]
+    _qualifying_cache[key] = result
+    return result
 
 
 def parse_csv(csv_path):
