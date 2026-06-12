@@ -26,20 +26,29 @@ class TimingQuizScreen:
     """Quiz screen for optimal move timing questions."""
 
     def __init__(self, app):
+        # No data loads here — this constructor previously did FOUR
+        # potential network fetches (gamemaster + three leagues' rankings)
+        # on the startup path (AP2/DL4). First build() pays instead.
         self.app = app
-        self.fastmoves, _ = get_moves()
+        self.fastmoves = None
+        self.ranked_fast_move_ids = None
         self._advance_task = None
-        all_mons = []
-        for league in ('great', 'ultra', 'master'):
-            all_mons.extend(get_rankings(league))
-        self.ranked_fast_move_ids = list({
-            mon['moveset'][0]
-            for mon in all_mons
-            if mon.get('moveset')
-        })
+
+    def _ensure_data(self):
+        if self.fastmoves is None:
+            self.fastmoves, _ = get_moves()
+            all_mons = []
+            for league in ('great', 'ultra', 'master'):
+                all_mons.extend(get_rankings(league))
+            self.ranked_fast_move_ids = list({
+                mon['moveset'][0]
+                for mon in all_mons
+                if mon.get('moveset')
+            })
 
     def build(self):
         self._cancel_advance_task()
+        self._ensure_data()
         self.score = 0
         self.total = 0
         self.attempts = 0

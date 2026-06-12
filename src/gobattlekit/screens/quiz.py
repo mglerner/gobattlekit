@@ -29,9 +29,17 @@ class QuizScreen:
     """Quiz screen for move timing questions."""
 
     def __init__(self, app):
+        # No data loads here: screens are constructed during startup(), and
+        # a cold/stale cache would put network fetches on the launch path
+        # (iOS watchdog risk — AP2/DL4). First build() pays instead.
         self.app = app
-        self.fastmoves, self.chargedmoves = get_moves()
+        self.fastmoves = None
+        self.chargedmoves = None
         self._advance_task = None
+
+    def _ensure_data(self):
+        if self.fastmoves is None:
+            self.fastmoves, self.chargedmoves = get_moves()
 
     def _quizzable(self, m):
         """Only mons whose moveset can produce an answerable question:
@@ -51,6 +59,7 @@ class QuizScreen:
 
     def build(self, league):
         self._cancel_advance_task()
+        self._ensure_data()
         self.league = league
         self.mons = [m for m in get_rankings(league) if self._quizzable(m)]
         self.score = 0
