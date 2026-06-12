@@ -46,8 +46,14 @@ for final, expected in sorted(hand_curated.items()):
         print(f'  got:      {got}')
 
 print()
-if all_pass:
-    print("All spot checks passed!")
+if not all_pass:
+    # Don't overwrite the bundled JSON with output that fails its own
+    # checks — the source is this dev machine's (possibly stale) cache.
+    print("Spot checks FAILED — not writing. Refresh "
+          "~/Documents/gobattlekit_cache/gamemaster.json (run the app) "
+          "or fix the generator, then re-run.")
+    sys.exit(1)
+print("All spot checks passed!")
 
 output_path = Path('src/gobattlekit/data/evolution_lines.json')
 output_path.write_text(json.dumps(evolution_lines, indent=2))
