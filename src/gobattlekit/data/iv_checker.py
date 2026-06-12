@@ -303,90 +303,94 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
     max_cp = LEAGUE_CAPS.get(league, 1500.99)
     results = {}
 
-    pre_evo_to_final = {}
+    # Multi-valued: a branched pre-evo (Eevee, Tyrogue, Wurmple, ...)
+    # belongs to EVERY line that contains it. The old single-valued map
+    # collapsed it to the last-iterated final (P0 #1, CODE_REVIEW.md).
+    pre_evo_to_finals = {}
     if evolution_lines:
         for final, line in evolution_lines.items():
             for member in line:
-                pre_evo_to_final[member] = final
+                if member != final:
+                    pre_evo_to_finals.setdefault(member, []).append(final)
 
     rank_tables = {}
+    league_label = league.capitalize()
 
     for mon in mons:
         csv_species = get_species_name(mon['name'], mon['form'], mon['is_shadow'])
 
+        # A species with its own targets is checked as itself (direct hit
+        # keeps priority — same rule as gopvpsim); otherwise check the row
+        # against every final form that has targets.
         if csv_species in thresholds:
-            final_species = csv_species
-        elif csv_species in pre_evo_to_final:
-            final_species = pre_evo_to_final[csv_species]
+            candidates = [csv_species]
         else:
-            continue
+            candidates = [f for f in pre_evo_to_finals.get(csv_species, [])
+                          if f in thresholds]
 
-        if final_species not in pokemon_index:
-            continue
-        if final_species not in thresholds:
-            continue
-
-        league_label = league.capitalize()
-        if league_label not in thresholds[final_species]:
-            continue
-        league_targets = thresholds[final_species][league_label]
-
-        base = pokemon_index[final_species]
-        stats = ivs_to_stats(
-            mon['atk_iv'], mon['def_iv'], mon['sta_iv'], mon['level'],
-            base_atk=base['atk'], base_def=base['def'], base_sta=base['hp'],
-            max_level=max_level, max_cp=max_cp,
-        )
-        if stats is None:
-            continue
-
-        iv_tuple = (mon['atk_iv'], mon['def_iv'], mon['sta_iv'])
-
-        # The 4096-combo rank table is expensive — build it only when a
-        # target in this species/league actually gates on 'onlytop'.
-        if any(isinstance(t, dict) and 'onlytop' in t
-               for t in league_targets.values()):
-            rank_key = (final_species, max_level, max_cp)
-            if rank_key not in rank_tables:
-                rank_tables[rank_key] = compute_rank_table(
-                    final_species,
-                    base['atk'], base['def'], base['hp'],
-                    max_level=max_level, max_cp=max_cp,
-                )
-            stats['rank'] = rank_tables[rank_key].get(iv_tuple, 4096)
-
-        matched = []
-        for target_name, target in league_targets.items():
-            try:
-                if not (stats['attack'] >= target.get('attack', 0) and
-                        stats['defense'] >= target.get('defense', 0) and
-                        stats['stamina'] >= target.get('stamina', 0)):
-                    continue
-                if 'ivs' in target:
-                    if not any(tuple(iv) == iv_tuple for iv in target['ivs']):
-                        continue
-                if 'onlytop' in target:
-                    if stats['rank'] > target['onlytop']:
-                        continue
-            except TypeError:
-                # One malformed target (e.g. a string-valued floor from a
-                # hand-edited file) must not break the whole check.
-                logger.warning("Skipping malformed target %s/%s/%s",
-                               final_species, league_label, target_name)
+        for final_species in candidates:
+            if final_species not in pokemon_index:
                 continue
-            matched.append(target_name)
+            if league_label not in thresholds[final_species]:
+                continue
+            league_targets = thresholds[final_species][league_label]
 
-        if matched:
-            if final_species not in results:
-                results[final_species] = []
-            results[final_species].append({
-                'mon': mon,
-                'csv_species': csv_species,
-                'final_species': final_species,
-                'is_pre_evo': csv_species != final_species,
-                'stats': stats,
-                'matched': matched,
-            })
+            base = pokemon_index[final_species]
+            stats = ivs_to_stats(
+                mon['atk_iv'], mon['def_iv'], mon['sta_iv'], mon['level'],
+                base_atk=base['atk'], base_def=base['def'], base_sta=base['hp'],
+                max_level=max_level, max_cp=max_cp,
+            )
+            if stats is None:
+                continue
+
+            iv_tuple = (mon['atk_iv'], mon['def_iv'], mon['sta_iv'])
+
+            # The 4096-combo rank table is expensive — build it only when a
+            # target in this species/league actually gates on 'onlytop'.
+            if any(isinstance(t, dict) and 'onlytop' in t
+                   for t in league_targets.values()):
+                rank_key = (final_species, max_level, max_cp)
+                if rank_key not in rank_tables:
+                    rank_tables[rank_key] = compute_rank_table(
+                        final_species,
+                        base['atk'], base['def'], base['hp'],
+                        max_level=max_level, max_cp=max_cp,
+                    )
+                stats['rank'] = rank_tables[rank_key].get(iv_tuple, 4096)
+
+            matched = []
+            for target_name, target in league_targets.items():
+                try:
+                    if not (stats['attack'] >= target.get('attack', 0) and
+                            stats['defense'] >= target.get('defense', 0) and
+                            stats['stamina'] >= target.get('stamina', 0)):
+                        continue
+                    if 'ivs' in target:
+                        if not any(tuple(iv) == iv_tuple for iv in target['ivs']):
+                            continue
+                    if 'onlytop' in target:
+                        if stats['rank'] > target['onlytop']:
+                            continue
+                except TypeError:
+                    # One malformed target (e.g. a string-valued floor from
+                    # a hand-edited file) must not break the whole check.
+                    logger.warning("Skipping malformed target %s/%s/%s",
+                                   final_species, league_label, target_name)
+                    continue
+                matched.append(target_name)
+
+            if matched:
+                if final_species not in results:
+                    results[final_species] = []
+                results[final_species].append({
+                    'mon': mon,
+                    'csv_species': csv_species,
+                    'final_species': final_species,
+                    'is_pre_evo': csv_species != final_species,
+                    'stats': stats,
+                    'matched': matched,
+                })
 
     if include_empty:
         league_label = league.capitalize()
