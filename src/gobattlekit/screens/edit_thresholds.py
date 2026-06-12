@@ -17,7 +17,7 @@ from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
     btn_primary, btn_secondary, btn_back, btn_nav, btn_league,
     btn_destructive, btn_icon, btn_destructive_icon, card_box,
-    btn_help, show_widget, hide_widget
+    btn_help, show_widget, hide_widget, paragraph_text
 )
 
 logger = logging.getLogger(__name__)
@@ -474,9 +474,11 @@ class EditThresholdsScreen:
         for child in list(self.species_list_box.children):
             self.species_list_box.remove(child)
         if not self._all_species and self._species_list_error:
-            self.species_list_box.add(toga.Label(
+            # paragraph_text — exception text is arbitrary-length and
+            # Labels never wrap.
+            self.species_list_box.add(paragraph_text(
                 f"Could not load species list: {self._species_list_error}",
-                style=Pack(font_size=13, color=COLOR_YELLOW, margin=8)
+                font_size=13,
             ))
             return
         for species in self._filtered_species[:50]:
