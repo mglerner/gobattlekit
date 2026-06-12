@@ -217,7 +217,10 @@ def compute_rank_table(species, base_atk, base_def, base_sta,
                 raw_product = stats['attack'] * stats['defense'] * stats['stamina']
                 combos.append((raw_product, a + d + s, a, d, s))
 
-    combos.sort(reverse=True)
+    # Sort key deliberately excludes the IVs: on exact (product, ivsum)
+    # ties, stable sort preserves the ascending a/d/s generation order,
+    # matching gopvpsim's tie-break (pinned by tests/test_parity_vectors.py).
+    combos.sort(key=lambda c: (c[0], c[1]), reverse=True)
 
     rank_table = {}
     for i, (_sp, _ivsum, a, d, s) in enumerate(combos):
