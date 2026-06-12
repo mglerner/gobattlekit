@@ -15,7 +15,7 @@ from ..data.user_thresholds import (
 from ..data.iv_checker import get_pokemon_index
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
-    btn_primary, btn_secondary, btn_back, btn_nav, btn_league,
+    btn_primary, btn_secondary, btn_nav, btn_league,
     btn_destructive, btn_icon, btn_destructive_icon, card_box,
     btn_help, show_widget, hide_widget, paragraph_text
 )

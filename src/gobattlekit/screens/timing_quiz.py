@@ -14,7 +14,6 @@ from ..data.gamemaster import (
 from ..platform import ON_ANDROID
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
-    COLOR_SECONDARY_BTN,
     answer_color_gradient,
     btn_nav
 )

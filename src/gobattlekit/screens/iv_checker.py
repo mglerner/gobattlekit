@@ -14,10 +14,10 @@ from ..data.iv_checker import (
 )
 from ..data.thresholds import DEFAULT_THRESHOLDS, EVOLUTION_LINES
 from ..data.fetcher import CACHE_DIR, SAVED_CSV, USER_GENERATED_CSV, get_csv_path
-from ..platform import ON_ANDROID, ON_IOS, ON_MOBILE
+from ..platform import ON_ANDROID, ON_IOS
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW, COLOR_BG,
-    btn_primary, btn_secondary, btn_back, btn_league, btn_icon, card_box,
+    btn_primary, btn_secondary, btn_league, btn_icon, card_box,
     btn_nav, btn_destructive, btn_destructive_icon, btn_help,
     show_widget, hide_widget, paragraph_text,
 )

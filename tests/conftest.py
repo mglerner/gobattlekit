@@ -133,12 +133,6 @@ MINI_GAMEMASTER = {
 }
 
 
-@pytest.fixture
-def mini_gamemaster():
-    """A minimal gamemaster dict for testing without network."""
-    return MINI_GAMEMASTER
-
-
 @pytest.fixture(autouse=True)
 def isolate_app_data(tmp_path):
     """Tripwire: no test may touch the real app cache or the network.

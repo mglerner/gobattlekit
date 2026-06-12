@@ -30,8 +30,6 @@ combined with 'ivs' — in that case all conditions must be satisfied
 (e.g. "in this IV list AND defense >= 138").
 """
 
-import json
-from pathlib import Path
 from .evolution_lines import load_evolution_lines
 
 EVOLUTION_LINES = load_evolution_lines()

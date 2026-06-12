@@ -10,10 +10,8 @@ from toga.style.pack import COLUMN, ROW
 # ------------------------------------------------------------------
 # Colors
 # ------------------------------------------------------------------
-COLOR_PRIMARY = "#1a3a5c"       # dark navy — background, primary text
 COLOR_BG = "#000000"            # black background .. maybe a bad idea for light mode
 COLOR_ACCENT = "#00BCD4"        # teal — primary action buttons
-COLOR_ACCENT_DARK = "#0097A7"   # darker teal — pressed/secondary accent
 COLOR_YELLOW = "#FFCC00"        # yellow — highlights, scores
 COLOR_TEXT_LIGHT = "#FFFFFF"    # white text on dark backgrounds
 COLOR_TEXT_DARK = "#1a3a5c"     # dark text on light/teal backgrounds
@@ -100,15 +98,6 @@ def btn_league(margin=4, height=40):
         color=COLOR_TEXT_LIGHT,
     )
 
-def btn_back(height=44, margin_bottom=8):
-    """Back/navigation button."""
-    return Pack(
-        height=height,
-        margin_bottom=margin_bottom,
-        background_color=COLOR_SECONDARY_BTN,
-        color=COLOR_TEXT_LIGHT,
-    )
-
 def btn_icon(width=44, height=36):
     """Small icon button (✕, ✎, ⧉, 📤, →)."""
     return Pack(
@@ -130,17 +119,6 @@ def btn_nav(height=44, font_size=14, margin_bottom=0, margin_top=0):
         color=COLOR_TEXT_LIGHT,
     )
 
-
-def btn_quiz_answer(height=44, font_size=14):
-    """Quiz answer button — full width within its row."""
-    return Pack(
-        flex=1,
-        margin=2,
-        height=height,
-        font_size=font_size,
-        background_color=COLOR_SECONDARY_BTN,
-        color=COLOR_TEXT_LIGHT,
-    )
 
 def btn_help(height=44, font_size=14, margin_bottom=8,flex=0,
                  margin_left=0, margin_right=0,):
@@ -167,30 +145,6 @@ def btn_ultra(height=50, font_size=16, margin_bottom=8):
 def btn_master(height=50, font_size=16, margin_bottom=8):
     return Pack(height=height, font_size=font_size, margin_bottom=margin_bottom,
                 background_color=COLOR_MASTER, color=COLOR_TEXT_LIGHT)
-
-# ------------------------------------------------------------------
-# Label styles
-# ------------------------------------------------------------------
-
-LABEL_TITLE = Pack(
-    font_size=24,
-    font_weight="bold",
-    text_align="center",
-    margin_bottom=10,
-)
-
-LABEL_SECTION = Pack(
-    font_size=22,
-    font_weight="bold",
-    text_align="center",
-    margin_bottom=8,
-)
-
-LABEL_BODY = Pack(font_size=14)
-
-LABEL_SMALL = Pack(font_size=12)
-
-LABEL_STATUS = Pack(font_size=13, text_align="center", margin_bottom=2)
 
 def label_section(margin_top=8, margin_bottom=8):
     """Section header label style."""

@@ -11,7 +11,7 @@ from ..data.preferences import get_pref, set_pref
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW, COLOR_BG,
     COLOR_SECONDARY_BTN, COLOR_NAV,
-    btn_primary, btn_secondary, btn_back, btn_nav, card_box, paragraph_text,
+    btn_primary, btn_secondary, btn_nav, card_box, paragraph_text,
 )
 
 INTRO_PREF_KEYS = [

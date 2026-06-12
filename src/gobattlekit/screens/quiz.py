@@ -8,11 +8,10 @@ import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from ..data.gamemaster import get_moves, get_rankings, counters_to_charge, charge_sequence
-from ..platform import ON_ANDROID, ON_IOS
+from ..platform import ON_ANDROID
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
-    COLOR_SECONDARY_BTN, btn_primary, btn_secondary, btn_nav,
-    btn_quiz_answer, answer_color_gradient
+    btn_nav, answer_color_gradient
 )
 
 MAX_ATTEMPTS = 3
