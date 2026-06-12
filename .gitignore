@@ -21,3 +21,7 @@ __pycache__/
 # macOS
 .DS_Store
 src/*.dist-info/
+
+# Claude Code session-local files
+.claude/settings.local.json
+.claude/pipeline_status.txt

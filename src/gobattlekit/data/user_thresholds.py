@@ -57,8 +57,15 @@ VALID_LEAGUES = ('Great', 'Ultra', 'Master')
 
 # The complete target-spec vocabulary shared with check_thresholds — and
 # with pogo-simulator's "Copy for IV scanner" export (its commit b97113f),
-# which emits exactly this schema.
-_SPEC_KEYS = {'attack', 'defense', 'stamina', 'ivs', 'onlytop'}
+# which emits exactly this schema. 'class'/'source'/'desc' are optional
+# provenance metadata (see data/thresholds.py); the match engine ignores
+# them.
+_SPEC_KEYS = {'attack', 'defense', 'stamina', 'ivs', 'onlytop',
+              'class', 'source', 'desc'}
+
+# Classes a spec may declare. Mirrors thresholds.TARGET_CLASSES (kept
+# literal here so the storage layer doesn't import the defaults module).
+_VALID_CLASSES = ('expert', 'generated')
 
 
 def _validate_spec(spec, where):
@@ -93,6 +100,20 @@ def _validate_spec(spec, where):
                 f"{where}: 'ivs' must be a list of [atk, def, sta] triples (0-15)."
             )
         out['ivs'] = [list(t) for t in ivs]
+    cls = spec.get('class')
+    if cls is not None:
+        if cls not in _VALID_CLASSES:
+            raise ValueError(
+                f"{where}: 'class' must be one of {', '.join(_VALID_CLASSES)}."
+            )
+        out['class'] = cls
+    for k in ('source', 'desc'):
+        v = spec.get(k)
+        if v is not None:
+            if not isinstance(v, str):
+                raise ValueError(f"{where}: '{k}' must be a string.")
+            if v.strip():
+                out[k] = v
     return out
 
 
@@ -149,6 +170,11 @@ def format_threshold_text(species, league, name, t):
         # Optional line; older app versions ignore unknown lines, so they
         # import such a share as floors-only (the pre-ivs behavior).
         lines.append(f"Ivs: {json.dumps(t['ivs'])}")
+    # Optional provenance lines — same forward-compat story as Ivs.
+    if t.get('class'):
+        lines.append(f"Class: {t['class']}")
+    if t.get('source'):
+        lines.append(f"Source: {t['source']}")
     return "\n".join(lines)
 
 
@@ -200,6 +226,13 @@ def parse_threshold_text(text):
             spec['ivs'] = json.loads(data['Ivs'])
         except json.JSONDecodeError:
             raise ValueError("Invalid Ivs list.")
+    # Imported pastes keep their declared class verbatim — no laundering
+    # on import. A paste with no Class line stores no class (implicitly
+    # the user's own).
+    if data.get('Class'):
+        spec['class'] = data['Class']
+    if data.get('Source'):
+        spec['source'] = data['Source']
     return species, league_label, name, _validate_spec(spec, name)
 
 
@@ -216,8 +249,12 @@ def import_threshold_entries(entries):
 
 
 def add_threshold(species, league, name, attack, defense, stamina, onlytop=0,
-                  ivs=None):
-    """Add a threshold entry for a species/league. Saves immediately."""
+                  ivs=None, cls=None, source=None, desc=None):
+    """Add a threshold entry for a species/league. Saves immediately.
+
+    cls/source/desc are the optional provenance metadata ('cls' because
+    'class' is reserved); falsy values store nothing.
+    """
     thresholds = load_user_thresholds()
     if species not in thresholds:
         thresholds[species] = {}
@@ -229,6 +266,12 @@ def add_threshold(species, league, name, attack, defense, stamina, onlytop=0,
         entry['onlytop'] = onlytop
     if ivs:
         entry['ivs'] = [list(t) for t in ivs]
+    if cls:
+        entry['class'] = cls
+    if source:
+        entry['source'] = source
+    if desc:
+        entry['desc'] = desc
     thresholds[species][league_label][name] = entry
     save_user_thresholds(thresholds)
     return thresholds
@@ -236,10 +279,14 @@ def add_threshold(species, league, name, attack, defense, stamina, onlytop=0,
 
 def replace_threshold(orig_species, orig_league, orig_name,
                       species, league, name, attack, defense, stamina,
-                      onlytop=0):
+                      onlytop=0, cls=None, source=None, desc=None):
     """Replace one threshold entry with another as a SINGLE load-modify-save
     transaction. The previous delete-then-add sequence saved twice; a failure
     of the second save lost the original entry with no trace (SI10).
+
+    cls/source/desc come from the edit form (which prefills them from the
+    original entry), so the metadata survives an edit unless the user
+    deliberately clears it.
 
     Returns True if the save succeeded; on False, the on-disk file is
     untouched.
@@ -263,6 +310,12 @@ def replace_threshold(orig_species, orig_league, orig_name,
         # so editing the floors doesn't silently turn an explicit-IV target
         # into match-everything floors (IV2).
         entry['ivs'] = orig_entry['ivs']
+    if cls:
+        entry['class'] = cls
+    if source:
+        entry['source'] = source
+    if desc:
+        entry['desc'] = desc
     league_label = league.capitalize()
     thresholds.setdefault(species, {}).setdefault(league_label, {})[name] = entry
     return save_user_thresholds(thresholds)

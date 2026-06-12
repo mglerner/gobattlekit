@@ -28,11 +28,80 @@ When 'ivs' is present, a mon must match one of the listed IV triples.
 Stat-floor keys ('attack'/'defense'/'stamina') and 'onlytop' may also be
 combined with 'ivs' — in that case all conditions must be satisfied
 (e.g. "in this IV list AND defense >= 138").
+
+A target may also carry optional provenance metadata, sibling to the
+stat keys:
+
+    'Target Name': {
+        'class': 'expert',   # or 'generated' — hand-curated vs
+                             # pipeline-generated ("SIM") numbers
+        'source': 'where the numbers came from',
+        'desc': 'one-line description of what the target beats',
+    }
+
+check_thresholds and qualifying_ivs ignore these keys; the IV screens
+use them to label, order, and optionally hide generated targets. See
+target_class() for how a missing/invalid 'class' resolves.
 """
 
 from .evolution_lines import load_evolution_lines
 
 EVOLUTION_LINES = load_evolution_lines()
+
+# The provenance classes a target may declare via its 'class' key.
+TARGET_CLASSES = ('expert', 'generated')
+
+
+def target_class(spec, store='default'):
+    """Resolve a target spec's provenance class.
+
+    An explicit valid 'class' on the spec wins. Otherwise the class
+    follows the store the spec came from: DEFAULT_THRESHOLDS entries
+    (store='default') are hand-curated, so 'expert'; user-store entries
+    (store='user') are the user's own, so 'user'.
+    """
+    cls = spec.get('class') if isinstance(spec, dict) else None
+    if cls in TARGET_CLASSES:
+        return cls
+    return 'expert' if store == 'default' else 'user'
+
+
+def drop_generated_targets(thresholds, store='default'):
+    """Return a filtered copy with class=='generated' targets removed.
+
+    Leagues emptied by the filter are dropped, and species left with no
+    league at all are dropped too (species-level metadata like 'sources'
+    rides along while any league survives), so display and matching
+    always agree on what exists.
+    """
+    filtered = {}
+    for species, leagues in thresholds.items():
+        kept_leagues = {}
+        for league, targets in leagues.items():
+            if not isinstance(targets, dict):
+                # Species-level metadata (e.g. 'sources'), not a league.
+                kept_leagues[league] = targets
+                continue
+            kept = {name: t for name, t in targets.items()
+                    if target_class(t, store) != 'generated'}
+            if kept:
+                kept_leagues[league] = kept
+        if any(isinstance(v, dict) for v in kept_leagues.values()):
+            filtered[species] = kept_leagues
+    return filtered
+
+
+def has_generated_targets(thresholds, store='default'):
+    """True when any target in the store resolves to class 'generated'."""
+    for leagues in thresholds.values():
+        for targets in leagues.values():
+            if not isinstance(targets, dict):
+                continue
+            for t in targets.values():
+                if (isinstance(t, dict)
+                        and target_class(t, store) == 'generated'):
+                    return True
+    return False
 
 # TO ADD
 # * inadequance chilling water florges
