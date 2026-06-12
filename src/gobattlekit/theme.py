@@ -10,7 +10,12 @@ from toga.style.pack import COLUMN, ROW
 # ------------------------------------------------------------------
 # Colors
 # ------------------------------------------------------------------
-COLOR_BG = "#000000"            # black background .. maybe a bad idea for light mode
+# The app is dark-themed ONLY (design decision 2026-06-12, review #11):
+# iOS is pinned dark via UIUserInterfaceStyle in pyproject.toml, so the
+# system can never render light-mode chrome around these colors. If
+# adaptive theming is ever wanted, every constant here needs a light
+# variant plus device verification in both modes — its own session.
+COLOR_BG = "#000000"            # black background
 COLOR_ACCENT = "#00BCD4"        # teal — primary action buttons
 COLOR_YELLOW = "#FFCC00"        # yellow — highlights, scores
 COLOR_TEXT_LIGHT = "#FFFFFF"    # white text on dark backgrounds

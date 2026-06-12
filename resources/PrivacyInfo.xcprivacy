@@ -8,8 +8,41 @@
     <array/>
     <key>NSPrivacyCollectedDataTypes</key>
     <array/>
+    <!-- Required-reason API declarations (review AP13). CPython itself
+         exercises these on every run; the declared reasons are the
+         within-app-container variants:
+         - FileTimestamp C617.1: os.stat on files inside the app container
+           (cache freshness checks, CSV handling, importlib).
+         - SystemBootTime 35F9.1: time.monotonic via mach_absolute_time
+           (asyncio's event loop clock).
+         - UserDefaults CA92.1: NSUserDefaults reads/writes by the app /
+           toga only, no shared defaults. -->
     <key>NSPrivacyAccessedAPITypes</key>
-    <array/>
+    <array>
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>C617.1</string>
+            </array>
+        </dict>
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>35F9.1</string>
+            </array>
+        </dict>
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>CA92.1</string>
+            </array>
+        </dict>
+    </array>
 </dict>
 </plist>
-
