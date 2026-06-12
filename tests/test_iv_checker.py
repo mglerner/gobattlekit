@@ -544,17 +544,11 @@ class TestCheckThresholds:
         assert 'Azumarill' in results
         assert 'Registeel' in results
 
-    @pytest.mark.xfail(
-        reason="P0 CODE_REVIEW.md #1: pre_evo_to_final is single-valued, so a "
-               "branched pre-evo (Eevee, Tyrogue, ...) maps to only the "
-               "last-iterated final. Flip this to a plain test when the "
-               "Session-3 design lands.",
-        strict=True,
-    )
     def test_branched_pre_evo_matches_all_finals(self, tmp_path):
         """A pre-evo whose line branches (modeled here as Marill evolving into
         both Azumarill and Registeel, standing in for Eevee's 8 lines) must be
-        checked against EVERY final form that has thresholds."""
+        checked against EVERY final form that has thresholds. (Was the P0
+        strict-xfail pin; fixed per the all-finals design decision.)"""
         path = self._write_csv(tmp_path, 'Marill,,200,8,15,15,20,0,0\n')
         thresholds = {
             'Azumarill': {
@@ -572,3 +566,26 @@ class TestCheckThresholds:
                                    evolution_lines=evo_lines)
         assert 'Azumarill' in results
         assert 'Registeel' in results
+        # Same CSV row, evaluated with each final's own base stats.
+        assert results['Azumarill'][0]['is_pre_evo'] is True
+        assert results['Registeel'][0]['is_pre_evo'] is True
+        assert (results['Azumarill'][0]['stats']['attack']
+                != results['Registeel'][0]['stats']['attack'])
+
+    def test_direct_threshold_hit_keeps_priority_over_evo_walk(self, tmp_path):
+        """If the pre-evo species has its own targets, it is checked as
+        itself only — matching gopvpsim's rule."""
+        path = self._write_csv(tmp_path, 'Marill,,200,8,15,15,20,0,0\n')
+        thresholds = {
+            'Marill': {
+                'Great': {'Own': {'attack': 0, 'defense': 0, 'stamina': 0}},
+            },
+            'Azumarill': {
+                'Great': {'Bulky': {'attack': 0, 'defense': 0, 'stamina': 0}},
+            },
+        }
+        evo_lines = {'Azumarill': ['Marill', 'Azumarill']}
+        results = check_thresholds(path, thresholds, league='great', max_level=40,
+                                   evolution_lines=evo_lines)
+        assert 'Marill' in results
+        assert 'Azumarill' not in results
