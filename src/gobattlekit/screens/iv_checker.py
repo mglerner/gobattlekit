@@ -12,7 +12,11 @@ from ..data.iv_checker import (
     check_thresholds, get_pokemon_index, cp_to_level, append_user_generated,
     qualifying_ivs, LEAGUE_CAPS
 )
-from ..data.thresholds import DEFAULT_THRESHOLDS, EVOLUTION_LINES
+from ..data.thresholds import (
+    DEFAULT_THRESHOLDS, EVOLUTION_LINES, target_class,
+    drop_generated_targets, has_generated_targets,
+)
+from ..data.preferences import get_pref, set_pref
 from ..data.fetcher import CACHE_DIR, SAVED_CSV, USER_GENERATED_CSV, get_csv_path
 from ..platform import ON_ANDROID, ON_IOS
 from ..theme import (
@@ -30,6 +34,10 @@ class IVCheckerScreen:
 
     NO_CSV_MESSAGE = "No Pokémon data loaded."
 
+    # Which store _get_thresholds_raw reads — drives target_class
+    # resolution for specs with no explicit 'class' (data/thresholds.py).
+    THRESHOLD_STORE = 'default'
+
     def __init__(self, app):
         self.app = app
         self.csv_path = None
@@ -42,8 +50,30 @@ class IVCheckerScreen:
         self._manual_cp = ''
         self._clear_csv_pending = False
 
-    def _get_thresholds(self):
+    def _get_thresholds_raw(self):
         return DEFAULT_THRESHOLDS
+
+    def _get_thresholds(self):
+        """Single enforcement chokepoint for the SIM-targets toggle.
+
+        Both display and matching read thresholds through here, so when
+        generated targets are hidden they are excluded from MATCHING too
+        and the hit counts always agree with what's on screen.
+        """
+        thresholds = self._get_thresholds_raw()
+        if get_pref("show_generated_targets", True):
+            return thresholds
+        return drop_generated_targets(thresholds, self.THRESHOLD_STORE)
+
+    def _toggle_generated_targets(self, widget):
+        set_pref("show_generated_targets",
+                 not get_pref("show_generated_targets", True))
+        # Same refresh as the league buttons: matching must rerun so the
+        # counts agree with the new filter.
+        if self.csv_path:
+            self._run_check()
+        else:
+            self._display_species_list()
 
     def build(self):
         self._clear_csv_pending = False
@@ -576,6 +606,20 @@ class IVCheckerScreen:
             if league_label in thresholds.get(s, {})
         ])
 
+        # SIM-targets toggle — rendered only when the RAW store actually
+        # contains generated targets, so the UI stays unchanged until
+        # pipeline data ships (and stays reachable while they're hidden).
+        if has_generated_targets(self._get_thresholds_raw(),
+                                 self.THRESHOLD_STORE):
+            shown = get_pref("show_generated_targets", True)
+            sim_style = btn_secondary(height=44, font_size=14)
+            sim_style.color = COLOR_YELLOW
+            self.results_box.add(toga.Button(
+                f"SIM targets: {'shown' if shown else 'hidden'}",
+                on_press=self._toggle_generated_targets,
+                style=sim_style
+            ))
+
         if not all_target_species:
             self.results_box.add(toga.Label(
                 "No targets defined for this league.",
@@ -607,8 +651,16 @@ class IVCheckerScreen:
 
         for species in all_target_species:
             hits = self.results.get(species, [])
+            league_targets = thresholds[species][league_label]
+            # A species whose targets for this league are ALL generated is
+            # visibly SIM at the list level too.
+            all_sim = league_targets and all(
+                target_class(t, self.THRESHOLD_STORE) == 'generated'
+                for t in league_targets.values()
+            )
+            suffix = " [SIM]" if all_sim else ""
             self.results_box.add(toga.Button(
-                f"{species} ({len(hits)})",
+                f"{species} ({len(hits)}){suffix}",
                 on_press=self._make_species_handler(species),
                 style=btn_secondary(height=48, font_size=16)
             ))
@@ -639,9 +691,16 @@ class IVCheckerScreen:
         ))
 
         thresholds = self._get_thresholds()
-        all_targets = sorted(
-            thresholds.get(species, {}).get(league_label, {}).keys()
-        )
+        league_targets = thresholds.get(species, {}).get(league_label, {})
+
+        def _target_sort_key(name):
+            # Expert-first ordering: generated (SIM) targets sort after
+            # the hand-curated ones, alphabetical within each class.
+            cls = target_class(league_targets.get(name, {}),
+                               self.THRESHOLD_STORE)
+            return (cls == 'generated', name)
+
+        all_targets = sorted(league_targets.keys(), key=_target_sort_key)
 
         targets_with_hits = {}
         for hit in hits:
@@ -657,7 +716,11 @@ class IVCheckerScreen:
         # If there are no hits, skip "All targets" and start on the first
         # specific target so qualifying IVs are shown immediately.
         if hits:
-            self._target_options_raw = [None] + sorted(targets_with_hits.keys()) + targets_without_hits
+            self._target_options_raw = (
+                [None]
+                + sorted(targets_with_hits.keys(), key=_target_sort_key)
+                + targets_without_hits
+            )
         else:
             self._target_options_raw = targets_without_hits or [None]
         self._target_index = 0
@@ -665,10 +728,12 @@ class IVCheckerScreen:
         def _target_label_text(target):
             if target is None:
                 return f"All targets ({len(hits)})"
-            elif target in self._targets_without_hits:
-                return f"{target} (0)"
-            else:
-                return f"{target} ({targets_with_hits.get(target, 0)})"
+            cls = target_class(league_targets.get(target, {}),
+                               self.THRESHOLD_STORE)
+            prefix = "SIM " if cls == 'generated' else ""
+            if target in self._targets_without_hits:
+                return f"{prefix}{target} (0)"
+            return f"{prefix}{target} ({targets_with_hits.get(target, 0)})"
 
         def make_cycle_handler(direction):
             def handler(widget):
@@ -692,6 +757,12 @@ class IVCheckerScreen:
                                    style=btn_icon(width=44, height=44)))
         self.results_box.add(target_row)
 
+        # Provenance line for the current target — content is rebuilt by
+        # _refresh_hits as the cycler moves.
+        self.source_box = toga.Box(style=Pack(direction=COLUMN,
+                                              margin_bottom=8))
+        self.results_box.add(self.source_box)
+
         self.hits_box = toga.Box(style=Pack(direction=COLUMN))
         self.results_box.add(self.hits_box)
         self._refresh_hits(species, hits)
@@ -702,11 +773,14 @@ class IVCheckerScreen:
 
         current = self._target_options_raw[self._target_index]
         league_label = self.league.capitalize()
+        thresholds = self._get_thresholds()
+        league_targets = thresholds.get(species, {}).get(league_label, {})
+
+        self._refresh_source_label(species, current, thresholds)
 
         # Empty target — show qualifying IV combinations
         if current is not None and current in self._targets_without_hits:
-            thresholds = self._get_thresholds()
-            target = thresholds.get(species, {}).get(league_label, {}).get(current, {})
+            target = league_targets.get(current, {})
             parts = []
             if target.get('attack', 0):
                 parts.append(f"{target['attack']}A")
@@ -787,7 +861,35 @@ class IVCheckerScreen:
 
         hits = sorted(hits, key=lambda h: h['stats']['stat_prod'], reverse=True)
         for hit in hits:
-            self._add_hit_display(self.hits_box, hit)
+            self._add_hit_display(self.hits_box, hit, league_targets)
+
+    def _refresh_source_label(self, species, current, thresholds):
+        """Provenance line under the cycler: the current target's source
+        and desc, falling back to the species-level 'sources' credit."""
+        for child in list(self.source_box.children):
+            self.source_box.remove(child)
+        species_entry = thresholds.get(species, {})
+        line = ""
+        if current is not None:
+            t = species_entry.get(self.league.capitalize(), {}).get(current, {})
+            line = " — ".join(
+                p for p in (t.get('source', ''), t.get('desc', '')) if p
+            )
+        if not line:
+            line = species_entry.get('sources') or ""
+        if not line:
+            return
+        line = f"Source: {line}"
+        if len(line) > 38:
+            # paragraph_text — source strings can run long and Labels
+            # never wrap (DEVELOPER_NOTES).
+            self.source_box.add(paragraph_text(line, font_size=12))
+        else:
+            self.source_box.add(toga.Label(
+                line,
+                style=Pack(font_size=12, text_align="center",
+                           color=COLOR_TEXT_LIGHT)
+            ))
 
     # ------------------------------------------------------------------
     # Show all results view
@@ -799,6 +901,9 @@ class IVCheckerScreen:
 
         self._show_back_btn(True)
 
+        thresholds = self._get_thresholds()
+        league_label = self.league.capitalize()
+
         for sp in sorted(self.results.keys()):
             hits = self.results[sp]
             if not hits:
@@ -809,9 +914,10 @@ class IVCheckerScreen:
                            margin_top=12, margin_bottom=4,
                            color=COLOR_ACCENT)
             ))
+            league_targets = thresholds.get(sp, {}).get(league_label, {})
             hits = sorted(hits, key=lambda h: h['stats']['stat_prod'], reverse=True)
             for hit in hits:
-                self._add_hit_display(self.results_box, hit)
+                self._add_hit_display(self.results_box, hit, league_targets)
 
     # ------------------------------------------------------------------
     # League selection
@@ -868,7 +974,10 @@ class IVCheckerScreen:
     # Hit display
     # ------------------------------------------------------------------
 
-    def _add_hit_display(self, box, hit):
+    def _add_hit_display(self, box, hit, league_targets=None):
+        """league_targets is the {name: spec} dict for the hit's
+        species/league — used to label generated (SIM) matches."""
+        league_targets = league_targets or {}
         m = hit['mon']
         s = hit['stats']
         pre = f" ({hit['csv_species']})" if hit['is_pre_evo'] else ""
@@ -892,8 +1001,16 @@ class IVCheckerScreen:
             style=Pack(font_size=12, color=COLOR_TEXT_LIGHT)
         ))
         for target in hit['matched']:
-            card.add(toga.Label(
-                f"✅ {target}",
-                style=Pack(font_size=12, color=COLOR_ACCENT)
-            ))
+            cls = target_class(league_targets.get(target, {}),
+                               self.THRESHOLD_STORE)
+            if cls == 'generated':
+                card.add(toga.Label(
+                    f"✅ SIM {target}",
+                    style=Pack(font_size=12, color=COLOR_YELLOW)
+                ))
+            else:
+                card.add(toga.Label(
+                    f"✅ {target}",
+                    style=Pack(font_size=12, color=COLOR_ACCENT)
+                ))
         box.add(card)

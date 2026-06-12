@@ -33,7 +33,11 @@ GETTING_STARTED = (
 class UserIVCheckerScreen(IVCheckerScreen):
     """IV checker screen using user-defined thresholds."""
 
-    def _get_thresholds(self):
+    # User-store specs with no explicit 'class' resolve to 'user', so the
+    # SIM filter in the inherited _get_thresholds never hides them.
+    THRESHOLD_STORE = 'user'
+
+    def _get_thresholds_raw(self):
         return load_user_thresholds()
 
     def build(self):
@@ -137,10 +141,13 @@ class UserIVCheckerScreen(IVCheckerScreen):
 
         self._show_back_btn(False)
 
-        user_thresholds = load_user_thresholds()
+        # Through the chokepoint, so SIM-hidden targets disappear here
+        # too; the GETTING_STARTED check uses the raw store so "no
+        # targets yet" only shows when the store is truly empty.
+        user_thresholds = self._get_thresholds()
         league_label = self.league.capitalize()
 
-        if not user_thresholds:
+        if not self._get_thresholds_raw():
             self.results_box.add(toga.Label(
                 GETTING_STARTED,
                 style=Pack(font_size=14, text_align="center",
@@ -195,8 +202,11 @@ class UserIVCheckerScreen(IVCheckerScreen):
             self._display_species_list()
             return
         try:
-            user_thresholds = load_user_thresholds()
-            if not user_thresholds:
+            # Matching reads through the SIM-filter chokepoint so hidden
+            # generated targets never produce hits (counts must agree
+            # with the display).
+            user_thresholds = self._get_thresholds()
+            if not self._get_thresholds_raw():
                 # CSV is still loaded — show its name; only the targets
                 # are missing. Don't clear the file label here.
                 self.status_label_file.text = pathlib.Path(self.csv_path).name
