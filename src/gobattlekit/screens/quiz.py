@@ -34,11 +34,26 @@ class QuizScreen:
         self.fastmoves, self.chargedmoves = get_moves()
         self._advance_task = None
 
+    def _quizzable(self, m):
+        """Only mons whose moveset can produce an answerable question:
+        a resolvable positive-gain fast move, and ≥2 distinct resolvable
+        charged moves with positive energy cost (an energy-0 charged move
+        would make the answer 0 — no such button exists)."""
+        moveset = m.get('moveset') or []
+        if len(moveset) < 3:
+            return False
+        fast, charged = moveset[0], moveset[1:]
+        if self.fastmoves.get(fast, {}).get('energyGain', 0) <= 0:
+            return False
+        if len(set(charged)) < 2:
+            return False
+        return all(self.chargedmoves.get(c, {}).get('energy', 0) > 0
+                   for c in charged)
+
     def build(self, league):
         self._cancel_advance_task()
         self.league = league
-        self.mons = [m for m in get_rankings(league)
-                     if len(set(m['moveset'][1:])) > 1]
+        self.mons = [m for m in get_rankings(league) if self._quizzable(m)]
         self.score = 0
         self.max_score = 0
         self.attempts = 0
