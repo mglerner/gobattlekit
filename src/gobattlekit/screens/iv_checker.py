@@ -721,7 +721,7 @@ class IVCheckerScreen:
             pokemon_index = get_pokemon_index()
             if species in pokemon_index:
                 base = pokemon_index[species]
-                max_cp = LEAGUE_CAPS.get(self.league, 1500.99)
+                max_cp = LEAGUE_CAPS.get(self.league, 1500)
                 max_level = 51
 
                 # Cached in the data layer — recomputing the ~8k-call scan

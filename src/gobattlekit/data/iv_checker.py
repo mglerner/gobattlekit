@@ -68,10 +68,32 @@ CPM = {
 }
 
 LEAGUE_CAPS = {
-    'great': 1500.99,
-    'ultra': 2500.99,
-    'master': 10000.99,
+    'great': 1500,
+    'ultra': 2500,
+    'master': 10000,
 }
+
+# PvPoke's shadow battle-stat multipliers. CP is NOT affected by shadow —
+# only the scaled battle stats are. Mirrors gopvpsim.pokemon.
+SHADOW_ATK_BONUS = 6 / 5   # ×1.2
+SHADOW_DEF_MULT = 5 / 6    # ×0.8333…
+
+
+def _is_shadow_species(species):
+    return species.endswith(' (Shadow)')
+
+
+def compute_cp(base_atk, base_def, base_sta, atk_iv, def_iv, sta_iv, cpm):
+    """CP at a given CPM. Minimum CP is 10; floored int (gopvpsim parity —
+    the old raw-float cap comparison excluded a sliver of legal spreads)."""
+    raw = (
+        (base_atk + atk_iv)
+        * math.sqrt(base_def + def_iv)
+        * math.sqrt(base_sta + sta_iv)
+        * cpm ** 2
+        / 10
+    )
+    return max(10, math.floor(raw))
 
 # Module-level cache of (species, max_level, max_cp) -> rank table.
 # Grows unbounded across screen visits but is bounded in practice by
@@ -99,32 +121,36 @@ def get_pokemon_index():
 def cp_to_level(cp, atk_iv, def_iv, sta_iv, base_atk, base_def, base_sta):
     """Find the level that produces the given CP for the given IVs and base stats.
 
-    Returns the level as a float (e.g. 20.0 or 20.5), or None if no match found.
-    CP is computed as floor((atk * def^0.5 * sta^0.5 * cpm^2) / 10).
-    We find the highest level whose computed CP matches the given CP.
+    Returns the level as a float (e.g. 20.0 or 20.5), or None if no match
+    found. When several levels share the CP, returns the LOWEST — the mon
+    can be powered up from there, while assuming the highest could wrongly
+    classify a cap-edge mon as over-cap (IV10).
     """
-    attack = base_atk + atk_iv
-    defense = base_def + def_iv
-    stamina = base_sta + sta_iv
-
-    best_level = None
     for level, cpm in sorted(CPM.items()):
-        computed_cp = int(math.floor(
-            (attack * (defense ** 0.5) * (stamina ** 0.5) * (cpm ** 2)) / 10
-        ))
+        computed_cp = compute_cp(base_atk, base_def, base_sta,
+                                 atk_iv, def_iv, sta_iv, cpm)
         if computed_cp == cp:
-            best_level = level
-        elif computed_cp > cp and best_level is not None:
+            return level
+        if computed_cp > cp:
             break
-    return best_level
+    return None
 
 
 def ivs_to_stats(atk_iv, def_iv, sta_iv, start_level, *,
                  base_atk, base_def, base_sta,
-                 max_level=40, max_cp=1500.99):
+                 max_level=51, max_cp=1500, shadow=False):
+    """Stats at the highest level <= max_level whose CP fits max_cp,
+    starting the walk at the mon's actual level (it can't power down).
+
+    Shadow applies PvPoke's ×1.2 atk / ×5/6 def to the returned battle
+    stats (and the products); CP is unaffected by shadow. Mirrors
+    gopvpsim.user_collection.ivs_to_stats_at_cap.
+    """
     attack = base_atk + atk_iv
     defense = base_def + def_iv
     stamina = base_sta + sta_iv
+    shadow_atk = SHADOW_ATK_BONUS if shadow else 1.0
+    shadow_def = SHADOW_DEF_MULT if shadow else 1.0
 
     best = None
     level = start_level
@@ -132,33 +158,42 @@ def ivs_to_stats(atk_iv, def_iv, sta_iv, start_level, *,
         cpm = CPM.get(level)
         if cpm is None:
             break
-        cp = (attack * (defense ** 0.5) * (stamina ** 0.5) * (cpm ** 2)) / 10
+        cp = compute_cp(base_atk, base_def, base_sta,
+                        atk_iv, def_iv, sta_iv, cpm)
         if cp <= max_cp:
-            level_attack = attack * cpm
-            level_defense = defense * cpm
-            level_stamina = stamina * cpm
-            stat_prod = math.floor(level_attack * level_defense * math.floor(level_stamina))
-            bulk_prod = math.floor(level_defense * math.floor(level_stamina))
+            level_attack = attack * cpm * shadow_atk
+            level_defense = defense * cpm * shadow_def
+            level_stamina = math.floor(stamina * cpm)
             best = {
                 'level': level,
-                'cp': int(math.floor(cp)),
+                'cp': cp,
                 'attack': level_attack,
                 'defense': level_defense,
-                'stamina': int(math.floor(level_stamina)),
-                'stat_prod': stat_prod,
-                'bulk_prod': bulk_prod,
+                'stamina': level_stamina,
+                'stat_prod': math.floor(level_attack * level_defense * level_stamina),
+                'bulk_prod': math.floor(level_defense * level_stamina),
             }
         level += 0.5
     return best
 
 
 def compute_rank_table(species, base_atk, base_def, base_sta,
-                       max_level, max_cp):
-    cache_key = (species, max_level, max_cp)
+                       max_level, max_cp, shadow=False):
+    """{(atk_iv, def_iv, sta_iv): rank} for all IV combos under the cap.
+
+    PvPoke/gopvpsim rank convention: dense unique ranks 1..N over the
+    UNFLOORED stat product, ties broken by total IV sum descending.
+    Combos over the cap even at level 1 are omitted — callers default
+    missing combos to 4096. Shadow changes the product ordering, so it is
+    part of the cache key. Aegislash (Blade) powers up in whole levels
+    only; mirror gopvpsim's round-down.
+    """
+    cache_key = (species, max_level, max_cp, shadow)
     if cache_key in _rank_cache:
         return _rank_cache[cache_key]
 
     logger.info("Computing rank table for %s (max_level=%s)...", species, max_level)
+    blade_round_down = (species == 'Aegislash (Blade)')
     combos = []
     for a in range(16):
         for d in range(16):
@@ -166,19 +201,27 @@ def compute_rank_table(species, base_atk, base_def, base_sta,
                 stats = ivs_to_stats(
                     a, d, s, start_level=1,
                     base_atk=base_atk, base_def=base_def, base_sta=base_sta,
-                    max_level=max_level, max_cp=max_cp,
+                    max_level=max_level, max_cp=max_cp, shadow=shadow,
                 )
-                sp = stats['stat_prod'] if stats is not None else 0
-                combos.append((sp, a, d, s))
+                if stats is None:
+                    continue
+                if blade_round_down and stats['level'] % 1.0 != 0:
+                    stats = ivs_to_stats(
+                        a, d, s, start_level=1,
+                        base_atk=base_atk, base_def=base_def, base_sta=base_sta,
+                        max_level=stats['level'] - 0.5, max_cp=max_cp,
+                        shadow=shadow,
+                    )
+                    if stats is None:
+                        continue
+                raw_product = stats['attack'] * stats['defense'] * stats['stamina']
+                combos.append((raw_product, a + d + s, a, d, s))
 
     combos.sort(reverse=True)
 
     rank_table = {}
-    current_rank = 1
-    for i, (sp, a, d, s) in enumerate(combos):
-        if i > 0 and sp < combos[i - 1][0]:
-            current_rank = i + 1
-        rank_table[(a, d, s)] = current_rank
+    for i, (_sp, _ivsum, a, d, s) in enumerate(combos):
+        rank_table[(a, d, s)] = i + 1
 
     _rank_cache[cache_key] = rank_table
     return rank_table
@@ -200,16 +243,17 @@ def qualifying_ivs(species, base_atk, base_def, base_sta, target,
     if key in _qualifying_cache:
         return _qualifying_cache[key]
 
+    shadow = _is_shadow_species(species)
     rank_table = compute_rank_table(
         species, base_atk, base_def, base_sta,
-        max_level=max_level, max_cp=max_cp,
+        max_level=max_level, max_cp=max_cp, shadow=shadow,
     )
     qualifying = []
     for (a, d, s), rank in rank_table.items():
         stats = ivs_to_stats(
             a, d, s, start_level=1,
             base_atk=base_atk, base_def=base_def, base_sta=base_sta,
-            max_level=max_level, max_cp=max_cp,
+            max_level=max_level, max_cp=max_cp, shadow=shadow,
         )
         if stats is None:
             continue
@@ -287,7 +331,7 @@ def append_user_generated(csv_path, name, atk_iv, def_iv, sta_iv, cp, level):
         })
 
 
-def check_thresholds(csv_path, thresholds, league='great', max_level=40,
+def check_thresholds(csv_path, thresholds, league='great', max_level=51,
                      evolution_lines=None, include_empty=False):
     """Check every mon in the given CSV(s) against the thresholds.
 
@@ -300,7 +344,7 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
     mons = []
     for p in paths:
         mons.extend(parse_csv(p))
-    max_cp = LEAGUE_CAPS.get(league, 1500.99)
+    max_cp = LEAGUE_CAPS.get(league, 1500)
     results = {}
 
     # Multi-valued: a branched pre-evo (Eevee, Tyrogue, Wurmple, ...)
@@ -340,6 +384,7 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
                 mon['atk_iv'], mon['def_iv'], mon['sta_iv'], mon['level'],
                 base_atk=base['atk'], base_def=base['def'], base_sta=base['hp'],
                 max_level=max_level, max_cp=max_cp,
+                shadow=mon['is_shadow'],
             )
             if stats is None:
                 continue
@@ -348,14 +393,16 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
 
             # The 4096-combo rank table is expensive — build it only when a
             # target in this species/league actually gates on 'onlytop'.
+            # Shadow changes the product ordering, so it keys the table.
             if any(isinstance(t, dict) and 'onlytop' in t
                    for t in league_targets.values()):
-                rank_key = (final_species, max_level, max_cp)
+                rank_key = (final_species, max_level, max_cp, mon['is_shadow'])
                 if rank_key not in rank_tables:
                     rank_tables[rank_key] = compute_rank_table(
                         final_species,
                         base['atk'], base['def'], base['hp'],
                         max_level=max_level, max_cp=max_cp,
+                        shadow=mon['is_shadow'],
                     )
                 stats['rank'] = rank_tables[rank_key].get(iv_tuple, 4096)
 
