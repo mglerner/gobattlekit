@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Threshold Content Pipeline — Kickoff Report (2026-06-12)</title>
+<style>
+  :root { --bg:#fafafa; --card:#fff; --ink:#1c1e21; --muted:#5f6368; --teal:#0e7c7b; --yellow:#b8860b; --red:#b3392f; --green:#2e7d32; --border:#e0e0e0; }
+  body { font:16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); margin:0; padding:2rem 1rem 4rem; }
+  main { max-width: 920px; margin:0 auto; }
+  h1 { font-size:1.6rem; border-bottom:3px solid var(--teal); padding-bottom:.4rem; }
+  h2 { font-size:1.25rem; margin-top:2.2rem; color:var(--teal); }
+  h3 { font-size:1.05rem; margin-top:1.4rem; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:1rem 1.2rem; margin:1rem 0; }
+  .pill { display:inline-block; border-radius:10px; padding:0 .55em; font-size:.78em; font-weight:600; vertical-align:middle; color:#fff; }
+  .pill.done { background:var(--green); } .pill.run { background:var(--yellow); } .pill.todo { background:#888; } .pill.exp { background:var(--teal); } .pill.sim { background:var(--yellow); }
+  table { border-collapse:collapse; width:100%; font-size:.9em; }
+  th, td { border:1px solid var(--border); padding:.three rem .5rem; padding:.3rem .5rem; text-align:left; vertical-align:top; }
+  th { background:#f0f4f4; }
+  tr.cfg { background:#e8f4f3; }
+  pre { background:#1c1e21; color:#e8eaed; padding:1rem; border-radius:8px; overflow-x:auto; font-size:.85em; line-height:1.45; }
+  code { background:#eef0f1; padding:.1em .35em; border-radius:4px; font-size:.9em; }
+  pre code { background:none; padding:0; }
+  .muted { color:var(--muted); }
+  .qa { border-left:4px solid var(--teal); padding-left:.9rem; margin:.9rem 0; }
+  .qa b.r { color:var(--green); }
+  .warn { border-left:4px solid var(--red); padding-left:.9rem; }
+</style>
+</head>
+<body><main>
+
+<h1>Threshold Content Pipeline — Kickoff Report</h1>
+<p class="muted">2026-06-12 · GoBattleKit × pogo-simulator · Phase 1 (recon + blockers) complete; Tinkaton validation pilot in flight</p>
+
+<h2>TL;DR</h2>
+<div class="card">
+<ul>
+  <li><b>Both simulator blockers were already fixed</b> — your S6-adjacent commit <code>3928b31</code> (today) shipped CP4 (level-aware CP-cap matching) and the Burmy→Mothim merge (CP13), with regression tests. My agents verified instead of re-implementing: <b>900 passed, 14 xfailed</b>, working tree clean. Nothing stands in the pipeline's way.</li>
+  <li><b>Roster locked:</b> top-40 current GL meta (PvPoke rankings of 2026-06-08). 2 of 40 already have configs; <b>~14 have published expert writeups</b>, the other ~26 will be simulator-derived — which is exactly why the provenance UI matters.</li>
+  <li><b>Batch cost:</b> ~16–20 min/species at full config → <b>~11–13 h overnight</b> for the roster (5–8 h at a lighter config). Re-runs are cache-cheap.</li>
+  <li><b>An exporter must be built</b> (the existing tier JSONs are hand-written <i>inputs</i>, not outputs) — but the pieces exist: <code>gopvpsim.thresholds.as_legacy_dict</code> + the replay blobs. Target shape: gobattlekit's nested <code>DEFAULT_THRESHOLDS</code>.</li>
+  <li><b>UI design is drafted</b> (badges + ordering + toggle, one merged list — not separate sections). 4 decisions for you below, each with a recommendation.</li>
+  <li><b>Code reuse decision:</b> artifact handoff, not imports — plus simulator-emitted <i>golden parity vectors</i> to turn the hand-maintained stat-math parity into an automated test.</li>
+</ul>
+</div>
+
+<h2>1 · Blockers: already resolved upstream <span class="pill done">DONE</span></h2>
+<div class="card">
+<p><b>CP4 (over-cap):</b> <code>match_mons</code> used to report over-leveled mons (e.g. a L35/CP2100 Talonflame) as Great League qualifiers, because <code>best_level</code> searched from level 1 — impossible stats, since power-ups are one-way. Fixed in <code>3928b31</code>: <code>min_level</code> threading through <code>pokemon.py:109-123</code> / <code>user_collection.py:384-385</code> (+ JS port). My agent reproduced the review's exact Talonflame scenario: now correctly excluded. <b>No effect on threshold <i>values</i></b> — ranking abstract IV spreads deliberately keeps the "any level reachable" hypothetical; only user-collection matching changed (correctly).</p>
+<p><b>Burmy gap (CP13):</b> the family-wide <code>visited</code> set dropped Burmy (Sandy)/(Trash) → Mothim paths. Fixed in the same commit (leaf-revisit termination + same-final merge, <code>evolution_lines.py:81-93,105-111</code>). Verified live: all three cloaks reach Mothim; end-to-end <code>match_mons</code> smoke passes.</p>
+<p class="muted">Both fixers honored the no-commit/no-force-a-change instructions; pogo-simulator's tree was clean before and after.</p>
+</div>
+
+<h2>2 · Running the sims: what recon established</h2>
+<div class="card">
+<ul>
+<li><b>Interpreter:</b> the shared <code>~/coding/MGLPoGo/.venv</code> <i>cannot</i> run the simulator (no numpy/numba/gopvpsim). The working interpreter is the pyenv 3.13.12 shim (<code>python</code>, selected by <code>.python-version</code>), per pogo-simulator's CLAUDE.md. All pipeline runs use it.</li>
+<li><b>Runtime:</b> measured cold-cache full-config dives: Tinkaton 16.2 min (2026-06-10 log) and 17.6 min (2026-06-11). Lighter dives (top-movesets 1) run 6–12 min. The 63-min figure in <code>overnight_eta.py</code> predates the 2026-06-10 perf arc (~11.4× sweep speedup) and is stale-high. <b>Roster budget: ~11–13 h full / ~5–8 h light.</b></li>
+<li><b>Outputs:</b> interactive HTML (per-moveset pages) + a <b>replay blob</b> (<code>userdata/replay/*.replay.pkl.gz</code>) holding the full machine-readable state — per-IV scores, resolved anchors, threshold registry — plus run logs that print resolved anchor floors. The blob is what the exporter will read.</li>
+<li><b>Exporter (to build):</b> nothing writes <code>thresholds/*.json</code> today — those are hand-edited inputs (<code>threshold_schema.md:21</code>). Plan: a script that merges (a) authored TOML stat-cutoff spreads via <code>as_legacy_dict</code> (<code>src/gopvpsim/thresholds.py:776-801</code>) and (b) dive-resolved Level-2/3 anchors from the replay blob, emitting gobattlekit's nested shape <code>{Species: {sources, League: {Target: {attack, defense, stamina, class, source, desc}}}}</code>. pogo-simulator's TODO already anticipates schema unification (<code>TODO.md:113-118</code>).</li>
+</ul>
+<div class="warn"><b>Cache trap (relevant to your S7 session):</b> engine files under <code>src/gopvpsim/</code> are hashed into the cache key, so engine edits self-invalidate — but worker/orchestration code in <code>scripts/</code> is <b>not</b> hashed. A plumbing change there silently serves stale sweep/slayer results; it already bit once (2026-06-10, manual <code>CACHE_VERSION</code> bump forgotten). Any S7 change to <code>_sweep_worker</code> / <code>slayer_iter_worker</code> must bump <code>CACHE_VERSION</code>.</div>
+</div>
+
+<h2>3 · Roster: top-40 Great League meta</h2>
+<div class="card">
+<p class="muted">Source: local PvPoke clone <code>~/coding/MGLPoGo/pvpoke</code>, <code>rankings-1500.json</code> updated 2026-06-08 (4 days old — current). Shaded rows already have a thresholds TOML. <span class="pill exp">EXPERT</span> = published human writeup exists → expert-anchored validation; blank → simulator-derived (PvPoke-parity validation).</p>
+<table>
+<tr><th>#</th><th>Species</th><th>Config</th><th>Expert source</th></tr>
+<tr><td>1</td><td>Lickilicky</td><td></td><td class="muted">— (RyanSwag #29 covers Lickitung, different species)</td></tr>
+<tr><td>2</td><td>Altaria</td><td></td><td><span class="pill exp">EXPERT</span> RyanSwag SwagTips-era GL thresholds</td></tr>
+<tr><td>3</td><td>Altaria (Shadow)</td><td></td><td></td></tr>
+<tr><td>4</td><td>Empoleon</td><td></td><td><span class="pill exp">EXPERT</span> JRE47 CD Classic Empoleon (2026-01)</td></tr>
+<tr><td>5</td><td>Jellicent</td><td></td><td></td></tr>
+<tr><td>6</td><td>Quagsire (Shadow)</td><td></td><td><span class="pill exp">EXPERT</span> RyanSwag Quagsire deep dive (#8)</td></tr>
+<tr><td>7</td><td>Corsola (Galarian)</td><td></td><td></td></tr>
+<tr><td>8</td><td>Quagsire</td><td></td><td><span class="pill exp">EXPERT</span> RyanSwag #8; SwagTips era</td></tr>
+<tr><td>9</td><td>Empoleon (Shadow)</td><td></td><td><span class="pill exp">EXPERT</span> JRE47 (article discusses shadow)</td></tr>
+<tr class="cfg"><td>10</td><td>Tinkaton</td><td>✓</td><td><span class="pill exp">EXPERT</span> JRE47 CD Tinkaton (2026-04) + acidicArisen</td></tr>
+<tr><td>11</td><td>Ninetales</td><td></td><td><span class="pill exp">EXPERT</span> JRE47 CD Ninetales (2026-02)</td></tr>
+<tr><td>12</td><td>Seaking</td><td></td><td></td></tr>
+<tr><td>13</td><td>Azumarill</td><td></td><td><span class="pill exp">EXPERT</span> RyanSwag SwagTips-era</td></tr>
+<tr><td>14</td><td>Forretress</td><td></td><td></td></tr>
+<tr><td>15</td><td>Feraligatr</td><td></td><td></td></tr>
+<tr><td>16</td><td>Guzzlord</td><td></td><td><span class="pill exp">EXPERT</span> RyanSwag #21 (Wayback)</td></tr>
+<tr><td>17</td><td>Mantine</td><td></td><td></td></tr>
+<tr><td>18</td><td>Ninetales (Shadow)</td><td></td><td><span class="pill exp">EXPERT</span> JRE47 (discusses shadow)</td></tr>
+<tr><td>19</td><td>Malamar</td><td></td><td><span class="pill exp">EXPERT</span> RyanSwag #25 (Wayback)</td></tr>
+<tr><td>20</td><td>Kingdra</td><td></td><td></td></tr>
+<tr><td>21</td><td>Corviknight</td><td></td><td><span class="pill exp">EXPERT</span> HomeSliceHenry Discord (already in app)</td></tr>
+<tr><td>22</td><td>Fearow</td><td></td><td></td></tr>
+<tr><td>23</td><td>Forretress (Shadow)</td><td></td><td></td></tr>
+<tr><td>24</td><td>Kingdra (Shadow)</td><td></td><td></td></tr>
+<tr><td>25</td><td>Feraligatr (Shadow)</td><td></td><td></td></tr>
+<tr><td>26</td><td>Dragonair (Shadow)</td><td></td><td></td></tr>
+<tr><td>27</td><td>Medicham</td><td></td><td><span class="pill exp">EXPERT</span> RyanSwag SwagTips-era</td></tr>
+<tr class="cfg"><td>28</td><td>Aegislash (Blade/Shield)</td><td>✓✓</td><td class="muted">both TOMLs map to this one ranking entry</td></tr>
+<tr><td>29</td><td>Sableye (Shadow)</td><td></td><td><span class="pill exp">EXPERT</span> RyanSwag #33 (Wayback)</td></tr>
+<tr><td>30</td><td>Shelgon</td><td></td><td></td></tr>
+<tr><td>31</td><td>Sliggoo</td><td></td><td></td></tr>
+<tr><td>32</td><td>Jumpluff</td><td></td><td></td></tr>
+<tr><td>33</td><td>Stunfisk (Galarian)</td><td></td><td><span class="pill exp">EXPERT</span> RyanSwag #24</td></tr>
+<tr><td>34</td><td>Dragonair</td><td></td><td></td></tr>
+<tr><td>35</td><td>Seismitoad</td><td></td><td></td></tr>
+<tr><td>36</td><td>Shelgon (Shadow)</td><td></td><td></td></tr>
+<tr><td>37</td><td>Clodsire</td><td></td><td><span class="pill exp">EXPERT</span> RyanSwag #2; SwagTips era</td></tr>
+<tr><td>38</td><td>Furret</td><td></td><td></td></tr>
+<tr><td>39</td><td>Lapras</td><td></td><td></td></tr>
+<tr><td>40</td><td>Sealeo</td><td></td><td class="muted">rank 40/41 tied at 90.6 with Sealeo (Shadow) et al.</td></tr>
+<tr class="cfg"><td>—</td><td>Oinkologne (Female) <span class="muted">(GL #51)</span></td><td>✓</td><td></td></tr>
+<tr class="cfg"><td>—</td><td>Sylveon <span class="muted">(#111)</span></td><td>✓</td><td><span class="pill exp">EXPERT</span> Lundberger NAIC IV card</td></tr>
+<tr class="cfg"><td>—</td><td>Annihilape <span class="muted">(#126)</span></td><td>✓</td><td><span class="pill exp">EXPERT</span> RyanSwag #5 (archived)</td></tr>
+<tr class="cfg"><td>—</td><td>Oinkologne <span class="muted">(#233)</span></td><td>✓</td><td></td></tr>
+</table>
+<p class="muted">RyanSwag archive index: <code>pogo-simulator/docs/reference_deep_dives/ryanswag/INDEX.md</code> (38 articles via Wayback). Shadow-variant expert credits need verification before we rely on them.</p>
+</div>
+
+<h2>4 · Provenance UI design <span class="pill todo">FOR YOUR REVIEW</span></h2>
+<div class="card">
+<p><b>Recommended: one merged list with per-target badges, colors, and ordering — not separate top-level sections.</b> Why: provenance is per-<i>target</i>, not per-species (Florges already mixes sources across its targets); the IV checker is organized species-first; and user targets already live on their own screen ("My PvP IV Targets"), so the in-screen problem is only expert-vs-generated. Sectioning would double list length and force mixed species to appear twice.</p>
+<ul>
+<li><b>Expert</b> targets: teal (<code>COLOR_ACCENT</code> — the current matched-target color), unchanged look.</li>
+<li><b>Generated</b> targets: yellow (<code>COLOR_YELLOW</code>) + a constant <b>SIM</b> text badge — color alone isn't "super clear," so the badge always accompanies it. Expert targets always sort/cycle first.</li>
+<li>A one-line <b>source label</b> under the target cycler ("Source: gobattlesim 2026-06 run (PvPoke-parity, no human review)").</li>
+<li>Species whose targets are <i>all</i> generated get a <code>[SIM]</code> suffix in the species list.</li>
+<li><b>Toggle:</b> "SIM targets: shown/hidden" button at the top of the IV-checker species list, persisted via the existing <code>preferences.py</code> (<code>show_generated_targets</code>), enforced at the single chokepoint <code>_get_thresholds</code> so display, counts, and matching can never disagree. Renders only when generated targets exist — today's UI stays pixel-identical.</li>
+</ul>
+<pre>
+  Azumarill - 3 hits
+  [&lt;]   SIM Wall-2026 (1)         [&gt;]
+  Source: gobattlesim 2026-06 run (PvPoke-parity, no human review)
+
+  +--------------------------------+
+  | 0/15/14 (CP 1497)              |
+  | Atk:93.10 Def:137.80 HP:189    |
+  | SP:2417k  Rank:#12             |
+  | ✓ Medi Wall                    |   &lt;- teal (expert)
+  | SIM Wall-2026                  |   &lt;- yellow (generated)
+  +--------------------------------+
+
+  Species list:
+  [ Show All (12 hits)                ]
+  [ SIM targets: shown  (tap to hide) ]   &lt;- yellow toggle
+  [ Azumarill (3)                     ]
+  [ Carbink (0) [SIM]                 ]   &lt;- all targets generated
+</pre>
+<p><b>Schema:</b> three optional per-target keys — <code>class</code> (<code>expert|generated</code>), <code>source</code>, <code>desc</code> — sibling to <code>attack/defense/stamina/ivs/onlytop</code>. Missing <code>class</code> ⇒ <code>expert</code> in shipped defaults, <code>user</code> in the user store. Verified mostly free: <code>check_thresholds</code>/<code>qualifying_ivs</code> ignore unknown keys; the one real break is <code>user_thresholds._SPEC_KEYS</code> rejecting unknown keys (must learn the three new ones), and edit/duplicate/share flows must carry the metadata so a generated import can't be laundered into an unlabeled target. Scope: ~200–300 lines across 7 files + ~100 lines of tests — one focused session.</p>
+
+<h3>Four decisions (each with my recommendation — I'll proceed with these unless you object)</h3>
+<div class="qa"><b>Q1. Toggle default?</b> <b class="r">Recommend: shown (badged).</b> Hiding by default makes the pipeline's output indistinguishable from "no data for this species"; the badge carries the trust signal. This is the one most worth your veto — it's a brand/trust call about unsigned simulator output on first launch.</div>
+<div class="qa"><b>Q2. When a user imports a simulator paste into their own targets, does it keep the SIM badge?</b> <b class="r">Recommend: yes, forever.</b> Importing ≠ human validation.</div>
+<div class="qa"><b>Q3. Does hiding SIM targets also exclude them from matching?</b> <b class="r">Recommend: yes.</b> Counts always agree with what's displayed.</div>
+<div class="qa"><b>Q4. Per-target source strings from the pipeline, or one per species?</b> <b class="r">Recommend: per-target.</b> The exporter will emit them; species-level <code>sources</code> stays as fallback so <code>iv_credits</code> keeps working.</div>
+</div>
+
+<h2>5 · Code reuse: artifact handoff + golden parity vectors</h2>
+<div class="card">
+<p><b>No import of gopvpsim into the app.</b> The numpy hard-dependency (the old Option-2 blocker) stays out of the iOS build; the app consumes tiny data artifacts. The duplicated stat math (<code>compute_rank_table</code>, <code>cp_to_level</code>, shadow multipliers, CP caps, evolution lines) — which already drifted once and cost a batch of parity fixes — gets protected by automation instead: the export stage also emits <b>golden parity vectors</b> — (species, IVs, level) → (attack, defense, stamina, CP, rank) — for every shipped species, bundled as fixtures in gobattlekit's test suite. Drift becomes a failing test, not a wrong verdict in the field. The deeper fix (a numpy-free gopvpsim core the app imports) stays on pogo-simulator's backlog.</p>
+</div>
+
+<h2>6 · Session coordination + your updated S7 prompt</h2>
+<div class="card">
+<p>This session uses pogo-simulator <b>read-only + additively</b>: dive runs (logs/replay blobs/caches), and soon ~35 new TOMLs under <code>thresholds/</code>. No <code>src/</code> edits — CP4/Burmy turned out to need none. <b>Sequencing:</b> your S7 cleanup can run any time; the only thing it gates is the ~40-species overnight batch, which I'll schedule after S7 lands (engine-semantics changes would invalidate caches and muddy a mid-flight batch). Restart your pogo-simulator session with:</p>
+<pre>Read ~/.claude/plans/perf-correctness-arc-2026-06.md and do Session S7. (CLAUDE.md session
+startup applies as usual.) The target register is §I of
+docs/reviews/2026-06-11_fable5_deep_codebase_review.md plus TODO's "Deferred cleanup"
+candidates and the S6-closeout leftovers noted in the plan file (e.g. the empty
+shadow-sableye-power-gem orphan dir). Read memory project_post_ship_cleanup_pain_points.md
+before cutting anything.
+
+Coordination with the gobattlekit threshold-pipeline session (active in the sibling repo,
+uses this repo read-only/additively):
+- Leave unexpected NEW files alone: per-species TOMLs appearing under thresholds/, plus
+  userdata/replay/ and userdata/logs/ churn from its dive runs (a Tinkaton pilot ran
+  2026-06-12; its HTML went to /tmp, not userdata/website/).
+- If S7 touches worker/orchestration code in scripts/ (_sweep_worker in deep_dive.py,
+  slayer_iter_worker in deep_dive_slayer.py): scripts/ is NOT in the cache engine hash —
+  bump CACHE_VERSION in sweep_cache.py + slayer_cache.py (this was forgotten once,
+  2026-06-10 S1).
+- Avoid changing src/gopvpsim engine semantics without flagging it: an engine-hash change
+  invalidates ~/.cache/gopvpsim and the pipeline's ~40-species overnight batch (~11-13 h
+  cold) is scheduled to run after S7 lands. Say when S7 is committed.
+- Do NOT delete things the pipeline depends on: as_legacy_dict
+  (src/gopvpsim/thresholds.py:776-801), the replay-blob dump path
+  (scripts/deep_dive.py:5706-5719), thresholds/_shared.toml, opponent_pools/.
+- Optional backlog seeds from the pipeline session (note them, don't start them): a golden
+  parity-vector emitter (species/IVs/level → stats/CP/rank fixtures for gobattlekit's
+  tests); TODO.md's threshold-schema unification item; a numpy-optional pure-Python core
+  split.</pre>
+</div>
+
+<h2>7 · Pipeline phases & status</h2>
+<div class="card">
+<table>
+<tr><th>Phase</th><th>What</th><th>Status</th></tr>
+<tr><td>1</td><td>Recon + blocker fixes + roster + UI design</td><td><span class="pill done">DONE</span> (5 agents, ~7 min)</td></tr>
+<tr><td>2</td><td>Tinkaton validation pilot (cold-cache full config; verify 143.03 / 141.66+138 reproduce post-3928b31; timing data point)</td><td><span class="pill run">RUNNING</span> ~16–20 min</td></tr>
+<tr><td>3a</td><td>Exporter: replay blob + TOML → app's nested threshold shape, with class/source/desc + parity vectors</td><td><span class="pill todo">NEXT</span></td></tr>
+<tr><td>3b</td><td>App-side provenance UI (~200–300 lines + tests) — proceeds with Q1–Q4 recommendations unless you object</td><td><span class="pill todo">NEXT</span> (parallel with 3a)</td></tr>
+<tr><td>4</td><td>Config authoring fan-out: ~38 species TOMLs (expert-anchored where writeups exist)</td><td><span class="pill todo">QUEUED</span></td></tr>
+<tr><td>5</td><td>Overnight batch (~11–13 h) + validation pass + curation into 2–4 tiers/species</td><td><span class="pill todo">AFTER S7 LANDS</span></td></tr>
+<tr><td>6</td><td>Bundle into app (DEFAULT_THRESHOLDS → TOML), device check, ship</td><td><span class="pill todo">QUEUED</span></td></tr>
+</table>
+<p class="muted">Nothing is committed in either repo from this session yet (only new untracked files: this report, status-bar plumbing). Say the word when you want commits.</p>
+</div>
+
+</main></body>
+</html>
