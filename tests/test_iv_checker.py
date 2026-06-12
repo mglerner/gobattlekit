@@ -489,7 +489,22 @@ class TestCheckThresholds:
         results = check_thresholds(path, thresholds, league='great', max_level=40)
         assert 'Azumarill' not in results
 
-    def test_accepts_multiple_csv_paths(self, tmp_path):
+    def test_rank_table_only_computed_when_needed(self, tmp_path):
+        """The 4096-combo rank table is expensive (IV8): it must not be
+        computed when the species' league has no targets, nor when no
+        matching target uses 'onlytop'."""
+        from gobattlekit.data.iv_checker import _rank_cache
+        path = self._write_csv(tmp_path, 'Azumarill,,1400,8,15,15,20,0,0\n')
+        thresholds = {
+            'Azumarill': {
+                'Ultra': {'X': {'attack': 0, 'defense': 0, 'stamina': 0,
+                                'onlytop': 10}},
+                'Great': {'Y': {'attack': 0, 'defense': 0, 'stamina': 0}},
+            },
+        }
+        results = check_thresholds(path, thresholds, league='great', max_level=40)
+        assert 'Y' in results['Azumarill'][0]['matched']
+        assert _rank_cache == {}, "rank table computed though nothing needed it"
         """check_thresholds must merge several CSVs — the IV screens pass
         both the PokeGenie export and user_generated.csv, so manual entries
         are no longer invisible while an export is loaded (SI1)."""
