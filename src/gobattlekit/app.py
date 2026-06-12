@@ -259,7 +259,13 @@ class GoBattleKit(toga.App):
         """Switch to the move count quiz screen for the given league."""
         if skip_intro:
             self._active_screen = "quiz"
-            self.main_window.content = self.quiz_screen.build(league)
+            try:
+                # Quiz data loads lazily on first build (AP2); a cold cache
+                # with no network surfaces here, not at startup.
+                self.main_window.content = self.quiz_screen.build(league)
+            except Exception as e:
+                logger.exception("Quiz build failed")
+                self._show_startup_error(e)
         else:
             self._show_with_intro(
                 "move_count_quiz",
@@ -270,7 +276,11 @@ class GoBattleKit(toga.App):
         """Switch to the move timing quiz screen."""
         if skip_intro:
             self._active_screen = "timing_quiz"
-            self.main_window.content = self.timing_quiz_screen.build()
+            try:
+                self.main_window.content = self.timing_quiz_screen.build()
+            except Exception as e:
+                logger.exception("Timing quiz build failed")
+                self._show_startup_error(e)
         else:
             self._show_with_intro(
                 "timing_quiz",
