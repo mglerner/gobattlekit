@@ -37,6 +37,10 @@ def answer_color_gradient(total_rows, row_index):
         t = 0.0
     else:
         t = row_index / (total_rows - 1)
+    # Clamp: an out-of-range row_index must stay inside the palette
+    # (t > 1 extrapolates past 'light'; t < 0 would format a broken
+    # color string like '#-2...').
+    t = min(1.0, max(0.0, t))
     r = int(dark[0] + t * (light[0] - dark[0]))
     g = int(dark[1] + t * (light[1] - dark[1]))
     b = int(dark[2] + t * (light[2] - dark[2]))
