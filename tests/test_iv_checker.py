@@ -489,6 +489,27 @@ class TestCheckThresholds:
         results = check_thresholds(path, thresholds, league='great', max_level=40)
         assert 'Azumarill' not in results
 
+    def test_qualifying_ivs_filters_sorts_and_caches(self):
+        """qualifying_ivs powers the empty-target view; it must respect the
+        target spec, sort by rank, and cache (the scan is ~8k ivs_to_stats
+        calls on the UI thread — SI12)."""
+        from gobattlekit.data.iv_checker import qualifying_ivs
+        result = qualifying_ivs(
+            'Azumarill', 112, 152, 225,
+            {'attack': 0, 'defense': 0, 'stamina': 0, 'onlytop': 10},
+            max_level=51, max_cp=1500.99,
+        )
+        assert 0 < len(result) <= 100
+        ranks = [r[0] for r in result]
+        assert ranks == sorted(ranks)
+        assert all(rank <= 10 for rank in ranks)
+        again = qualifying_ivs(
+            'Azumarill', 112, 152, 225,
+            {'attack': 0, 'defense': 0, 'stamina': 0, 'onlytop': 10},
+            max_level=51, max_cp=1500.99,
+        )
+        assert again is result, "second call should hit the cache"
+
     def test_rank_table_only_computed_when_needed(self, tmp_path):
         """The 4096-combo rank table is expensive (IV8): it must not be
         computed when the species' league has no targets, nor when no
