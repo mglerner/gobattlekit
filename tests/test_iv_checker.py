@@ -146,36 +146,33 @@ class TestCpToLevel:
         """Compute stats at a known level, then recover that level from CP."""
         result = ivs_to_stats(8, 15, 15, 1,
                               base_atk=112, base_def=152, base_sta=225,
-                              max_level=40, max_cp=1500.99)
+                              max_level=40, max_cp=1500)
         level = cp_to_level(result['cp'], 8, 15, 15, *self.BASE)
-        # The recovered level should be >= the stats level (since cp_to_level
-        # finds the *highest* level producing that CP)
+        # The recovered level should be <= the stats level (cp_to_level
+        # returns the LOWEST level producing that CP — power-up safe).
         assert level is not None
-        assert level >= result['level']
+        assert level <= result['level']
 
     def test_no_match_returns_none(self):
-        # CP=1 is unlikely to match any level for Azumarill
+        # CP=1 is below the floor of 10 — never matches.
         level = cp_to_level(1, 8, 15, 15, *self.BASE)
         assert level is None
 
-    def test_returns_highest_matching_level(self):
-        """If multiple levels produce the same CP, return the highest."""
-        # Level 1 and 1.5 both produce very low CP — find a case
-        # by brute force
-        for target_cp in range(10, 50):
-            levels = []
-            for lvl in sorted(CPM.keys()):
-                cpm = CPM[lvl]
-                atk = 112 + 15
-                dfn = 152 + 15
-                sta = 225 + 15
-                cp = int(math.floor((atk * dfn**0.5 * sta**0.5 * cpm**2) / 10))
-                if cp == target_cp:
-                    levels.append(lvl)
-            if len(levels) > 1:
-                result = cp_to_level(target_cp, 15, 15, 15, *self.BASE)
-                assert result == max(levels)
-                break
+    def test_returns_lowest_matching_level(self):
+        """If multiple levels produce the same CP, return the lowest (IV10:
+        assuming the highest could classify a cap-edge mon as over-cap).
+        Weak base stats sit at the CP-10 floor across many low levels —
+        a guaranteed duplicate-CP case."""
+        from gobattlekit.data.iv_checker import compute_cp
+        levels_at_10 = [lvl for lvl, cpm in sorted(CPM.items())
+                        if compute_cp(10, 10, 10, 0, 0, 0, cpm) == 10]
+        assert len(levels_at_10) > 1, "fixture should produce duplicates"
+        assert cp_to_level(10, 0, 0, 0, 10, 10, 10) == min(levels_at_10)
+
+    def test_min_cp_is_10(self):
+        """CP floors at 10 (gopvpsim/game parity)."""
+        from gobattlekit.data.iv_checker import compute_cp
+        assert compute_cp(10, 10, 10, 0, 0, 0, CPM[1]) == 10
 
 
 # ── compute_rank_table ────────────────────────────────────────────
@@ -213,19 +210,22 @@ class TestComputeRankTable:
         t_ultra = compute_rank_table('Azumarill', 112, 152, 225, 40, 2500.99)
         assert t_great is not t_ultra
 
-    def test_tied_stat_products_share_rank(self):
+    def test_ranks_are_dense_and_unique(self):
+        """PvPoke/gopvpsim convention: ranks are 1..N with no shared ranks
+        (ties broken by IV-sum descending), replacing the old shared
+        competition ranks over floored products (CP7)."""
         table = compute_rank_table('Azumarill', 112, 152, 225, 40, 1500.99)
-        from collections import Counter
-        rank_counts = Counter(table.values())
-        # If any rank appears more than once, those entries were tied
-        ties = {r: c for r, c in rank_counts.items() if c > 1}
-        # We just verify the structure is valid — ranks after ties skip numbers
-        if ties:
-            sorted_ranks = sorted(set(table.values()))
-            for i in range(len(sorted_ranks) - 1):
-                r = sorted_ranks[i]
-                # Next rank should be current rank + count of entries at current rank
-                assert sorted_ranks[i + 1] == r + rank_counts[r]
+        ranks = sorted(table.values())
+        assert ranks == list(range(1, len(table) + 1))
+
+    def test_shadow_changes_rank_ordering(self):
+        """Shadow multiplies atk ×1.2 / def ×5/6, which reshuffles stat
+        products — the shadow table must differ from the regular one."""
+        plain = compute_rank_table('Azumarill', 112, 152, 225, 51, 1500)
+        shadow = compute_rank_table('Azumarill', 112, 152, 225, 51, 1500,
+                                    shadow=True)
+        assert plain is not shadow
+        assert any(plain[k] != shadow[k] for k in plain)
 
 
 # ── parse_csv ─────────────────────────────────────────────────────
@@ -488,6 +488,34 @@ class TestCheckThresholds:
         # Check Great league but thresholds only define Ultra
         results = check_thresholds(path, thresholds, league='great', max_level=40)
         assert 'Azumarill' not in results
+
+    def test_shadow_stat_multipliers_applied(self, tmp_path):
+        """A shadow mon's scaled attack gets ×1.2 and defense ×5/6 (CP3,
+        gopvpsim parity) — an attack floor between the plain and shadow
+        values passes only for the shadow row."""
+        path = self._write_csv(tmp_path,
+                               'Azumarill,,1400,8,15,15,20,0,0\n'
+                               'Azumarill,,1400,8,15,15,20,1,0\n')  # shadow
+        plain = ivs_to_stats(8, 15, 15, 20, base_atk=112, base_def=152,
+                             base_sta=225, max_level=40, max_cp=1500)
+        floor_between = plain['attack'] * 1.1  # plain fails, ×1.2 passes
+        thresholds = {
+            'Azumarill (Shadow)': {
+                'Great': {'ShadowAtk': {'attack': floor_between,
+                                        'defense': 0, 'stamina': 0}},
+            },
+            'Azumarill': {
+                'Great': {'PlainAtk': {'attack': floor_between,
+                                       'defense': 0, 'stamina': 0}},
+            },
+        }
+        results = check_thresholds(path, thresholds, league='great',
+                                   max_level=40)
+        assert 'Azumarill (Shadow)' in results
+        assert 'Azumarill' not in results
+        # CP itself is unaffected by shadow.
+        shadow_stats = results['Azumarill (Shadow)'][0]['stats']
+        assert shadow_stats['cp'] == plain['cp']
 
     def test_qualifying_ivs_filters_sorts_and_caches(self):
         """qualifying_ivs powers the empty-target view; it must respect the

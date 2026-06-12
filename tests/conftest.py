@@ -39,6 +39,18 @@ MINI_GAMEMASTER = {
                 'evolutions': [],
             },
         },
+        {
+            # Shadow entries carry the same base stats; shadowness is a
+            # flag applied at stat-calculation time (PvPoke convention).
+            'speciesId': 'azumarill_shadow',
+            'speciesName': 'Azumarill (Shadow)',
+            'baseStats': {'atk': 112, 'def': 152, 'hp': 225},
+            'family': {
+                'id': 'marill',
+                'parent': 'marill',
+                'evolutions': [],
+            },
+        },
     ],
     'moves': [
         # Fast moves (energyGain != 0)
