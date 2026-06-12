@@ -8,12 +8,10 @@ __pycache__/
 *.py[cod]
 *.pyo
 .venv/
+*.egg-info/
 
 # Briefcase support packages
 .briefcase/
-
-# Cache
-~/.pogoquiz_cache/
 
 # Emacs
 *~
