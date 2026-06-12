@@ -6,11 +6,21 @@
 > (SI1/SI2+prune/AP1/AP6/SQ1/SQ2), fetcher hardening (DL1/DL2/DL3/DL6 +
 > DL4's parse-once memo), and the JSON contract (IV1/IV2/IV5/IV6/IV9/TS2;
 > scanner-JSON import is live). Suite: 133 → 176 passed + 1 strict xfail
-> (the Eevee pin). Still open: the Eevee P0 (Session 3 design), AP2/DL4
-> off-main-thread startup + everything device-gated (SI5, SI7, AP5,
-> Batch 6), the App Store pass (Session 4), and the §I dead-code register
-> (gated). Read the per-finding sections below as the point-in-time
-> Phase-1 snapshot.
+> (the Eevee pin). **Update 2026-06-12:** the remaining no-decision
+> backlog is also fixed (16 commits, 36e69af..360873e): all quiz findings
+> (SQ3/SQ4/SQ5/SQ6/SQ8/SQ9 — OPTIMAL_TIMING now derived in a test),
+> screen-state leftovers (SI7/SI8-partial/SI9/SI12/SI13/SI14+AP16),
+> inbox-poll hardening (AP5/AP7/AP8/AP9), shell fixes (AP3+AP4
+> recoverable startup with retry, AP14, AP15, AP17), data robustness
+> (DL7, IV8 lazy rank tables), and build scripts (AP11, AP12). Suite:
+> 184 passed + 1 strict xfail. Still open — ALL gated on a decision or a
+> device: the Eevee P0 (Session 3 design), the §I dead-code register
+> (sign-off), COLOR_BG light mode (#11), the cross-project parity
+> divergences (CP3/CP5/CP7/CP8/CP11/CP13, IV7, IV10 — need a
+> which-side-changes call), AP2/DL4 off-main-thread startup,
+> SI5/SI8-residual/AP13/SQ7 (device/visual verification), and the
+> Session-4 App Store pass. Read the per-finding sections below as the
+> point-in-time Phase-1 snapshot.
 
 **Method.** Modeled on the same-day pogo-simulator deep review
 (`../pogo-simulator/docs/reviews/2026-06-11_fable5_deep_codebase_review.md`).
