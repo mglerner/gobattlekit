@@ -94,6 +94,9 @@ class TimingQuizScreen:
         return self.container
 
     def _load_question(self):
+        # Guards against a natively queued duplicate tap double-resolving
+        # the question (same pattern as quiz.py).
+        self._question_over = False
         self.attempts = 0
         your_id = random.choice(self.ranked_fast_move_ids)
         their_id = random.choice(self.ranked_fast_move_ids)
@@ -165,8 +168,11 @@ class TimingQuizScreen:
             correct_btn.style.background_color = COLOR_ACCENT
 
     def _check_answer(self, chosen):
+        if self._question_over:
+            return
         self.attempts += 1
         if chosen == self.right_answer:
+            self._question_over = True
             self.total_questions += 1
             pts = POINTS.get(self.attempts, 1)
             self.score += pts
@@ -183,6 +189,7 @@ class TimingQuizScreen:
         else:
             self.streak = 0
             if self.attempts >= MAX_ATTEMPTS:
+                self._question_over = True
                 self.total_questions += 1
                 self.total += 3
                 self.score_label.text = self._score_text()

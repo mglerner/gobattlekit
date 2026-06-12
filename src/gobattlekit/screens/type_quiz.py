@@ -101,6 +101,9 @@ class TypeQuizScreen:
         return self.container
 
     def _load_question(self):
+        # Guards against a natively queued duplicate tap double-resolving
+        # the question (same pattern as quiz.py).
+        self._question_over = False
         types = list(effectiveness.keys())
         self.attacker = random.choice(types)
         self.defender = random.choice(types)
@@ -146,6 +149,9 @@ class TypeQuizScreen:
             correct_btn.style.background_color = COLOR_ACCENT
 
     def _check_answer(self, chosen):
+        if self._question_over:
+            return
+        self._question_over = True
         self.total_questions += 1
         self._disable_buttons()
         if chosen == self.right_answer:
