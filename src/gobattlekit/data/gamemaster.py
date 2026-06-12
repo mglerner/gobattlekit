@@ -58,6 +58,13 @@ def counters_to_charge(fast_move, charged_move, fastmoves, chargedmoves):
         raise KeyError(f"Charged move not found: {charged_move}")
     energy_per_fast = fastmoves[fast_move]['energyGain']
     energy_needed = chargedmoves[charged_move]['energy']
+    if energy_per_fast <= 0 or energy_needed <= 0:
+        # An energy-0 "charged" move (TRANSFORM-style) would yield 0 —
+        # an answer the quiz has no button for. Fail loudly instead.
+        raise ValueError(
+            f"Non-positive energy: {fast_move} gain {energy_per_fast}, "
+            f"{charged_move} cost {energy_needed}"
+        )
     result = int(math.ceil(energy_needed / energy_per_fast))
     return result if result <= 20 else 'more'
 
@@ -73,7 +80,12 @@ def charge_sequence(fast_move, charged_move, fastmoves, chargedmoves, num_charge
         raise KeyError(f"Charged move not found: {charged_move}")
     energy_per_fast = fastmoves[fast_move]['energyGain']
     energy_needed = chargedmoves[charged_move]['energy']
-    
+    if energy_per_fast <= 0 or energy_needed <= 0:
+        raise ValueError(
+            f"Non-positive energy: {fast_move} gain {energy_per_fast}, "
+            f"{charged_move} cost {energy_needed}"
+        )
+
     sequence = []
     leftover = 0
     for _ in range(num_charges):

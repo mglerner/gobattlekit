@@ -44,6 +44,20 @@ class TestGetMoves:
 
 
 class TestCountersToCharge:
+    def test_rejects_nonpositive_energy(self):
+        """An energy-0 'charged' move (TRANSFORM-style) or a zero-gain fast
+        move must raise, not return an answerless 0 (SQ5)."""
+        fast = {'F': {'energyGain': 10}, 'F0': {'energyGain': 0}}
+        charged = {'C': {'energy': 50}, 'C0': {'energy': 0}}
+        with pytest.raises(ValueError):
+            counters_to_charge('F', 'C0', fast, charged)
+        with pytest.raises(ValueError):
+            counters_to_charge('F0', 'C', fast, charged)
+        with pytest.raises(ValueError):
+            charge_sequence('F', 'C0', fast, charged)
+        with pytest.raises(ValueError):
+            charge_sequence('F0', 'C', fast, charged)
+
     def test_bubble_ice_beam(self):
         fast, charged = get_moves()
         # Ice Beam costs 55 energy, Bubble gives 11 per use → ceil(55/11) = 5
@@ -196,3 +210,21 @@ class TestOptimalTiming:
                 used.add(val)
         for pattern in ALL_TIMING_PATTERNS:
             assert pattern in used, f"Pattern {pattern} never used in OPTIMAL_TIMING"
+
+    def test_every_entry_derivable_from_timing_rule(self):
+        """Semantic check of the hand-typed table (SQ9): the optimal throw
+        pattern is the arithmetic progression of fast-move counts k that
+        maximize the wasted-turn residue (k * yourTurns) mod theirTurns;
+        timing doesn't matter exactly when theirTurns divides yourTurns
+        (the residue is always 0). A future hand-edit typo fails here."""
+        for (yours, theirs), pattern in OPTIMAL_TIMING.items():
+            if yours % theirs == 0:
+                assert pattern is None, (yours, theirs)
+                continue
+            residues = [(k, (k * yours) % theirs) for k in range(1, 2 * theirs + 1)]
+            best = max(r for _, r in residues)
+            ks = [k for k, r in residues if r == best]
+            start, step = ks[0], ks[1] - ks[0]
+            # The winning ks form an arithmetic progression.
+            assert all(k == start + i * step for i, k in enumerate(ks)), (yours, theirs)
+            assert pattern == (start, step), (yours, theirs, pattern, (start, step))
