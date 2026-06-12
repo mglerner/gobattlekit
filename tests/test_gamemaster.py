@@ -2,14 +2,34 @@
 import math
 import pytest
 
+from unittest.mock import patch
+
 from gobattlekit.data.gamemaster import (
     get_moves,
+    get_rankings,
     counters_to_charge,
     charge_sequence,
     format_timing_pattern,
     OPTIMAL_TIMING,
     ALL_TIMING_PATTERNS,
 )
+
+
+class TestGetRankings:
+    def test_skips_malformed_entries(self):
+        """A rankings entry without a numeric rating must be skipped with a
+        log, not crash the sort (DL7) — same policy as get_moves."""
+        rankings = [
+            {'speciesName': 'A', 'rating': 700},
+            {'speciesName': 'NoRating'},
+            {'speciesName': 'StrRating', 'rating': 'high'},
+            'not even a dict',
+            {'speciesName': 'B', 'rating': 900},
+        ]
+        with patch('gobattlekit.data.gamemaster.load_rankings',
+                   return_value=rankings):
+            top = get_rankings('great')
+        assert [m['speciesName'] for m in top] == ['B', 'A']
 
 
 # ── get_moves ─────────────────────────────────────────────────────
