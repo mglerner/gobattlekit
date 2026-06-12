@@ -489,6 +489,59 @@ class TestCheckThresholds:
         results = check_thresholds(path, thresholds, league='great', max_level=40)
         assert 'Azumarill' not in results
 
+    def test_gender_filter_for_differentiated_species(self, tmp_path):
+        """CP5 / gopvpsim parity: during the evolution walk, an
+        'X (Female)' target matches only female-gendered pre-evos; the
+        bare 'X' (with a Female sibling in the gamemaster) only male;
+        blank gender is permissive. (Mirrors gopvpsim's Lechonk tests —
+        evolved female rows arrive as 'X (Female)' via the Form column.)"""
+        header = ('Name,Form,CP,Atk IV,Def IV,Sta IV,Level Min,'
+                  'Shadow/Purified,Lucky,Gender\n')
+        p = tmp_path / 'gendered.csv'
+        p.write_text(header
+                     + 'Lechonk,,500,8,15,15,20,0,0,♂\n'
+                     + 'Lechonk,,500,9,15,15,20,0,0,♀\n'
+                     + 'Lechonk,,500,10,15,15,20,0,0,\n',
+                     encoding='utf-8-sig')
+        thresholds = {
+            'Oinkologne': {
+                'Great': {'M': {'attack': 0, 'defense': 0, 'stamina': 0}},
+            },
+            'Oinkologne (Female)': {
+                'Great': {'F': {'attack': 0, 'defense': 0, 'stamina': 0}},
+            },
+        }
+        evo_lines = {
+            'Oinkologne': ['Lechonk', 'Oinkologne'],
+            'Oinkologne (Female)': ['Lechonk', 'Oinkologne (Female)'],
+        }
+        results = check_thresholds(str(p), thresholds, league='great',
+                                   max_level=40, evolution_lines=evo_lines)
+        male_hits = {h['mon']['atk_iv'] for h in results['Oinkologne']}
+        # ♂ row and blank-gender row; never the ♀ row.
+        assert male_hits == {8, 10}
+        female_hits = {h['mon']['atk_iv'] for h in results['Oinkologne (Female)']}
+        assert female_hits == {9, 10}
+
+    def test_parse_csv_gender_column(self, tmp_path):
+        header = ('Name,Form,CP,Atk IV,Def IV,Sta IV,Level Min,'
+                  'Shadow/Purified,Lucky,Gender\n')
+        p = tmp_path / 'g.csv'
+        p.write_text(header
+                     + 'Azumarill,,1400,8,15,15,20,0,0,♀\n'
+                     + 'Azumarill,,1400,8,15,15,20,0,0,♂\n'
+                     + 'Azumarill,,1400,8,15,15,20,0,0,\n',
+                     encoding='utf-8-sig')
+        mons = parse_csv(str(p))
+        assert [m['gender'] for m in mons] == ['female', 'male', '']
+
+    def test_parse_csv_without_gender_column(self, tmp_path):
+        p = tmp_path / 'g.csv'
+        p.write_text(self.HEADER + 'Azumarill,,1400,8,15,15,20,0,0\n',
+                     encoding='utf-8-sig')
+        mons = parse_csv(str(p))
+        assert mons[0]['gender'] == ''
+
     def test_shadow_stat_multipliers_applied(self, tmp_path):
         """A shadow mon's scaled attack gets ×1.2 and defense ×5/6 (CP3,
         gopvpsim parity) — an attack floor between the plain and shadow
