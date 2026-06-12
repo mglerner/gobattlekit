@@ -278,6 +278,11 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
         if final_species not in thresholds:
             continue
 
+        league_label = league.capitalize()
+        if league_label not in thresholds[final_species]:
+            continue
+        league_targets = thresholds[final_species][league_label]
+
         base = pokemon_index[final_species]
         stats = ivs_to_stats(
             mon['atk_iv'], mon['def_iv'], mon['sta_iv'], mon['level'],
@@ -287,23 +292,23 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=40,
         if stats is None:
             continue
 
-        rank_key = (final_species, max_level, max_cp)
-        if rank_key not in rank_tables:
-            rank_tables[rank_key] = compute_rank_table(
-                final_species,
-                base['atk'], base['def'], base['hp'],
-                max_level=max_level, max_cp=max_cp,
-            )
-        stats['rank'] = rank_tables[rank_key].get(
-            (mon['atk_iv'], mon['def_iv'], mon['sta_iv']), 4096)
+        iv_tuple = (mon['atk_iv'], mon['def_iv'], mon['sta_iv'])
 
-        league_label = league.capitalize()
-        if league_label not in thresholds[final_species]:
-            continue
+        # The 4096-combo rank table is expensive — build it only when a
+        # target in this species/league actually gates on 'onlytop'.
+        if any(isinstance(t, dict) and 'onlytop' in t
+               for t in league_targets.values()):
+            rank_key = (final_species, max_level, max_cp)
+            if rank_key not in rank_tables:
+                rank_tables[rank_key] = compute_rank_table(
+                    final_species,
+                    base['atk'], base['def'], base['hp'],
+                    max_level=max_level, max_cp=max_cp,
+                )
+            stats['rank'] = rank_tables[rank_key].get(iv_tuple, 4096)
 
         matched = []
-        iv_tuple = (mon['atk_iv'], mon['def_iv'], mon['sta_iv'])
-        for target_name, target in thresholds[final_species][league_label].items():
+        for target_name, target in league_targets.items():
             try:
                 if not (stats['attack'] >= target.get('attack', 0) and
                         stats['defense'] >= target.get('defense', 0) and
