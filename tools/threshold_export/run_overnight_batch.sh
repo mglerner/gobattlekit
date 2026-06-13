@@ -25,11 +25,12 @@ LOG=$OUT_ROOT/batch.log
 # truncated night still covers the core. Aegislash forms last.
 BASE_DIVES=(
   "Lickilicky" "Altaria" "Empoleon" "Jellicent" "Quagsire"
-  "Corsola (Galarian)" "Ninetales" "Seaking" "Azumarill" "Forretress"
-  "Feraligatr" "Guzzlord" "Mantine" "Malamar" "Kingdra" "Corviknight"
-  "Fearow" "Dragonair" "Medicham" "Shelgon" "Sliggoo" "Jumpluff"
-  "Stunfisk (Galarian)" "Seismitoad" "Clodsire" "Furret" "Lapras"
-  "Sealeo" "Spidops" "Florges" "Aegislash (Shield)" "Aegislash (Blade)"
+  "Corsola (Galarian)" "Tinkaton" "Ninetales" "Seaking" "Azumarill"
+  "Forretress" "Feraligatr" "Guzzlord" "Mantine" "Malamar" "Kingdra"
+  "Corviknight" "Fearow" "Dragonair" "Medicham" "Shelgon" "Sliggoo"
+  "Jumpluff" "Stunfisk (Galarian)" "Seismitoad" "Clodsire" "Furret"
+  "Lapras" "Sealeo" "Spidops" "Florges" "Sylveon"
+  "Aegislash (Shield)" "Aegislash (Blade)"
 )
 # Shadow variants that are independently GL-meta-relevant. Sableye and
 # Drapion run shadow-only (base form is not meta).
