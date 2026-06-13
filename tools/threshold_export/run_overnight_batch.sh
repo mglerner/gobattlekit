@@ -16,7 +16,9 @@ EXPORT_DIR=/Users/mglerner/coding/MGLPoGo/gobattlekit/tools/threshold_export
 PYRUN="pyenv exec python"
 export PYENV_VERSION=3.13.12
 
-STAMP=$(date +%Y%m%d)
+# BATCH_DATE override lets a post-midnight resume keep writing into the
+# original night's dir (and honoring its .done markers).
+STAMP=${BATCH_DATE:-$(date +%Y%m%d)}
 OUT_ROOT=$SIM/userdata/threshold_batch/$STAMP
 mkdir -p "$OUT_ROOT"
 LOG=$OUT_ROOT/batch.log
@@ -63,7 +65,7 @@ run_dive() {
       --html "$OUT_ROOT/html/$tag/index.html" --interactive --standalone \
       --mirror-slayer --mirror-slayer-metric all --mirror-slayer-rounds 4 \
       --mirror-slayer-pool 30 --mirror-slayer-show 20 --split-movesets \
-      --reserve-cpus 1 "${flags[@]}" ) >>"$LOG" 2>&1
+      --reserve-cpus 1 ${flags[@]+"${flags[@]}"} ) >>"$LOG" 2>&1
   local rc=$?
   local mins=$(( (SECONDS - t0) / 60 ))
   if [ $rc -ne 0 ]; then say "DIVE $tag FAILED rc=$rc after ${mins}m (continuing)"; return 1; fi
