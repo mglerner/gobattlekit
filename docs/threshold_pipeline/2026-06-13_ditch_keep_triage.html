@@ -1,0 +1,193 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Threshold Batch — Ditch/Keep Triage (2026-06-13)</title>
+<style>
+:root{--ink:#1c1e21;--muted:#5f6368;--teal:#0e7c7b;--border:#e0e0e0;}
+body{font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:#fafafa;margin:0;padding:2rem 1rem 5rem;}
+main{max-width:1000px;margin:0 auto;}
+h1{font-size:1.55rem;border-bottom:3px solid var(--teal);padding-bottom:.4rem;}
+h2{font-size:1.2rem;color:var(--teal);margin-top:2.2rem;}
+h3{margin-top:1.5rem;font-size:1.02rem;}
+.card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:1rem 1.2rem;margin:1rem 0;}
+table{border-collapse:collapse;width:100%;font-size:.85em;}
+th,td{border:1px solid var(--border);padding:.3rem .5rem;text-align:left;}
+th{background:#f0f4f4;}
+.chip{color:#fff;border-radius:9px;padding:1px 7px;font-size:.72em;font-weight:600;}
+.big{font-size:1.7rem;font-weight:700;}
+.grid{display:flex;gap:1rem;flex-wrap:wrap;}
+.stat{flex:1;min-width:130px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:.8rem;text-align:center;}
+.prov{background:#fff8e1;border-left:4px solid #b8860b;padding:.6rem .9rem;border-radius:4px;}
+.drift td{color:#5f6368;}
+.flag{background:#fff3f0;}
+small{color:var(--muted);}
+</style></head><body><main>
+<h1>Threshold Batch — Ditch/Keep Triage</h1>
+<p><small>2026-06-13 · 46 species dived overnight on engine <code>56fd106</code> · 14 with expert claims, 32 simulator-derived</small></p>
+
+<div class="grid">
+  <div class="stat"><div class="big" style="color:#2e7d32">16</div>MATCH<br><small>keep as-is</small></div>
+  <div class="stat"><div class="big" style="color:#0e7c7b">55</div>small drift &lt;1.0<br><small>re-derive &amp; keep</small></div>
+  <div class="stat"><div class="big" style="color:#b8860b">3</div>big divergence<br><small>all artifacts</small></div>
+  <div class="stat"><div class="big" style="color:#b3392f">34</div>opponent rank&gt;50<br><small>YOUR call</small></div>
+</div>
+
+<div class="card"><h2>How to read this</h2>
+<p>Your staleness instinct was right: the recent writeup (Tinkaton) reproduced perfectly (8/8), while the 2022-era RyanSwag/SwagTips numbers nearly all moved. <b>But "DIVERGED" is mostly benign</b> — 55 of the 58 divergences are sub-1.0-stat-point grid-notch drift: the matchup is intact, the exact floor just shifted. Those get re-derived to current numbers and shipped as <code>generated</code> with their expert lineage preserved.</p>
+<p>That leaves two real decisions: <b>3 "big" divergences that are all data artifacts</b> (not meta shifts — see below), and <b>34 anchors whose opponent has fallen out of the current top 50</b> — the genuine part-2 "does this matchup still matter" judgment that needs your eye.</p>
+<div class="prov">⚠ <b>Shadow species are PROVISIONAL.</b> The pogo-simulator shadow-CMP correction hasn't landed yet (no commits since the batch engine). The 12 shadow species below are shown for completeness but their CMP-adjacent anchors may change; do not finalize them until that fix ships and the affected species are re-dived.</div>
+</div>
+
+<div class="card"><h2>The 3 "big" divergences — all artifacts, not meta shifts</h2>
+<table><tr><th>Species</th><th>Anchor</th><th>Expert</th><th>Re-derived</th><th>Δ</th><th>Diagnosis</th></tr>
+<tr class="flag"><td>Azumarill</td><td>tinkaton_blkp_any</td><td>143.03 def</td><td>138.66</td><td>−4.37</td><td>Cross-contamination: 143.03 is <b>Tinkaton's</b> Azumarill bulkpoint, mis-copied into Azumarill's config. Drop the anchor.</td></tr>
+<tr class="flag"><td>Guzzlord</td><td>jumpluff_shadow_brkp</td><td>154.7 "def"</td><td>67.51</td><td>−87.2</td><td>Exporter misread an <b>opponent</b> reference stat (Jumpluff's def) as a focal atk claim. Fix the description format; not a real anchor.</td></tr>
+<tr class="flag"><td>Guzzlord</td><td>froslass_brkp</td><td>115.5 "def"</td><td>67.51</td><td>−48.0</td><td>Same parse artifact (opponent def read as focal). Fix/drop.</td></tr>
+</table>
+<p><small>The verification layer catching authoring/parse errors — not just meta drift — is working as intended.</small></p>
+</div>
+
+<div class="card"><h2>Opponent out of current top 50 — your ditch/keep call (34 anchors)</h2>
+<p>These anchors reproduce numerically but target opponents that have slipped in the meta. Out-of-top-50 ≠ dead (some are still played), so this is judgment, not a rule. Sorted by how far the opponent fell.</p>
+<table><tr><th>Species</th><th>Anchor opponent</th><th>Opp rank</th><th>Verdict</th><th>Floor</th></tr>
+<tr><td>altaria</td><td>Trevenant</td><td>#352</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td><td>102.9798 atk</td></tr>
+<tr><td>guzzlord</td><td>Froslass</td><td>#320</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>67.5062 def</td></tr>
+<tr><td>altaria</td><td>Whiscash</td><td>#303</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>106.204 atk</td></tr>
+<tr><td>guzzlord</td><td>Skuntank</td><td>#272</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>113.7068 atk</td></tr>
+<tr><td>azumarill</td><td>Nidoqueen (Shadow)</td><td>#256</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>138.2426 def</td></tr>
+<tr><td>guzzlord</td><td>Nidoqueen (Shadow)</td><td>#256</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td><td>64.3517 def</td></tr>
+<tr><td>azumarill</td><td>Drifblim</td><td>#252</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td><td>137.8251 def</td></tr>
+<tr><td>altaria</td><td>Cofagrigus</td><td>#251</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>107.2788 atk</td></tr>
+<tr><td>azumarill</td><td>Cofagrigus</td><td>#251</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>92.4114 atk</td></tr>
+<tr><td>stunfisk_galarian</td><td>Cofagrigus</td><td>#251</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>128.8999 def</td></tr>
+<tr><td>stunfisk_galarian</td><td>Noctowl</td><td>#218</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>126.7983 def</td></tr>
+<tr><td>spidops</td><td>Golisopod</td><td>#199</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>110.1998 atk</td></tr>
+<tr><td>azumarill</td><td>Lickitung</td><td>#175</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>92.1289 atk</td></tr>
+<tr><td>azumarill</td><td>Walrein</td><td>#158</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>137.4076 def</td></tr>
+<tr><td>quagsire</td><td>Carbink</td><td>#154</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td><td>112.6807 def</td></tr>
+<tr><td>altaria</td><td>Lanturn</td><td>#137</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>103.4095 atk</td></tr>
+<tr><td>stunfisk_galarian</td><td>Lanturn</td><td>#137</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>125.8254 def</td></tr>
+<tr><td>spidops</td><td>Cradily</td><td>#133</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td><td>109.8295 atk</td></tr>
+<tr><td>corviknight</td><td>Annihilape</td><td>#126</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>134.8137 def</td></tr>
+<tr><td>corviknight</td><td>Annihilape</td><td>#126</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>134.8137 def</td></tr>
+<tr><td>tinkaton</td><td>Annihilape</td><td>#126</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td><td>106.5839 atk</td></tr>
+<tr><td>spidops</td><td>Annihilape (Shadow)</td><td>#121</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td><td>112.4634 atk</td></tr>
+<tr><td>spidops</td><td>Togekiss</td><td>#101</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>112.5778 atk</td></tr>
+<tr><td>tinkaton</td><td>Politoed (Shadow)</td><td>#90</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td><td>140.9112 def</td></tr>
+<tr><td>altaria</td><td>Cresselia</td><td>#87</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>103.1697 atk</td></tr>
+<tr><td>guzzlord</td><td>Drapion (Shadow)</td><td>#77</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>114.1034 atk</td></tr>
+<tr><td>tinkaton</td><td>Drapion (Shadow)</td><td>#77</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td><td>140.217 def</td></tr>
+<tr><td>corviknight</td><td>Diggersby</td><td>#74</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>109.9452 atk</td></tr>
+<tr><td>guzzlord</td><td>Jumpluff (Shadow)</td><td>#69</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>67.5062 def</td></tr>
+<tr><td>quagsire</td><td>Charjabug</td><td>#61</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>111.9501 def</td></tr>
+<tr><td>spidops</td><td>Moltres (Galarian)</td><td>#59</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td><td>110.5467 atk</td></tr>
+<tr><td>spidops</td><td>Florges</td><td>#57</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td><td>110.9228 atk</td></tr>
+<tr><td>clodsire</td><td>Sableye</td><td>#55</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>95.91 atk</td></tr>
+<tr><td>quagsire</td><td>Sableye</td><td>#55</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td><td>112.141 def</td></tr>
+</table></div>
+<div class="card"><h2>Per-species detail (expert claims)</h2>
+<h3>altaria</h3><table><tr><th>Anchor</th><th>Opp</th><th>Expert</th><th>Re-derived</th><th>Δ</th><th>Opp rank</th><th>Verdict</th></tr>
+<tr class="drift"><td>jumpluff_brkp_any</td><td>Jumpluff</td><td>102.85 atk</td><td>103.1697</td><td>+0.320</td><td>#32</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr><td>trevenant_brkp_any</td><td>Trevenant</td><td>102.97 atk</td><td>102.9798</td><td>+0.010</td><td>#352</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td></tr>
+<tr class="drift"><td>lanturn_brkp_any</td><td>Lanturn</td><td>103.31 atk</td><td>103.4095</td><td>+0.099</td><td>#137</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>cresselia_brkp_any</td><td>Cresselia</td><td>103.4 atk</td><td>103.1697</td><td>-0.230</td><td>#87</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>whiscash_brkp_any</td><td>Whiscash</td><td>106.03 atk</td><td>106.204</td><td>+0.174</td><td>#303</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>cofagrigus_brkp_any</td><td>Cofagrigus</td><td>107.24 atk</td><td>107.2788</td><td>+0.039</td><td>#251</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>jumpluff_blkp_any</td><td>Jumpluff</td><td>149.61 def</td><td>149.7655</td><td>+0.155</td><td>#32</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+</table>
+<h3>azumarill</h3><table><tr><th>Anchor</th><th>Opp</th><th>Expert</th><th>Re-derived</th><th>Δ</th><th>Opp rank</th><th>Verdict</th></tr>
+<tr class="drift"><td>cmp_vs_slight_atk</td><td>—</td><td>92.0 atk</td><td>92.1289</td><td>+0.129</td><td>—</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>talonflame_brkp_any</td><td>Talonflame</td><td>91.7 atk</td><td>91.8464</td><td>+0.146</td><td>#43</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>cofagrigus_brkp_any</td><td>Cofagrigus</td><td>91.92 atk</td><td>92.4114</td><td>+0.491</td><td>#251</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>lickitung_brkp_any</td><td>Lickitung</td><td>92.15 atk</td><td>92.1289</td><td>-0.021</td><td>#175</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>medicham_blkp_any</td><td>Medicham</td><td>137.64 def</td><td>137.8251</td><td>+0.185</td><td>#27</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="flag"><td>tinkaton_blkp_any</td><td>Tinkaton</td><td>143.03 def</td><td>138.6601</td><td>-4.370</td><td>#10</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>walrein_blkp_any</td><td>Walrein</td><td>137.28 def</td><td>137.4076</td><td>+0.128</td><td>#158</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr><td>drifblim_blkp_any</td><td>Drifblim</td><td>137.82 def</td><td>137.8251</td><td>+0.005</td><td>#252</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td></tr>
+<tr class="drift"><td>nidoqueen_shadow_blkp_any</td><td>Nidoqueen (Shadow)</td><td>138.04 def</td><td>138.2426</td><td>+0.203</td><td>#256</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+</table>
+<h3>clodsire</h3><table><tr><th>Anchor</th><th>Opp</th><th>Expert</th><th>Re-derived</th><th>Δ</th><th>Opp rank</th><th>Verdict</th></tr>
+<tr class="drift"><td>mirror_blkp_any</td><td>Clodsire</td><td>116.45 def</td><td>116.4979</td><td>+0.048</td><td>#37</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>mirror_brkp_any</td><td>Clodsire</td><td>97.15 atk</td><td>97.1801</td><td>+0.030</td><td>#37</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>medicham_brkp_any</td><td>Medicham</td><td>96.5 atk</td><td>96.7192</td><td>+0.219</td><td>#27</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>sableye_brkp_any</td><td>Sableye</td><td>95.8 atk</td><td>95.91</td><td>+0.110</td><td>#55</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>mantine_brkp_any</td><td>Mantine</td><td>94.7 atk</td><td>94.7816</td><td>+0.082</td><td>#17</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+</table>
+<h3>corviknight</h3><table><tr><th>Anchor</th><th>Opp</th><th>Expert</th><th>Re-derived</th><th>Δ</th><th>Opp rank</th><th>Verdict</th></tr>
+<tr class="drift"><td>mirror_blkp_above_hsh_basic</td><td>Corviknight</td><td>127.59 def</td><td>127.9971</td><td>+0.407</td><td>#21</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>annihilape_blkp_above_swag</td><td>Annihilape</td><td>134.61 def</td><td>134.8137</td><td>+0.204</td><td>#126</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>corsola_galarian_blkp_above_swag</td><td>Corsola (Galarian)</td><td>130.34 def</td><td>130.5317</td><td>+0.192</td><td>#7</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>annihilape_blkp_any</td><td>Annihilape</td><td>134.61 def</td><td>134.8137</td><td>+0.204</td><td>#126</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>corsola_galarian_blkp_any</td><td>Corsola (Galarian)</td><td>130.34 def</td><td>130.5317</td><td>+0.192</td><td>#7</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr><td>mirror_brkp_above_hsh_atk</td><td>Corviknight</td><td>111.47 atk</td><td>111.4736</td><td>+0.004</td><td>#21</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td></tr>
+<tr class="drift"><td>azumarill_brkp_above_swag</td><td>Azumarill</td><td>108.75 atk</td><td>108.964</td><td>+0.214</td><td>#13</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>diggersby_brkp_above_swag</td><td>Diggersby</td><td>110.0 atk</td><td>109.9452</td><td>-0.055</td><td>#74</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+</table>
+<h3>empoleon</h3><table><tr><th>Anchor</th><th>Opp</th><th>Expert</th><th>Re-derived</th><th>Δ</th><th>Opp rank</th><th>Verdict</th></tr>
+<tr class="drift"><td>mirror_blkp_above_jre</td><td>Empoleon</td><td>117.0 def</td><td>117.3877</td><td>+0.388</td><td>#4</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>malamar_brkp_above_jre</td><td>Malamar</td><td>125.0 atk</td><td>125.0562</td><td>+0.056</td><td>#19</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+</table>
+<h3>guzzlord</h3><table><tr><th>Anchor</th><th>Opp</th><th>Expert</th><th>Re-derived</th><th>Δ</th><th>Opp rank</th><th>Verdict</th></tr>
+<tr class="drift"><td>mirror_blkp_any</td><td>Guzzlord</td><td>62.0 def</td><td>62.0535</td><td>+0.053</td><td>#16</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>altaria_brkp_any</td><td>Altaria</td><td>114.4 atk</td><td>114.1267</td><td>-0.273</td><td>#2</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="flag"><td>jumpluff_shadow_brkp_any</td><td>Jumpluff (Shadow)</td><td>154.7 def</td><td>67.5062</td><td>-87.194</td><td>#69</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>medicham_brkp_any</td><td>Medicham</td><td>114.0 atk</td><td>113.8484</td><td>-0.152</td><td>#27</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="flag"><td>froslass_brkp_any</td><td>Froslass</td><td>115.5 def</td><td>67.5062</td><td>-47.994</td><td>#320</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>skuntank_brkp_any</td><td>Skuntank</td><td>113.85 atk</td><td>113.7068</td><td>-0.143</td><td>#272</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>drapion_shadow_brkp_any</td><td>Drapion (Shadow)</td><td>114.25 atk</td><td>114.1034</td><td>-0.147</td><td>#77</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr><td>nidoqueen_shadow_blkp_any</td><td>Nidoqueen (Shadow)</td><td>64.35 def</td><td>64.3517</td><td>+0.002</td><td>#256</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td></tr>
+</table>
+<h3>jumpluff</h3><table><tr><th>Anchor</th><th>Opp</th><th>Expert</th><th>Re-derived</th><th>Δ</th><th>Opp rank</th><th>Verdict</th></tr>
+<tr class="drift"><td>altaria_brkp_any</td><td>Altaria</td><td>102.85 atk</td><td>102.7874</td><td>-0.063</td><td>#2</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+</table>
+<h3>malamar</h3><table><tr><th>Anchor</th><th>Opp</th><th>Expert</th><th>Re-derived</th><th>Δ</th><th>Opp rank</th><th>Verdict</th></tr>
+<tr class="drift"><td>medicham_brkp_above_swag</td><td>Medicham</td><td>119.94 atk</td><td>120.0756</td><td>+0.136</td><td>#27</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>medicham_brkp_any</td><td>Medicham</td><td>119.94 atk</td><td>120.0756</td><td>+0.136</td><td>#27</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>stunfisk_galarian_brkp_any</td><td>Stunfisk (Galarian)</td><td>111.2 def</td><td>111.3839</td><td>+0.184</td><td>#33</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>medicham_blkp_any</td><td>Medicham</td><td>111.2 def</td><td>111.2541</td><td>+0.054</td><td>#27</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>stunfisk_galarian_blkp_any</td><td>Stunfisk (Galarian)</td><td>111.2 def</td><td>111.3839</td><td>+0.184</td><td>#33</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+</table>
+<h3>medicham</h3><table><tr><th>Anchor</th><th>Opp</th><th>Expert</th><th>Re-derived</th><th>Δ</th><th>Opp rank</th><th>Verdict</th></tr>
+<tr class="drift"><td>cmp_vs_ryanswag_preferred</td><td>—</td><td>106.92 atk</td><td>107.1087</td><td>+0.189</td><td>—</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>mirror_brkp_above_swag</td><td>Medicham</td><td>108.0 atk</td><td>108.0762</td><td>+0.076</td><td>#27</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>mirror_blkp_above_swag</td><td>Medicham</td><td>137.64 def</td><td>137.8092</td><td>+0.169</td><td>#27</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>mirror_blkp_any</td><td>Medicham</td><td>137.64 def</td><td>137.8092</td><td>+0.169</td><td>#27</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+</table>
+<h3>ninetales</h3><table><tr><th>Anchor</th><th>Opp</th><th>Expert</th><th>Re-derived</th><th>Δ</th><th>Opp rank</th><th>Verdict</th></tr>
+<tr class="drift"><td>mirror_blkp_above_jre47</td><td>Ninetales</td><td>136.0 def</td><td>136.1616</td><td>+0.162</td><td>#11</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>azumarill_brkp_above_jre47</td><td>Azumarill</td><td>113.0 atk</td><td>113.0685</td><td>+0.069</td><td>#13</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+</table>
+<h3>quagsire</h3><table><tr><th>Anchor</th><th>Opp</th><th>Expert</th><th>Re-derived</th><th>Δ</th><th>Opp rank</th><th>Verdict</th></tr>
+<tr class="drift"><td>sableye_blkp_any</td><td>Sableye</td><td>112.0 def</td><td>112.141</td><td>+0.141</td><td>#55</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>medicham_blkp_any</td><td>Medicham</td><td>112.0 def</td><td>112.141</td><td>+0.141</td><td>#27</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>charjabug_blkp_any</td><td>Charjabug</td><td>112.0 def</td><td>111.9501</td><td>-0.050</td><td>#61</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>medicham_brkp_any</td><td>Medicham</td><td>113.28 atk</td><td>113.3402</td><td>+0.060</td><td>#27</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr><td>carbink_blkp_any</td><td>Carbink</td><td>112.68 def</td><td>112.6807</td><td>+0.001</td><td>#154</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td></tr>
+</table>
+<h3>spidops</h3><table><tr><th>Anchor</th><th>Opp</th><th>Expert</th><th>Re-derived</th><th>Δ</th><th>Opp rank</th><th>Verdict</th></tr>
+<tr><td>cradily_brkp_any</td><td>Cradily</td><td>109.82 atk</td><td>109.8295</td><td>+0.010</td><td>#133</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td></tr>
+<tr class="drift"><td>golisopod_brkp_any</td><td>Golisopod</td><td>110.24 atk</td><td>110.1998</td><td>-0.040</td><td>#199</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr><td>moltres_galarian_brkp_any</td><td>Moltres (Galarian)</td><td>110.54 atk</td><td>110.5467</td><td>+0.007</td><td>#59</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td></tr>
+<tr><td>florges_brkp_any</td><td>Florges</td><td>110.92 atk</td><td>110.9228</td><td>+0.003</td><td>#57</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td></tr>
+<tr><td>stunfisk_brkp_any</td><td>Stunfisk</td><td>111.34 atk</td><td>111.3389</td><td>-0.001</td><td>#42</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td></tr>
+<tr class="drift"><td>togekiss_brkp_any</td><td>Togekiss</td><td>112.03 atk</td><td>112.5778</td><td>+0.548</td><td>#101</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr><td>annihilape_shadow_brkp_any</td><td>Annihilape (Shadow)</td><td>112.46 atk</td><td>112.4634</td><td>+0.003</td><td>#121</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td></tr>
+<tr class="drift"><td>forretress_brkp_any</td><td>Forretress</td><td>113.03 atk</td><td>112.5294</td><td>-0.501</td><td>#14</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+</table>
+<h3>stunfisk_galarian</h3><table><tr><th>Anchor</th><th>Opp</th><th>Expert</th><th>Re-derived</th><th>Δ</th><th>Opp rank</th><th>Verdict</th></tr>
+<tr><td>mirror_brkp_above_swag</td><td>Stunfisk (Galarian)</td><td>101.79 atk</td><td>101.7913</td><td>+0.001</td><td>#33</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td></tr>
+<tr class="drift"><td>mirror_brkp_any</td><td>Stunfisk (Galarian)</td><td>102.0 atk</td><td>101.8619</td><td>-0.138</td><td>#33</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>lanturn_blkp_any</td><td>Lanturn</td><td>125.78 def</td><td>125.8254</td><td>+0.045</td><td>#137</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>noctowl_blkp_any</td><td>Noctowl</td><td>126.9 def</td><td>126.7983</td><td>-0.102</td><td>#218</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+<tr class="drift"><td>cofagrigus_blkp_any</td><td>Cofagrigus</td><td>128.8 def</td><td>128.8999</td><td>+0.100</td><td>#251</td><td><span class="chip" style="background:#b8860b">DIVERGED</span></td></tr>
+</table>
+<h3>tinkaton</h3><table><tr><th>Anchor</th><th>Opp</th><th>Expert</th><th>Re-derived</th><th>Δ</th><th>Opp rank</th><th>Verdict</th></tr>
+<tr><td>jellicent_brkp_any</td><td>Jellicent</td><td>106.2 atk</td><td>106.2015</td><td>+0.001</td><td>#5</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td></tr>
+<tr><td>annihilape_brkp_any</td><td>Annihilape</td><td>106.58 atk</td><td>106.5839</td><td>+0.004</td><td>#126</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td></tr>
+<tr><td>azumarill_blkp_any</td><td>Azumarill</td><td>143.03 def</td><td>143.0385</td><td>+0.008</td><td>#13</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td></tr>
+<tr><td>shadow_drapion_blkp_any</td><td>Drapion (Shadow)</td><td>140.21 def</td><td>140.217</td><td>+0.007</td><td>#77</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td></tr>
+<tr><td>shadow_politoed_blkp_any</td><td>Politoed (Shadow)</td><td>140.91 def</td><td>140.9112</td><td>+0.001</td><td>#90</td><td><span class="chip" style="background:#2e7d32">MATCH</span></td></tr>
+</table>
+</div>
+<div class="card"><h2>Simulator-derived species (32) — pure new coverage</h2>
+<p>No expert claim to verify; these are fresh current-engine anchors for species the app does not cover today. Shadow forms marked provisional.</p><p>
+aegislash_blade, aegislash_shield, <b>altaria_shadow</b>, corsola_galarian, dragonair, <b>dragonair_shadow</b>, <b>drapion_shadow</b>, <b>empoleon_shadow</b>, fearow, feraligatr, <b>feraligatr_shadow</b>, florges, forretress, <b>forretress_shadow</b>, furret, jellicent, kingdra, <b>kingdra_shadow</b>, lapras, lickilicky, mantine, <b>ninetales_shadow</b>, <b>quagsire_shadow</b>, <b>sableye_shadow</b>, seaking, sealeo, <b>sealeo_shadow</b>, seismitoad, shelgon, <b>shelgon_shadow</b>, sliggoo, sylveon
+</p><p><small>Bold = shadow (provisional pending shadow-CMP fix).</small></p></div>
+</main></body></html>
