@@ -72,7 +72,11 @@ run_dive() {
   say "DIVE $tag done in ${mins}m"
 
   # Export: newest matching blob -> app TOML + parity vectors + verification.
-  local pat="*${species//[()]/*}*replay.pkl.gz"; [ "$shadow" = yes ] && pat="*${species//[()]/*}*shadow*replay.pkl.gz"
+  # deep_dive.py names blobs with non-alphanumerics collapsed to '_'
+  # (e.g. "Corsola (Galarian)" -> Corsola_Galarian), so match by turning
+  # every non-alphanumeric run in the species into a glob '*'.
+  local gp="${species//[^A-Za-z0-9]/*}"
+  local pat="*${gp}*replay.pkl.gz"; [ "$shadow" = yes ] && pat="*${gp}*shadow*replay.pkl.gz"
   local blob; blob=$(ls -t "$SIM"/userdata/replay/$pat 2>/dev/null | head -1)
   local toml=$SIM/thresholds/$s.toml
   [ "$shadow" = yes ] && [ -f "$SIM/thresholds/${s}_shadow.toml" ] && toml=$SIM/thresholds/${s}_shadow.toml
