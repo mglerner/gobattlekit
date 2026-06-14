@@ -44,9 +44,42 @@ use them to label, order, and optionally hide generated targets. See
 target_class() for how a missing/invalid 'class' resolves.
 """
 
+import logging
+import tomllib
+from pathlib import Path
+
 from .evolution_lines import load_evolution_lines
 
+logger = logging.getLogger(__name__)
+
 EVOLUTION_LINES = load_evolution_lines()
+
+# The bundled TOML that backs DEFAULT_THRESHOLDS. It is a lossless
+# encoding of the nested-dict schema documented above; the threshold
+# pipeline appends per-species tables to it. Located beside this module
+# so it travels with the Briefcase/Toga package (same pattern as
+# evolution_lines.json's BUNDLED_PATH).
+BUNDLED_THRESHOLDS_PATH = Path(__file__).parent / 'default_thresholds.toml'
+
+
+def load_bundled_thresholds(path=BUNDLED_THRESHOLDS_PATH):
+    """Load the bundled default thresholds from TOML.
+
+    Returns the same nested dict shape DEFAULT_THRESHOLDS has always had:
+    {Species: {'sources': str (optional),
+               'Great'|'Ultra'|'Master': {Target: spec}}}.
+
+    The TOML tables map straight onto that shape — tomllib already yields
+    the int/float/str/list-of-lists types the consumers expect, so no
+    coercion happens here. The file is a packaged asset; a missing or
+    corrupt one is a build error, so we log and re-raise rather than limp
+    along with empty thresholds.
+    """
+    try:
+        return tomllib.loads(path.read_text())
+    except Exception:
+        logger.exception("Could not load bundled thresholds from %s", path)
+        raise
 
 # The provenance classes a target may declare via its 'class' key.
 TARGET_CLASSES = ('expert', 'generated')
@@ -106,105 +139,14 @@ def has_generated_targets(thresholds, store='default'):
 # TO ADD
 # * inadequance chilling water florges
 
-DEFAULT_THRESHOLDS = {
-    'Spidops': {
-        'sources': "the HomeSliceHenry Discord server",
-        'Great': {
-            'Atk': {
-                'attack': 113.03, 'defense': 138.88, 'stamina': 0},
-            'Bulk': {
-                'attack': 109.82, 'defense': 138.88, 'stamina': 0},
-            'Bulk+': {
-                'attack': 109.82, 'defense': 140.67, 'stamina': 0},
-        },
-    },
-    'Tinkaton': {
-        'sources': "These are Gigaton Hammer matchups, from the HomeSliceHenry Discord server",
-        'Great': {
-            'GH Great': {
-                'attack': 0, 'defense': 143.03, 'stamina': 138},
-            'GH Good': {
-                'attack': 0, 'defense': 141.66, 'stamina': 138},
-        },
-    },
-    'Corviknight': {
-        'sources': "the HomeSliceHenry Discord server",
-        'Great': {
-            'Basic': {
-                'attack': 0, 'defense': 127.59, 'stamina': 0},
-            'Atk': {
-                'attack': 111.47, 'defense': 127.59, 'stamina': 0},
-            'Bulk': {
-                'attack': 100, 'defense': 132.10, 'stamina': 149},
-        },
-    },
-    'Drapion (Shadow)': {
-        'sources': "the HomeSliceHenry Discord server",
-        'Great': {
-            'Azu bul': {
-                'attack': 0, 'defense': 138, 'stamina': 0,},
-        },
-    },
-    'Florges': {
-        'sources': "Inadequance's [YouTube Video](https://www.youtube.com/watch?v=KXLWLcOw3G4&t=295s)",
-        'Great': {
-            'SWak 9/6/14': {
-                'attack': 121.5, 'defense': 0, 'stamina': 0},
-            'Inadequance': {
-                'ivs': [[0, 14, 13], [9, 6, 14], [8, 1, 8]],
-            },
-        },
-        'Ultra': {
-            'Inadequance': { # 15/15/13
-                'ivs': [[0, 14, 15], [0, 15, 3], [5, 11, 5]],
-            },
-
-        },
-        'Master': {
-            'Basic': { # 15/15/13
-                'attack': 190, 'defense': 217, 'stamina': 167},
-            'Inadequance': { # 15/15/13
-                'ivs': [[15, 15, 15], [15, 15, 14], [15, 15, 13], [15, 15, 12]],
-            },
-
-        },
-    },
-    'Annihilape': {
-        'Great': {
-            'Ape Slayer': {
-                'ivs': [
-                    [11, 10, 2],
-                    [15, 12, 5],
-                    [11, 11, 0],
-                    [15, 13, 4],
-                    [11, 9, 3],
-                    [11, 9, 2],
-                    [15, 14, 3],
-                    [15, 14, 2],
-                    [11, 10, 1],
-                    [11, 10, 0],
-                    [12, 9, 1],
-                    [12, 9, 0],
-                    [15, 15, 1],
-                    [15, 15, 0],
-                    [15, 12, 4],
-                    [15, 13, 3],
-                    [15, 13, 2],
-                    [11, 9, 1],
-                    [11, 9, 0],
-                    [15, 14, 1],
-                    [15, 14, 0],
-                    [15, 12, 3],
-                    [15, 12, 2],
-                    [15, 13, 1],
-                    [15, 13, 0],
-                    [15, 12, 1],
-                    [15, 12, 0],
-                ],
-            },
-        },
-    },
-}
+# DEFAULT_THRESHOLDS now lives in the bundled default_thresholds.toml and
+# is loaded at import time. The TOML is a lossless encoding of the former
+# in-Python dict (same species, leagues, targets, numeric types, ivs
+# lists, onlytop, and provenance keys) and is what the threshold pipeline
+# appends to. SENTIMENTAL_DEFAULT_THRESHOLDS stays a Python literal below:
+# it is deliberately frozen, carries no provenance, and the pipeline never
+# touches it, so a second TOML/table would just be ceremony.
+DEFAULT_THRESHOLDS = load_bundled_thresholds()
 
 
 # Do not delete these. They're the old SwagTips era thresholds, and I

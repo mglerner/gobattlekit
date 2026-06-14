@@ -1,0 +1,99 @@
+# Bundled default IV thresholds for GoBattleKit.
+#
+# This file is the data source for DEFAULT_THRESHOLDS, loaded at
+# import time by load_bundled_thresholds() in thresholds.py. It is a
+# lossless TOML encoding of the former in-Python dict; the threshold
+# pipeline appends per-species tables here as it generates them.
+#
+# Schema (mirrors the nested dict the loader returns):
+#   [Species]                       species table
+#   sources = "..."                 optional species-level credit
+#   [Species.League."Target Name"]  one table per target
+#     attack/defense/stamina = num  stat floors (0 = don't care)
+#     ivs = [[a, d, s], ...]        optional explicit IV list
+#     onlytop = int                 optional rank cap
+#     class/source/desc = "..."     optional provenance metadata
+
+[Spidops]
+sources = "the HomeSliceHenry Discord server"
+
+[Spidops.Great.Atk]
+attack = 113.03
+defense = 138.88
+stamina = 0
+
+[Spidops.Great.Bulk]
+attack = 109.82
+defense = 138.88
+stamina = 0
+
+[Spidops.Great."Bulk+"]
+attack = 109.82
+defense = 140.67
+stamina = 0
+
+[Tinkaton]
+sources = "These are Gigaton Hammer matchups, from the HomeSliceHenry Discord server"
+
+[Tinkaton.Great."GH Great"]
+attack = 0
+defense = 143.03
+stamina = 138
+
+[Tinkaton.Great."GH Good"]
+attack = 0
+defense = 141.66
+stamina = 138
+
+[Corviknight]
+sources = "the HomeSliceHenry Discord server"
+
+[Corviknight.Great.Basic]
+attack = 0
+defense = 127.59
+stamina = 0
+
+[Corviknight.Great.Atk]
+attack = 111.47
+defense = 127.59
+stamina = 0
+
+[Corviknight.Great.Bulk]
+attack = 100
+defense = 132.1
+stamina = 149
+
+["Drapion (Shadow)"]
+sources = "the HomeSliceHenry Discord server"
+
+["Drapion (Shadow)".Great."Azu bul"]
+attack = 0
+defense = 138
+stamina = 0
+
+[Florges]
+sources = "Inadequance's [YouTube Video](https://www.youtube.com/watch?v=KXLWLcOw3G4&t=295s)"
+
+[Florges.Great."SWak 9/6/14"]
+attack = 121.5
+defense = 0
+stamina = 0
+
+[Florges.Great.Inadequance]
+ivs = [[0, 14, 13], [9, 6, 14], [8, 1, 8]]
+
+[Florges.Ultra.Inadequance]
+ivs = [[0, 14, 15], [0, 15, 3], [5, 11, 5]]
+
+[Florges.Master.Basic]
+attack = 190
+defense = 217
+stamina = 167
+
+[Florges.Master.Inadequance]
+ivs = [[15, 15, 15], [15, 15, 14], [15, 15, 13], [15, 15, 12]]
+
+[Annihilape]
+
+[Annihilape.Great."Ape Slayer"]
+ivs = [[11, 10, 2], [15, 12, 5], [11, 11, 0], [15, 13, 4], [11, 9, 3], [11, 9, 2], [15, 14, 3], [15, 14, 2], [11, 10, 1], [11, 10, 0], [12, 9, 1], [12, 9, 0], [15, 15, 1], [15, 15, 0], [15, 12, 4], [15, 13, 3], [15, 13, 2], [11, 9, 1], [11, 9, 0], [15, 14, 1], [15, 14, 0], [15, 12, 3], [15, 12, 2], [15, 13, 1], [15, 13, 0], [15, 12, 1], [15, 12, 0]]
