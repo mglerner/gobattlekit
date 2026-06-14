@@ -1,0 +1,37 @@
+# Curation rule for the threshold exporter (export_thresholds.py --curation).
+#
+# Purpose: keep generated tiers focused on opponents that still matter in the
+# current Great League meta. Resolved anchors target a specific opponent; if
+# that opponent has fallen out of the current GL top 50 it usually should not
+# spawn an app threshold tier -- UNLESS the owner judges it still meta-relevant.
+#
+# Rule (applied to each resolved anchor by its opponent's display name):
+#   * Opponent within the current top `rank_threshold`  -> ALWAYS KEEP.
+#   * Opponent on `keep_names` (match on base name, ignoring " (Shadow)")
+#     -> ALWAYS KEEP, regardless of rank.
+#   * Otherwise (rank > threshold, or opponent absent from rankings)
+#     -> DITCH (anchor never becomes a tier).
+#
+# Source of the ditch/keep calls: the 2026-06-13 triage,
+#   docs/threshold_pipeline/2026-06-13_ditch_keep_triage.html
+# ("Opponent out of current top 50 -- your ditch/keep call"). The owner's
+# explicit KEEP-regardless picks from that triage are encoded in keep_names.
+#
+# Rankings are read from pvpoke's rankings-1500.json (list order == rank,
+# matched on speciesName). If that file is missing the exporter degrades
+# gracefully: it keeps everything and logs a warning.
+
+# Opponents within this rank are always kept (1-indexed; top 50 => 50).
+rank_threshold = 50
+
+# KEEP regardless of rank. Compared against the opponent's BASE name, i.e.
+# with a trailing " (Shadow)" stripped, so e.g. "Annihilape (Shadow)" and
+# "Annihilape" both match "Annihilape", and "Jumpluff (Shadow)" matches
+# "Jumpluff".
+keep_names = [
+    "Annihilape",
+    "Togekiss",
+    "Diggersby",
+    "Jumpluff",
+    "Sableye",
+]

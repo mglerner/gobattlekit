@@ -31,6 +31,8 @@ import math
 import pickle
 import re
 import sys
+import tomllib
+from collections import Counter
 from datetime import date
 from pathlib import Path
 
@@ -61,6 +63,13 @@ MAX_TARGETS = 4
 CLUSTER_EPS = 0.75          # stat distance for grouping anchor floors into a tier
 N_PARITY_VECTORS = 25
 FORBIDDEN_TARGET_KEYS = {"onlytop"}
+
+# Current GL rankings (list order == rank, matched on speciesName). Used only
+# when --curation is given; overridable via --rankings.
+DEFAULT_RANKINGS = Path(
+    "/Users/mglerner/coding/MGLPoGo/pvpoke/src/data/rankings/all/overall/"
+    "rankings-1500.json"
+)
 
 
 def slugify(s: str) -> str:
@@ -171,6 +180,67 @@ def _cluster_floors(parent_floors: dict[str, float]) -> list[tuple[float, list[s
     # A tier clears all its members only at the cluster's MAX floor.
     return [(max(parent_floors[p] for p in members), members)
             for top, members in clusters]
+
+
+# ---------------------------------------------------------------------------
+# Curation: drop anchors whose opponent has fallen out of the current meta
+# (deliverable 1). See curation.toml for the rule.
+# ---------------------------------------------------------------------------
+
+def base_name(opponent: str) -> str:
+    """Opponent display name with a trailing ' (Shadow)' stripped."""
+    return opponent[: -len(" (Shadow)")] if opponent.endswith(" (Shadow)") else opponent
+
+
+def load_curation(path: Path) -> dict:
+    cfg = tomllib.loads(path.read_text())
+    return {
+        "rank_threshold": int(cfg.get("rank_threshold", 50)),
+        "keep_names": set(cfg.get("keep_names", [])),
+    }
+
+
+def load_rankings(path: Path) -> dict[str, int] | None:
+    """speciesName -> 1-indexed rank, or None if the file is unavailable."""
+    try:
+        data = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"WARNING: rankings unavailable ({path}): {e}; keeping all anchors")
+        return None
+    return {e["speciesName"]: i + 1 for i, e in enumerate(data)}
+
+
+def keep_anchor(opponent: str | None, ranks: dict[str, int], cfg: dict) -> bool:
+    """True if an anchor's opponent should be kept under the curation rule."""
+    if not opponent:
+        return True  # no opponent (e.g. CMP anchors) -> never curated out
+    if base_name(opponent) in cfg["keep_names"]:
+        return True
+    rank = ranks.get(opponent)
+    return rank is not None and rank <= cfg["rank_threshold"]
+
+
+def curate_anchors(resolved_anchors, ranks: dict[str, int] | None, cfg: dict):
+    """Filter resolved anchors by the curation rule; log a per-species summary.
+
+    If ranks is None (rankings missing) everything is kept.
+    """
+    if ranks is None:
+        return list(resolved_anchors)
+    kept, dropped = [], []
+    for a in resolved_anchors:
+        (kept if keep_anchor(getattr(a, "opponent", None), ranks, cfg)
+         else dropped).append(a)
+
+    kept_opps = Counter(getattr(a, "opponent", None) or "(no opponent)" for a in kept)
+    drop_opps = Counter(getattr(a, "opponent", None) or "(no opponent)" for a in dropped)
+    print(f"curation: kept {len(kept)} anchors, dropped {len(dropped)} "
+          f"(rank>{cfg['rank_threshold']} & not on keep-list)")
+    for opp in sorted(set(kept_opps) | set(drop_opps)):
+        k, d = kept_opps.get(opp, 0), drop_opps.get(opp, 0)
+        verdict = "DROP" if d and not k else ("KEEP" if k and not d else "MIXED")
+        print(f"  {opp}: kept {k}, dropped {d} [{verdict}]")
+    return kept
 
 
 def generated_targets(resolved_anchors, grid: StatGrid, n_slots: int) -> list[dict]:
@@ -517,6 +587,13 @@ def main(argv=None) -> int:
                     help="authored thresholds TOML; overrides the registry "
                          "embedded in the blob as the expert source")
     ap.add_argument("--out", type=Path, required=True, help="output directory")
+    ap.add_argument("--curation", type=Path, default=None,
+                    help="curation TOML (e.g. curation.toml); when given, "
+                         "resolved anchors whose opponent is out of the meta "
+                         "are dropped before clustering. Default: no curation.")
+    ap.add_argument("--rankings", type=Path, default=DEFAULT_RANKINGS,
+                    help="rankings JSON for the curation rule "
+                         "(list order == rank, matched on speciesName)")
     args = ap.parse_args(argv)
 
     blob = load_blob(args.blob)
@@ -539,8 +616,14 @@ def main(argv=None) -> int:
     focal_types = species_types(species)
     focal_moves = species_moves(species)
 
+    gen_anchors = resolved
+    if args.curation is not None:
+        cfg = load_curation(args.curation)
+        ranks = load_rankings(args.rankings)
+        gen_anchors = curate_anchors(resolved, ranks, cfg)
+
     targets = expert_targets(spreads_lt) if spreads_lt else []
-    targets += generated_targets(resolved, grid, MAX_TARGETS - len(targets))
+    targets += generated_targets(gen_anchors, grid, MAX_TARGETS - len(targets))
     targets = targets[:MAX_TARGETS]
 
     args.out.mkdir(parents=True, exist_ok=True)
