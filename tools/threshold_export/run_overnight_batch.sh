@@ -83,7 +83,8 @@ run_dive() {
   if [ -n "$blob" ]; then
     local targs=()
     [ -f "$toml" ] && targs=(--thresholds "$toml")
-    ( cd "$EXPORT_DIR" && $PYRUN export_thresholds.py "$blob" "${targs[@]}" --out "$OUT_ROOT/export" ) >>"$LOG" 2>&1 \
+    ( cd "$EXPORT_DIR" && $PYRUN export_thresholds.py "$blob" ${targs[@]+"${targs[@]}"} \
+        --curation curation.toml --out "$OUT_ROOT/export" ) >>"$LOG" 2>&1 \
       && say "EXPORT $tag ok" || say "EXPORT $tag FAILED (dive kept; re-export later)"
   else
     say "EXPORT $tag SKIPPED: no replay blob found"
