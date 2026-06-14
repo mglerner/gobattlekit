@@ -31,9 +31,11 @@ from gobattlekit.data.iv_checker import (
     ivs_to_stats,
 )
 
+# Canonical, checked-in golden vectors. The exporter writes to its scratch
+# out/ dir (gitignored, regenerated every dive); copy a species' *_parity.json
+# here and pin its base stats below to add it to the suite.
 PARITY_DIR = (
-    pathlib.Path(__file__).resolve().parents[1]
-    / 'tools' / 'threshold_export' / 'out'
+    pathlib.Path(__file__).resolve().parent / 'fixtures' / 'parity'
 )
 
 # Base stats pinned from the cached gamemaster snapshot that generated the
