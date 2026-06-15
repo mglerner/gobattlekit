@@ -1,18 +1,38 @@
 # GoBattleKit Developer Notes
 
 ## Setup
+
+`briefcase` is installed once as a uv-managed tool (pipx-style) — no venv to activate:
 ```zsh
-cd ~/coding/MGLPoGo
-source .venv/bin/activate
-cd gobattlekit
+uv tool install briefcase     # one-time; on PATH globally, uv-managed Python
+cd ~/coding/MGLPoGo/gobattlekit
 ```
 
-## Quick Testing
+## Quick Testing (run the app)
 ```zsh
 briefcase dev
 ```
 
 Runs the app on macOS without building for iOS/Android. Note: some platform-specific behavior differs (e.g. colors may look different in light/dark mode).
+
+## Running the unit tests
+
+This is a Briefcase app, **not** a pip package — its deps live under `[tool.briefcase]`
+(`requires`, `test_requires`), so `uv pip install -e '.[dev]'` does **not** work here (no
+`[project]`/`[build-system]` table, no `dev` extra). The tests are pure-logic
+(`gobattlekit.data.*` + stdlib — no toga/GUI), so they need only `pytest` + `certifi`.
+
+Quickest — ephemeral, no venv to manage:
+```zsh
+uv run --with pytest --with certifi pytest -q     # 241 passed
+```
+
+Or a persistent dev venv:
+```zsh
+uv venv --python-preference only-managed
+uv pip install -e . pytest certifi
+uv run pytest -q
+```
 
 ## GitHub
 `https://github.com/mglerner/gobattlekit` (public)
