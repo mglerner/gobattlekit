@@ -1,15 +1,27 @@
-"""The bundled-TOML default thresholds: lossless migration pin.
+"""The bundled-TOML default thresholds: lossless round-trip + provenance pin.
 
-DEFAULT_THRESHOLDS used to be a Python literal in thresholds.py; it now
-loads from the bundled default_thresholds.toml via load_bundled_thresholds().
-These tests pin that the TOML decodes to the EXACT pre-migration structure —
-same species/leagues/targets, same numeric *types* (int vs float, which the
-match engine and screens rely on), same ivs lists, onlytop, and the
-class/source/desc provenance keys — and that target_class /
-drop_generated_targets / has_generated_targets behave identically on the
-loaded data. EXPECTED below is a verbatim copy of the old in-Python dict.
+DEFAULT_THRESHOLDS loads from the bundled default_thresholds.toml via
+load_bundled_thresholds(). That file is now produced by the threshold
+re-dive pipeline (tools/threshold_export/bundle_into_app.py) merging fresh
+per-species exports into the prior file — 6 hand-curated species grew to 47
+(most carrying pipeline-"generated" targets that light up the SIM toggle),
+while Florges' Ultra/Master and the no-fresh-export Annihilape were kept
+verbatim.
+
+These tests keep the original intent across that growth:
+  * lossless round-trip — the file decodes to a dict that re-emits to the
+    exact same bytes (so nothing is silently dropped or reordered) and the
+    module-level name is the loader's output, not a stale literal;
+  * type-strict leaves — every numeric leaf keeps its int-vs-float identity
+    (the match engine and screens rely on it) and ivs stay int triples;
+  * provenance behavior — class/source/desc survive the loader and
+    target_class / drop_generated_targets / has_generated_targets honor
+    them, now that real 'generated' targets are present.
+Representative values from updated / preserved species are pinned directly.
 """
+import sys
 import tomllib
+from pathlib import Path
 
 import pytest
 
@@ -18,72 +30,10 @@ from gobattlekit.data.thresholds import (
     target_class, drop_generated_targets, has_generated_targets,
 )
 
-
-# Verbatim snapshot of DEFAULT_THRESHOLDS as it was the moment before the
-# TOML migration. Do not "tidy" the numeric literals — the int/float split
-# is load-bearing and is exactly what this fixture exists to pin.
-EXPECTED = {
-    'Spidops': {
-        'sources': "the HomeSliceHenry Discord server",
-        'Great': {
-            'Atk': {'attack': 113.03, 'defense': 138.88, 'stamina': 0},
-            'Bulk': {'attack': 109.82, 'defense': 138.88, 'stamina': 0},
-            'Bulk+': {'attack': 109.82, 'defense': 140.67, 'stamina': 0},
-        },
-    },
-    'Tinkaton': {
-        'sources': "These are Gigaton Hammer matchups, from the HomeSliceHenry Discord server",
-        'Great': {
-            'GH Great': {'attack': 0, 'defense': 143.03, 'stamina': 138},
-            'GH Good': {'attack': 0, 'defense': 141.66, 'stamina': 138},
-        },
-    },
-    'Corviknight': {
-        'sources': "the HomeSliceHenry Discord server",
-        'Great': {
-            'Basic': {'attack': 0, 'defense': 127.59, 'stamina': 0},
-            'Atk': {'attack': 111.47, 'defense': 127.59, 'stamina': 0},
-            'Bulk': {'attack': 100, 'defense': 132.10, 'stamina': 149},
-        },
-    },
-    'Drapion (Shadow)': {
-        'sources': "the HomeSliceHenry Discord server",
-        'Great': {
-            'Azu bul': {'attack': 0, 'defense': 138, 'stamina': 0},
-        },
-    },
-    'Florges': {
-        'sources': "Inadequance's [YouTube Video](https://www.youtube.com/watch?v=KXLWLcOw3G4&t=295s)",
-        'Great': {
-            'SWak 9/6/14': {'attack': 121.5, 'defense': 0, 'stamina': 0},
-            'Inadequance': {'ivs': [[0, 14, 13], [9, 6, 14], [8, 1, 8]]},
-        },
-        'Ultra': {
-            'Inadequance': {'ivs': [[0, 14, 15], [0, 15, 3], [5, 11, 5]]},
-        },
-        'Master': {
-            'Basic': {'attack': 190, 'defense': 217, 'stamina': 167},
-            'Inadequance': {
-                'ivs': [[15, 15, 15], [15, 15, 14], [15, 15, 13], [15, 15, 12]],
-            },
-        },
-    },
-    'Annihilape': {
-        'Great': {
-            'Ape Slayer': {
-                'ivs': [
-                    [11, 10, 2], [15, 12, 5], [11, 11, 0], [15, 13, 4],
-                    [11, 9, 3], [11, 9, 2], [15, 14, 3], [15, 14, 2],
-                    [11, 10, 1], [11, 10, 0], [12, 9, 1], [12, 9, 0],
-                    [15, 15, 1], [15, 15, 0], [15, 12, 4], [15, 13, 3],
-                    [15, 13, 2], [11, 9, 1], [11, 9, 0], [15, 14, 1],
-                    [15, 14, 0], [15, 12, 3], [15, 12, 2], [15, 13, 1],
-                    [15, 13, 0], [15, 12, 1], [15, 12, 0],
-                ],
-            },
-        },
-    },
-}
+# Make the bundler's emitter importable for the byte-identical round-trip pin.
+_TOOLS = Path(__file__).resolve().parents[1] / 'tools' / 'threshold_export'
+sys.path.insert(0, str(_TOOLS))
+from bundle_into_app import emit_app_toml, APP_HEADER  # noqa: E402
 
 
 def _leaves(obj, path=''):
@@ -98,60 +48,30 @@ def _leaves(obj, path=''):
         yield path, obj
 
 
-class TestLosslessMigration:
+class TestLosslessRoundTrip:
     def test_default_thresholds_is_the_loaded_toml(self):
         # The module-level name is produced by the loader, not a literal.
         assert DEFAULT_THRESHOLDS == load_bundled_thresholds()
 
-    def test_deep_equals_pre_migration_dict(self):
-        assert DEFAULT_THRESHOLDS == EXPECTED
+    def test_file_re_emits_to_identical_bytes(self):
+        # The bundler's emitter is a fixed point on the shipped file: decode
+        # then re-emit must reproduce it byte for byte. This is the strongest
+        # "nothing was lost / nothing drifted" pin we can have now that the
+        # content is pipeline-generated rather than a frozen literal.
+        orig = BUNDLED_THRESHOLDS_PATH.read_text()
+        data = tomllib.loads(orig)
+        assert emit_app_toml(data, header=APP_HEADER) == orig
 
-    def test_leaf_types_match_exactly(self):
-        # == treats 100 == 100.0 as True; the engine/screens care which is
-        # which, so compare type alongside value at every leaf.
-        loaded = dict(_leaves(DEFAULT_THRESHOLDS))
-        expected = dict(_leaves(EXPECTED))
-        assert set(loaded) == set(expected)
-        for path, value in expected.items():
-            assert type(loaded[path]) is type(value), path
-            assert loaded[path] == value, path
+    def test_decode_re_emit_decode_is_stable(self):
+        re_emitted = emit_app_toml(DEFAULT_THRESHOLDS, header=APP_HEADER)
+        assert tomllib.loads(re_emitted) == DEFAULT_THRESHOLDS
 
-    def test_species_set(self):
-        assert set(DEFAULT_THRESHOLDS) == set(EXPECTED)
+    def test_species_count_grew_to_47(self):
+        assert len(DEFAULT_THRESHOLDS) == 47
 
-    def test_per_species_leagues_and_targets(self):
-        for species, leagues in EXPECTED.items():
-            assert set(DEFAULT_THRESHOLDS[species]) == set(leagues), species
-            for league, targets in leagues.items():
-                if not isinstance(targets, dict):
-                    continue  # species-level 'sources'
-                assert set(DEFAULT_THRESHOLDS[species][league]) == set(targets), \
-                    f'{species}/{league}'
-
-
-class TestRepresentativeValues:
-    def test_tinkaton_gh_great(self):
-        spec = DEFAULT_THRESHOLDS['Tinkaton']['Great']['GH Great']
-        assert spec == {'attack': 0, 'defense': 143.03, 'stamina': 138}
-        assert isinstance(spec['defense'], float)
-        assert isinstance(spec['stamina'], int)
-
-    def test_florges_iv_lists(self):
-        great = DEFAULT_THRESHOLDS['Florges']['Great']['Inadequance']['ivs']
-        assert great == [[0, 14, 13], [9, 6, 14], [8, 1, 8]]
-        master = DEFAULT_THRESHOLDS['Florges']['Master']['Inadequance']['ivs']
-        assert master == [[15, 15, 15], [15, 15, 14], [15, 15, 13], [15, 15, 12]]
-        assert all(isinstance(x, int) for triple in great for x in triple)
-
-    def test_annihilape_27_entry_iv_list(self):
-        ivs = DEFAULT_THRESHOLDS['Annihilape']['Great']['Ape Slayer']['ivs']
-        assert len(ivs) == 27
-        assert ivs[0] == [11, 10, 2]
-        assert ivs[-1] == [15, 12, 0]
-
-    def test_clodsire_onlytop_absent_so_provenance_check_stays_meaningful(self):
-        # onlytop lives in SENTIMENTAL, not DEFAULT — pin that DEFAULT has
-        # no onlytop so the schema sample above stays representative.
+    def test_no_onlytop_in_bundled_default(self):
+        # onlytop lives in SENTIMENTAL, not DEFAULT; the export pipeline never
+        # emits it. Pin its absence so the schema stays scan-safe.
         for leagues in DEFAULT_THRESHOLDS.values():
             for targets in leagues.values():
                 if isinstance(targets, dict):
@@ -159,22 +79,128 @@ class TestRepresentativeValues:
                         assert 'onlytop' not in spec
 
 
-class TestHelpersUnchangedOnLoadedData:
-    def test_target_class_defaults_expert_for_bundled(self):
-        spec = DEFAULT_THRESHOLDS['Tinkaton']['Great']['GH Great']
-        assert target_class(spec, 'default') == 'expert'
+class TestLeafTypesAreStrict:
+    def test_every_stat_leaf_is_int_or_float_not_bool(self):
+        for path, value in _leaves(DEFAULT_THRESHOLDS):
+            seg = path.rsplit('/', 1)[-1]
+            if seg in ('attack', 'defense', 'stamina'):
+                assert type(value) in (int, float), path
+                assert not isinstance(value, bool), path
 
-    def test_no_generated_targets_in_bundled_default(self):
-        assert has_generated_targets(DEFAULT_THRESHOLDS) is False
+    def test_ivs_are_int_triples(self):
+        for species, leagues in DEFAULT_THRESHOLDS.items():
+            for league, targets in leagues.items():
+                if not isinstance(targets, dict):
+                    continue
+                for name, spec in targets.items():
+                    if 'ivs' not in spec:
+                        continue
+                    for triple in spec['ivs']:
+                        assert len(triple) == 3, f'{species}/{league}/{name}'
+                        for x in triple:
+                            assert type(x) is int, f'{species}/{league}/{name}'
 
-    def test_drop_generated_is_identity_when_none_generated(self):
-        assert drop_generated_targets(DEFAULT_THRESHOLDS) == DEFAULT_THRESHOLDS
+    def test_re_emit_preserves_leaf_types(self):
+        # int vs float is load-bearing; confirm it survives a round-trip.
+        reloaded = tomllib.loads(emit_app_toml(DEFAULT_THRESHOLDS, header=APP_HEADER))
+        a = dict(_leaves(DEFAULT_THRESHOLDS))
+        b = dict(_leaves(reloaded))
+        assert set(a) == set(b)
+        for path, value in a.items():
+            assert type(b[path]) is type(value), path
+            assert b[path] == value, path
+
+
+class TestPreservedSpecies:
+    def test_florges_keeps_all_three_leagues(self):
+        florges = DEFAULT_THRESHOLDS['Florges']
+        assert set(k for k in florges if isinstance(florges[k], dict)) == {
+            'Great', 'Ultra', 'Master'}
+
+    def test_florges_ultra_and_master_are_verbatim(self):
+        florges = DEFAULT_THRESHOLDS['Florges']
+        assert florges['Ultra'] == {
+            'Inadequance': {'ivs': [[0, 14, 15], [0, 15, 3], [5, 11, 5]]},
+        }
+        assert florges['Master'] == {
+            'Basic': {'attack': 190, 'defense': 217, 'stamina': 167},
+            'Inadequance': {
+                'ivs': [[15, 15, 15], [15, 15, 14], [15, 15, 13], [15, 15, 12]],
+            },
+        }
+        basic = florges['Master']['Basic']
+        assert all(type(v) is int for v in basic.values())
+
+    def test_florges_great_was_replaced_by_export(self):
+        # The export's Great targets (not the old 'SWak 9/6/14'/'Inadequance')
+        # now back Great, and at least one is pipeline-generated.
+        great = DEFAULT_THRESHOLDS['Florges']['Great']
+        assert 'swak' in great
+        assert any(target_class(s, 'default') == 'generated' for s in great.values())
+
+    def test_annihilape_preserved_verbatim(self):
+        # Annihilape was NOT in the re-dive batch, so its 27-entry ivs target
+        # must survive untouched, Great-only, with no provenance keys.
+        ann = DEFAULT_THRESHOLDS['Annihilape']
+        assert set(k for k in ann if isinstance(ann[k], dict)) == {'Great'}
+        assert set(ann['Great']) == {'Ape Slayer'}
+        ivs = ann['Great']['Ape Slayer']['ivs']
+        assert len(ivs) == 27
+        assert ivs[0] == [11, 10, 2]
+        assert ivs[-1] == [15, 12, 0]
+        assert all(type(x) is int for triple in ivs for x in triple)
+        assert 'class' not in ann['Great']['Ape Slayer']
+
+
+class TestRepresentativeValues:
+    def test_tinkaton_gh_great_expert_and_generated_coexist(self):
+        great = DEFAULT_THRESHOLDS['Tinkaton']['Great']
+        gh = great['GH Great']
+        assert gh['attack'] == 0 and type(gh['attack']) is int
+        assert gh['defense'] == 143.03 and type(gh['defense']) is float
+        assert gh['stamina'] == 138 and type(gh['stamina']) is int
+        assert target_class(gh, 'default') == 'expert'
+        # at least one generated target on the same species
+        assert any(target_class(s, 'default') == 'generated'
+                   for s in great.values())
+
+    def test_shadow_species_keyed_with_suffix(self):
+        # Shadow exports carry the base name in-file; the bundler keys them
+        # with the ' (Shadow)' suffix the app expects.
+        assert 'Drapion (Shadow)' in DEFAULT_THRESHOLDS
+        assert 'Altaria (Shadow)' in DEFAULT_THRESHOLDS
+        assert 'Altaria' in DEFAULT_THRESHOLDS  # base form distinct
+
+
+class TestProvenanceHelpers:
+    def test_has_generated_targets_now_true(self):
+        assert has_generated_targets(DEFAULT_THRESHOLDS) is True
+
+    def test_many_species_have_generated_targets(self):
+        n = 0
+        for leagues in DEFAULT_THRESHOLDS.values():
+            for targets in leagues.values():
+                if not isinstance(targets, dict):
+                    continue
+                if any(target_class(s, 'default') == 'generated'
+                       for s in targets.values()):
+                    n += 1
+                    break
+        assert n >= 20  # in practice 40
+
+    def test_drop_generated_removes_only_generated(self):
+        filtered = drop_generated_targets(DEFAULT_THRESHOLDS)
+        # No generated targets survive.
+        assert has_generated_targets(filtered) is False
+        # Expert targets (e.g. Tinkaton GH Great) do survive.
+        assert 'GH Great' in filtered['Tinkaton']['Great']
+        # Florges keeps its preserved Ultra/Master (no generated targets there).
+        assert filtered['Florges']['Ultra'] == DEFAULT_THRESHOLDS['Florges']['Ultra']
+        assert filtered['Florges']['Master'] == DEFAULT_THRESHOLDS['Florges']['Master']
 
     def test_provenance_round_trips_when_present(self):
-        # The bundled file has no provenance keys today, but the loader must
-        # carry them through verbatim when the pipeline appends them. Build a
-        # tiny TOML with class/source/desc and confirm it survives the loader
-        # and is honored by target_class / the generated filters.
+        # A class/source/desc target survives the loader and is honored by
+        # target_class / the generated filters.
         toml = (
             '[Testmon.Great."SIM Target"]\n'
             'defense = 130.5\n'
