@@ -313,7 +313,18 @@ def bundle(export_dir: Path, current: dict) -> tuple[dict, dict]:
     # untouched.
     preserved = [s for s in current if s not in export_species]
 
+    # Rule 4: drop species that ended up with no targets in any league (only a
+    # 'sources' stub) — e.g. Aegislash (Shield), whose config is narrative-only.
+    # A targetless species is a dead row: nothing to match, nothing to show.
+    dropped_empty = []
+    for sp in list(merged):
+        leagues = [k for k in merged[sp] if k != "sources"]
+        if not any(merged[sp].get(lg) for lg in leagues):
+            del merged[sp]
+            dropped_empty.append(sp)
+
     audit = {
+        "dropped_empty": sorted(dropped_empty),
         "updated": sorted(updated),
         "added": sorted(added),
         "preserved": sorted(preserved),

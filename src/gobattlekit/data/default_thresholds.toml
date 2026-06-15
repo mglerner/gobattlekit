@@ -219,9 +219,6 @@ attack = 186.51
 defense = 0
 stamina = 0
 
-["Aegislash (Shield)"]
-sources = "pogo-simulator realistic form-change dive (canonical Shield -> Blade path, via the native formchange.py); PvPoke GL/UL rankings (Aegislash (Shield) is the ranking entry for Aegislash)."
-
 [Altaria]
 sources = "RyanSwag's Altaria PvP IV Deep-Dive (GamePress 2022-10-27, via Wayback snapshot 2023-03-21, fetched 2026-06-12); SwagTips-era SENTIMENTAL_DEFAULT_THRESHOLDS (gobattlekit); opponent pool gl_top50_plus_cs.txt (2026-06-10)"
 

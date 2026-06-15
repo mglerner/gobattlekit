@@ -3,7 +3,7 @@
 DEFAULT_THRESHOLDS loads from the bundled default_thresholds.toml via
 load_bundled_thresholds(). That file is now produced by the threshold
 re-dive pipeline (tools/threshold_export/bundle_into_app.py) merging fresh
-per-species exports into the prior file — 6 hand-curated species grew to 47
+per-species exports into the prior file — 6 hand-curated species grew to 46
 (most carrying pipeline-"generated" targets that light up the SIM toggle),
 while Florges' Ultra/Master and the no-fresh-export Annihilape were kept
 verbatim.
@@ -66,8 +66,12 @@ class TestLosslessRoundTrip:
         re_emitted = emit_app_toml(DEFAULT_THRESHOLDS, header=APP_HEADER)
         assert tomllib.loads(re_emitted) == DEFAULT_THRESHOLDS
 
-    def test_species_count_grew_to_47(self):
-        assert len(DEFAULT_THRESHOLDS) == 47
+    def test_species_count_grew_to_46(self):
+        # 6 hand-curated species + 41 added from the re-dive, minus the
+        # targetless Aegislash (Shield) stub the bundler prunes = 46.
+        assert len(DEFAULT_THRESHOLDS) == 46
+        assert 'Aegislash (Shield)' not in DEFAULT_THRESHOLDS  # pruned (no targets)
+        assert 'Aegislash (Blade)' in DEFAULT_THRESHOLDS
 
     def test_no_onlytop_in_bundled_default(self):
         # onlytop lives in SENTIMENTAL, not DEFAULT; the export pipeline never
