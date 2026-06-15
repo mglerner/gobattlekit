@@ -4,7 +4,8 @@ project_name = "GoBattleKit"
 bundle = "com.mglerner"
 version = "0.0.30"
 url = "https://mglerner.com/gobattlekit"
-license.file = "LICENSE"
+license = "MIT"
+license-files = ["LICENSE"]
 author = "Michael G. Lerner"
 author_email = "mglerner@protonmail.com"
 
