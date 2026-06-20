@@ -1281,8 +1281,6 @@ attack = 0
 defense = 94
 stamina = 0
 
-# Ultra/Master: hand-maintained (the export bundler is GL-only); preserved
-# verbatim across future Great re-bundles. gopvpsim deep dives 2026-06-20.
 [Baxcalibur.Ultra."Bulk / R1 (1/15/15)"]
 class = "expert"
 source = "gopvpsim deep dive 2026-06-20"
