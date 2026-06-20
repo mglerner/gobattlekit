@@ -2,7 +2,7 @@
 [tool.briefcase]
 project_name = "GoBattleKit"
 bundle = "com.mglerner"
-version = "0.0.30"
+version = "0.0.31"
 url = "https://mglerner.com/gobattlekit"
 license = "MIT"
 license-files = ["LICENSE"]
