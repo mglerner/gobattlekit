@@ -49,7 +49,13 @@ uv run pytest -q
    every `briefcase create iOS` since the build directory is wiped each time.
 
 2. Open `build/gobattlekit/ios/xcode/GoBattleKit.xcodeproj` in Xcode
-3. Set signing team to Michael Lerner (Personal Team) — resets on each run of `prepare_ios.sh`
+3. Set signing team to **Michael Lerner** (team `MF55GHNQC2`, the paid
+   Apple Developer Program account) — resets on each run of `prepare_ios.sh`.
+   There is only one team; leave "Automatically manage signing" checked so
+   Xcode mints the distribution cert during Archive/Distribute. If you ever
+   hit "No iOS Distribution cert" / "PLA Update available", accept the
+   updated Program License Agreement at developer.apple.com/account first —
+   an outstanding PLA blocks cert creation.
 4. Product → Clean Build Folder (Cmd+Shift+K)
 5. Product → Archive → Distribute → App Store Connect → Upload
 
@@ -168,4 +174,3 @@ targets for the current league, regardless of whether any Pokémon are
 loaded. Species with no hits show as "Species (0)". Clicking a species
 with 0 hits shows qualifying IV combinations (top 100 by stat product,
 displayed by IVs descending).
-

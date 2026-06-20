@@ -4,7 +4,9 @@ A Pokémon GO PvP companion app built with Python/BeeWare (Briefcase + Toga).
 
 ## Key info
 - Bundle ID: com.mglerner.gobattlekit
-- Apple Developer team: 6TV57R6ZCC
+- Apple Developer team: MF55GHNQC2 (mglerner@gmail.com, Individual; renews
+  2027-03-21). NOTE: an old "Apple Development" cert for a stale team
+  `6TV57R6ZCC` lingers in the keychain — it is NOT the team, ignore it.
 - Repo: https://github.com/mglerner/gobattlekit
 - Current version: 0.0.31 (0.0.24 on TestFlight)
 - venv: ~/coding/MGLPoGo/.venv
