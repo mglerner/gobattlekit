@@ -1251,3 +1251,54 @@ desc = "Card 'Full Attack' (recommended IV 11/2/2 -> 122.96 atk / 118.94 def). a
 attack = 122.96
 defense = 0
 stamina = 0
+
+[Baxcalibur]
+sources = "DragapultSim (@DragapultSim) GL breakpoint-guarantee spreads, June 2026 Frigibax CD; gopvpsim deep dives 2026-06-20."
+
+[Baxcalibur.Great."Bulk / R1 (0/15/5)"]
+class = "expert"
+source = "gopvpsim deep dive 2026-06-20; DragapultSim R1 reference"
+desc = "Rank-1 stat product / max GL defense (135.7 atk, 97.79 def, 125 hp). Our sim's highest total-wins spread and the most robust catch — stays best with the realistic future coverage move (Brick Break). DragapultSim's R1 reference spread."
+ivs = [[0, 15, 5]]
+
+[Baxcalibur.Great."Jumpluff BP (5/8/5)"]
+class = "expert"
+source = "DragapultSim (@DragapultSim), June 2026 Frigibax CD"
+desc = "DragapultSim Jumpluff breakpoint-guarantee spread (138.39 atk, 94.04 def). Attack-weighted: trades total wins for guaranteed Glaive Rush breakpoints vs specific targets (G-Corsola / S-Empoleon range; direction sim-confirmed)."
+ivs = [[5, 8, 5]]
+
+[Baxcalibur.Great."Furret BP (8/4/5)"]
+class = "expert"
+source = "DragapultSim (@DragapultSim), June 2026 Frigibax CD"
+desc = "DragapultSim Furret breakpoint-guarantee spread (140.00 atk, 91.90 def). The most attack-weighted of the three; beats the most G-Corsola / Furret opponent IVs of any spread, at the cost of overall bulk."
+ivs = [[8, 4, 5]]
+
+[Baxcalibur.Great."General Bulk (def >= 94)"]
+class = "expert"
+source = "gopvpsim deep dive 2026-06-20"
+desc = "Practical catch floor: prioritize defense/HP. Sim says bulk wins more total matchups than attack-weighting for Baxcalibur, so a high-def catch is the safe keep when you are not chasing a specific breakpoint."
+attack = 0
+defense = 94
+stamina = 0
+
+# Ultra/Master: hand-maintained (the export bundler is GL-only); preserved
+# verbatim across future Great re-bundles. gopvpsim deep dives 2026-06-20.
+[Baxcalibur.Ultra."Bulk / R1 (1/15/15)"]
+class = "expert"
+source = "gopvpsim deep dive 2026-06-20"
+desc = "Rank-1 stat product (173.7 atk, 124.7 def, 166 hp). Highest total-wins UL spread; bulk beats attack-weighting here too (max-atk 15/0/0 loses ~15 matchups vs this)."
+ivs = [[1, 15, 15]]
+
+[Baxcalibur.Ultra."General Bulk (def >= 120)"]
+class = "expert"
+source = "gopvpsim deep dive 2026-06-20"
+desc = "Practical UL catch floor: prioritize defense/HP. Same bulk-over-attack finding as GL."
+attack = 0
+defense = 120
+stamina = 0
+
+[Baxcalibur.Master."Hundo (15/15/15)"]
+class = "expert"
+source = "gopvpsim deep dive 2026-06-20"
+desc = "No CP cap, so rank-1 stat product is the hundo (227.4 atk, 154.7 def, 206 hp). Master is Baxcalibur's strongest league; attack-weighting is free here (no cap) but does not change the catch — take the highest IVs."
+ivs = [[15, 15, 15]]

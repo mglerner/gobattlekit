@@ -19,6 +19,16 @@ See DEVELOPER_NOTES.md — always use `./prepare_ios.sh` instead of `briefcase c
 - `src/gobattlekit/theme.py` — all colors and button styles
 - `src/gobattlekit/app.py` — main app, screen navigation
 
+## Threshold spreads come from pogo-simulator (read-only input)
+
+App IV thresholds in `src/gobattlekit/data/default_thresholds.toml` are
+produced from the `../pogo-simulator` repo: `tools/threshold_export/`
+`export_thresholds.py` reads that repo's `thresholds/*.toml` + deep-dive
+replay blobs; `bundle_into_app.py` merges them in. The bundler is
+**Great-league only** — Ultra/Master targets are hand-maintained in
+`default_thresholds.toml` and preserved across re-bundles. See
+`tools/threshold_export/README.md` for the contract.
+
 ## Current priorities
 1. TestFlight 0.0.28 build + device verification — run through
    `docs/device_test_checklist.md` (covers the 2026-06-11/12 deep-review
