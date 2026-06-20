@@ -10,7 +10,7 @@ from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from ..data.iv_checker import (
     check_thresholds, get_pokemon_index, cp_to_level, append_user_generated,
-    qualifying_ivs, LEAGUE_CAPS
+    qualifying_ivs, compute_rank_table, LEAGUE_CAPS
 )
 from ..data.thresholds import (
     DEFAULT_THRESHOLDS, EVOLUTION_LINES, target_class,
@@ -674,6 +674,36 @@ class IVCheckerScreen:
     # Species results view
     # ------------------------------------------------------------------
 
+    def _fill_hit_ranks(self, species, hits):
+        """Annotate each hit's stats with its stat-product rank.
+
+        check_thresholds only computes ranks eagerly when a target gates on
+        'onlytop'; otherwise the hit display fell back to 'Rank:#?'. We fill
+        them in lazily here, once per species view. The 4096-combo table is
+        cached per (species, level, cap, shadow) in the data layer, so this
+        is a one-time cost on first open and instant on revisit.
+        """
+        if not hits:
+            return
+        pokemon_index = get_pokemon_index()
+        if species not in pokemon_index:
+            return
+        base = pokemon_index[species]
+        max_cp = LEAGUE_CAPS.get(self.league, 1500)
+        max_level = 51
+        for hit in hits:
+            s = hit['stats']
+            if 'rank' in s:
+                continue
+            m = hit['mon']
+            rank_table = compute_rank_table(
+                species, base['atk'], base['def'], base['hp'],
+                max_level=max_level, max_cp=max_cp,
+                shadow=m['is_shadow'],
+            )
+            s['rank'] = rank_table.get(
+                (m['atk_iv'], m['def_iv'], m['sta_iv']), 4096)
+
     def _display_species_results(self, species):
         for child in list(self.results_box.children):
             self.results_box.remove(child)
@@ -682,6 +712,8 @@ class IVCheckerScreen:
 
         hits = self.results.get(species, [])
         league_label = self.league.capitalize()
+
+        self._fill_hit_ranks(species, hits)
 
         self.results_box.add(toga.Label(
             f"{species} — {len(hits)} hit{'s' if len(hits) != 1 else ''}",
