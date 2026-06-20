@@ -66,10 +66,11 @@ class TestLosslessRoundTrip:
         re_emitted = emit_app_toml(DEFAULT_THRESHOLDS, header=APP_HEADER)
         assert tomllib.loads(re_emitted) == DEFAULT_THRESHOLDS
 
-    def test_species_count_grew_to_46(self):
+    def test_species_count_grew_to_47(self):
         # 6 hand-curated species + 41 added from the re-dive, minus the
-        # targetless Aegislash (Shield) stub the bundler prunes = 46.
-        assert len(DEFAULT_THRESHOLDS) == 46
+        # targetless Aegislash (Shield) stub the bundler prunes = 46,
+        # plus Baxcalibur (Frigibax CD, hand+export GL/UL/ML) = 47.
+        assert len(DEFAULT_THRESHOLDS) == 47
         assert 'Aegislash (Shield)' not in DEFAULT_THRESHOLDS  # pruned (no targets)
         assert 'Aegislash (Blade)' in DEFAULT_THRESHOLDS
 
