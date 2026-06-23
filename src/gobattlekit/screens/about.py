@@ -37,7 +37,7 @@ class AboutScreen:
         ))
 
         content = toga.Box(style=Pack(direction=COLUMN, flex=1))
-        scroll = toga.ScrollContainer(horizontal=False, 
+        scroll = toga.ScrollContainer(
             content=content,
             style=Pack(flex=1, background_color=COLOR_BG)
         )
