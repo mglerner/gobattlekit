@@ -28,6 +28,12 @@ Threshold-pipeline UI (0.0.29–1.0.0, never device-verified):
 - [ ] Add a target, then confirm a forced save failure surfaces the
       "Could not save target" error instead of silently dropping it
       (hard to trigger on-device; at minimum confirm a normal add works).
+- [ ] Pareto badges: in a species/target with several of your hits, the
+      globally-efficient mon(s) show 👑, a best-of-yours-but-not-optimal mon
+      shows 🏆, and a mon beaten by one of your own shows no badge. Check
+      both the per-target view and "Show All", on IV Checker and My PvP IV
+      Targets. Badges are absent when there is only one hit and it is not
+      efficient.
 
 Visual / theme:
 - [ ] Force-dark (`UIUserInterfaceStyle=Dark`): set the PHONE to light

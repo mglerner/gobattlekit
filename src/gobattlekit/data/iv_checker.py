@@ -346,6 +346,104 @@ def append_user_generated(csv_path, name, atk_iv, def_iv, sta_iv, cp, level):
         })
 
 
+_iv_stats_cache = {}
+
+
+def all_iv_stats(species, base_atk, base_def, base_sta,
+                 max_level, max_cp, shadow=False):
+    """List of (attack, defense, stamina) scaled-stat triples for every IV
+    combo that fits under the cap. Cached per (species, level/cap, shadow).
+
+    Used to decide whether a spread is globally Pareto-efficient (no other
+    spread beats it on all three stats). Mirrors compute_rank_table's scan,
+    including Aegislash (Blade)'s whole-level round-down.
+    """
+    key = (species, max_level, max_cp, shadow)
+    if key in _iv_stats_cache:
+        return _iv_stats_cache[key]
+    blade_round_down = (species == 'Aegislash (Blade)')
+    out = []
+    for a in range(16):
+        for d in range(16):
+            for s in range(16):
+                stats = ivs_to_stats(
+                    a, d, s, start_level=1,
+                    base_atk=base_atk, base_def=base_def, base_sta=base_sta,
+                    max_level=max_level, max_cp=max_cp, shadow=shadow,
+                )
+                if stats is None:
+                    continue
+                if blade_round_down and stats['level'] % 1.0 != 0:
+                    stats = ivs_to_stats(
+                        a, d, s, start_level=1,
+                        base_atk=base_atk, base_def=base_def, base_sta=base_sta,
+                        max_level=stats['level'] - 0.5, max_cp=max_cp,
+                        shadow=shadow,
+                    )
+                    if stats is None:
+                        continue
+                out.append((stats['attack'], stats['defense'], stats['stamina']))
+    _iv_stats_cache[key] = out
+    return out
+
+
+def _dominates(a, b):
+    """True if stat triple a is at least as good as b on every axis and
+    strictly better on at least one (a != b with a >= b elementwise)."""
+    return a != b and a[0] >= b[0] and a[1] >= b[1] and a[2] >= b[2]
+
+
+def pareto_badges(hits, all_stats=None):
+    """Badge each hit in a displayed group by how Pareto-optimal it is.
+
+    Each hit carries scaled stats in hit['stats']; we compare the
+    (attack, defense, stamina) triples. Returns a list aligned to `hits`:
+
+      'crown'  — globally efficient: no IV spread beats this one on all three
+                 stats at once, so it is Pareto-optimal among ALL spreads that
+                 could meet the target. Pass `all_stats` (every spread's
+                 triple, from all_iv_stats) to enable this. The "efficient
+                 IVs" idea from orgodemir's r/TheSilphArena webapp.
+      'trophy' — not a crown, but it beats at least one other hit in the group
+                 on all three stats while nothing in the group beats it: the
+                 best of what you own, short of optimal.
+      None     — dominated by one of your own hits, the lone hit when it is not
+                 globally efficient, or one of several mutually non-dominated
+                 hits (badging them all would say nothing).
+
+    Crown takes precedence over trophy. With all_stats=None, crowns are
+    disabled and only the local trophy logic runs.
+
+    Why testing against every spread (not just the qualifying ones) is
+    correct: a spread that dominates a qualifying mon also qualifies, since
+    its stats are >= the mon's >= the target floor. So the Pareto frontier of
+    the qualifying set is exactly the global frontier intersected with it.
+    """
+    n = len(hits)
+    badges = [None] * n
+    if n == 0:
+        return badges
+    pts = [(h['stats']['attack'], h['stats']['defense'], h['stats']['stamina'])
+           for h in hits]
+
+    crown = [False] * n
+    if all_stats is not None:
+        for i, p in enumerate(pts):
+            crown[i] = not any(_dominates(s, p) for s in all_stats)
+
+    local_nd = {i for i in range(n)
+                if not any(_dominates(pts[j], pts[i])
+                           for j in range(n) if j != i)}
+    some_dominated = len(local_nd) < n
+
+    for i in range(n):
+        if crown[i]:
+            badges[i] = 'crown'
+        elif i in local_nd and some_dominated:
+            badges[i] = 'trophy'
+    return badges
+
+
 def check_thresholds(csv_path, thresholds, league='great', max_level=51,
                      evolution_lines=None, include_empty=False):
     """Check every mon in the given CSV(s) against the thresholds.
