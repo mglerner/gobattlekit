@@ -173,7 +173,7 @@ class EditThresholdsScreen:
 
         if not thresholds:
             self.content_box.add(toga.Label(
-                "No user targets yet. Tap 'Add Target' to get started.",
+                "No user targets yet.\nTap 'Add Target' to get started.",
                 style=Pack(font_size=14, text_align="center", margin_top=20,
                            color=COLOR_TEXT_LIGHT)
             ))
@@ -649,7 +649,7 @@ class EditThresholdsScreen:
         self.content_box.add(self._import_error)
 
         self.content_box.add(toga.Label(
-            "Paste a shared target or scanner JSON:",
+            "Paste a shared target or\nscanner JSON:",
             style=Pack(font_size=14, margin_bottom=8, color=COLOR_TEXT_LIGHT)
         ))
 

@@ -38,7 +38,7 @@ class IVCreditsScreen:
         ))
 
         container.add(toga.Label(
-            "Sources for the default PvP IV targets:",
+            "Sources for the default\nPvP IV targets:",
             style=Pack(font_size=13, text_align="center", margin_bottom=12,
                        color=COLOR_TEXT_LIGHT)
         ))
