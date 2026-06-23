@@ -76,6 +76,15 @@ class TestParetoBadges:
         hits = [_hit(100, 100, 100), _hit(100, 100, 100), _hit(50, 50, 50)]
         assert pareto_badges(hits, universe) == ['crown', 'crown', None]
 
+    def test_duplicate_ivs_all_get_the_same_badge(self):
+        # Several mons with the SAME IVs must all earn the badge their spread
+        # deserves, not reject each other. Here an unowned Z dominates spread
+        # X (so X is not a crown), but X beats C; all three X copies -> 🏆.
+        universe = [(110, 110, 110), (100, 90, 80), (80, 80, 80)]
+        X, C = (100, 90, 80), (80, 80, 80)
+        hits = [_hit(*X), _hit(*X), _hit(*X), _hit(*C)]
+        assert pareto_badges(hits, universe) == ['trophy', 'trophy', 'trophy', None]
+
 
 # ── get_species_name ──────────────────────────────────────────────
 
