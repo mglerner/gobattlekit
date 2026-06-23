@@ -65,7 +65,7 @@ class AboutScreen:
                        color=COLOR_YELLOW)
         ))
         content.add(toga.Label(
-            "Game data and rankings: PvPoke by EmpoleonDynamite (MIT license)",
+            "Game data and rankings: PvPoke\nby EmpoleonDynamite (MIT license)",
             style=Pack(font_size=14, margin_bottom=4, color=COLOR_TEXT_LIGHT)
         ))
         content.add(toga.Button(
@@ -83,7 +83,7 @@ class AboutScreen:
             style=btn_secondary(height=40, margin_bottom=12)
         ))
         content.add(toga.Label(
-            "XehrFelrose's Discord - best PvP community",
+            "XehrFelrose's Discord -\nbest PvP community",
             style=Pack(font_size=14, margin_bottom=4, color=COLOR_TEXT_LIGHT)
         ))
         content.add(toga.Button(
@@ -92,7 +92,7 @@ class AboutScreen:
             style=btn_secondary(height=40, margin_bottom=16)
         ))
         content.add(toga.Label(
-            "🏆/👑 efficient-IV badges inspired by orgodemir's PvP IV webapp",
+            "🏆/👑 efficient-IV badges\ninspired by orgodemir's webapp",
             style=Pack(font_size=14, margin_bottom=16, color=COLOR_TEXT_LIGHT)
         ))
 
