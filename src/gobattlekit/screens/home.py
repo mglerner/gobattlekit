@@ -30,7 +30,7 @@ class HomeScreen:
         # Scroll the menu so the About/Help row stays reachable on smaller
         # phones (the fixed layout clipped it below the iPhone 17 Pro size).
         menu = toga.Box(style=Pack(direction=COLUMN, flex=1))
-        scroll = toga.ScrollContainer(horizontal=False, 
+        scroll = toga.ScrollContainer(
             content=menu,
             style=Pack(flex=1, background_color=COLOR_BG)
         )
