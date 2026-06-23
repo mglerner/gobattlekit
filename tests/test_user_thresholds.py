@@ -49,6 +49,21 @@ class TestLoadRobustness:
         assert 'Registeel' in load_user_thresholds()
         assert corrupt.read_text() == '{"Azumarill": {"Great"'
 
+    def test_valid_json_but_not_a_dict_is_reset_not_returned(self):
+        """A file holding valid JSON that isn't an object (a list, from a
+        sync conflict or bad edit) must be treated like corruption — every
+        mutation function indexes it as species->leagues and would crash
+        otherwise. Mirrors the preferences.py non-dict guard."""
+        f = user_thresholds.USER_THRESHOLDS_FILE
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text('["Azumarill"]')
+
+        assert load_user_thresholds() == {}
+        assert f.with_suffix('.json.corrupt').exists()
+        # The mutation path that used to crash now works on a fresh dict.
+        assert add_threshold('Registeel', 'great', 'Tanky', 0, 0, 0) is True
+        assert 'Registeel' in load_user_thresholds()
+
 
 class TestSaveAndDelete:
     def test_save_is_atomic_no_tmp_left_behind(self):

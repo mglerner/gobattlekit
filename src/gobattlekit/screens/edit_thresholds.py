@@ -573,9 +573,11 @@ class EditThresholdsScreen:
             self._show_threshold_list()
             return
 
-        add_threshold(self._selected_species, league, name,
-                      attack, defense, stamina, onlytop,
-                      cls=cls, source=source, desc=desc)
+        if not add_threshold(self._selected_species, league, name,
+                             attack, defense, stamina, onlytop,
+                             cls=cls, source=source, desc=desc):
+            self.form_error.text = "Could not save target. Please try again."
+            return
 
         self._show_threshold_list()
 

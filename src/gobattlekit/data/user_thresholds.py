@@ -13,27 +13,40 @@ logger = logging.getLogger(__name__)
 USER_THRESHOLDS_FILE = CACHE_DIR / 'user_thresholds.json'
 
 
+def _move_corrupt_aside():
+    """Rename the thresholds file aside so the next save_user_thresholds()
+    can't clobber what might still be recoverable."""
+    corrupt_path = USER_THRESHOLDS_FILE.with_suffix(".json.corrupt")
+    try:
+        os.replace(USER_THRESHOLDS_FILE, corrupt_path)
+        logger.warning("User thresholds file was corrupt; moved to %s", corrupt_path)
+    except OSError:
+        logger.exception("Could not move corrupt user thresholds file aside")
+
+
 def load_user_thresholds():
     """Load user thresholds from JSON. Returns empty dict if file doesn't exist."""
     if not USER_THRESHOLDS_FILE.exists():
         return {}
     try:
-        return json.loads(USER_THRESHOLDS_FILE.read_text())
+        data = json.loads(USER_THRESHOLDS_FILE.read_text())
     except json.JSONDecodeError:
         # File is corrupt (partial write from a prior kill, manual edit gone
-        # wrong). Rename it aside so the next save_user_thresholds() can't
-        # clobber what might still be recoverable, and start fresh — same
-        # pattern as preferences.py.
-        corrupt_path = USER_THRESHOLDS_FILE.with_suffix(".json.corrupt")
-        try:
-            os.replace(USER_THRESHOLDS_FILE, corrupt_path)
-            logger.warning("User thresholds file was corrupt; moved to %s", corrupt_path)
-        except OSError:
-            logger.exception("Could not move corrupt user thresholds file aside")
+        # wrong). Same pattern as preferences.py.
+        _move_corrupt_aside()
         return {}
     except OSError:
         logger.exception("Could not read user thresholds")
         return {}
+    if not isinstance(data, dict):
+        # Valid JSON but not an object (a list, string, ...). Every mutation
+        # function indexes/.get()s this as species -> leagues and would crash.
+        # Treat it like corruption.
+        logger.warning("User thresholds file held %s, not an object; resetting",
+                       type(data).__name__)
+        _move_corrupt_aside()
+        return {}
+    return data
 
 
 def save_user_thresholds(thresholds):
@@ -254,6 +267,9 @@ def add_threshold(species, league, name, attack, defense, stamina, onlytop=0,
 
     cls/source/desc are the optional provenance metadata ('cls' because
     'class' is reserved); falsy values store nothing.
+
+    Returns True if the save landed, False otherwise — callers should check
+    it before telling the user the target was added.
     """
     thresholds = load_user_thresholds()
     if species not in thresholds:
@@ -273,8 +289,7 @@ def add_threshold(species, league, name, attack, defense, stamina, onlytop=0,
     if desc:
         entry['desc'] = desc
     thresholds[species][league_label][name] = entry
-    save_user_thresholds(thresholds)
-    return thresholds
+    return save_user_thresholds(thresholds)
 
 
 def replace_threshold(orig_species, orig_league, orig_name,
