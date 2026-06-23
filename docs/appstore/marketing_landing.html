@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<!--
+  GoBattleKit landing page. The pyproject `url` (https://mglerner.com/gobattlekit)
+  currently 404s, and App Store Connect uses it as the Marketing URL. Publish this
+  there, or repoint the URL to something already live. Restyle to match the rest
+  of mglerner.com if you prefer. Set the TestFlight/App Store link below once the
+  public listing exists.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GoBattleKit</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0f2030;
+      color: #e8eef4;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+    }
+    main { max-width: 720px; margin: 0 auto; padding: 48px 22px 60px; }
+    h1 { color: #4ea1d3; font-size: 34px; margin-bottom: 2px; }
+    .tag { color: #9fb3c4; font-size: 16px; margin-top: 0; }
+    h2 { color: #ffcb3a; font-size: 18px; margin-top: 30px; }
+    ul { padding-left: 20px; }
+    a { color: #4ea1d3; }
+    .cta {
+      display: inline-block; margin-top: 22px; padding: 12px 20px;
+      background: #4ea1d3; color: #0f2030; border-radius: 8px;
+      text-decoration: none; font-weight: 600;
+    }
+    footer { color: #9fb3c4; font-size: 13px; margin-top: 44px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>GoBattleKit</h1>
+  <p class="tag">A Pokémon GO PvP companion app</p>
+
+  <p>
+    GoBattleKit helps you decide which Pokémon are worth building for ranked PvP,
+    then helps you practice the parts of a battle that come down to timing and
+    move counts.
+  </p>
+
+  <h2>What it does</h2>
+  <ul>
+    <li>Checks your Pokémon against the IV spreads that matter in Great League, Ultra League, and Master League</li>
+    <li>Imports a PokeGenie CSV, or lets you enter a Pokémon by hand</li>
+    <li>Stores your own IV targets, with import from pogo-simulator deep dives</li>
+    <li>Quizzes you on move counts, move timing, and type matchups</li>
+  </ul>
+
+  <h2>Your data stays with you</h2>
+  <p>
+    The app downloads public game data and rankings from PvPoke. Your imported CSV
+    and saved targets stay on your device. There are no accounts and no ads, and
+    nothing you do is tracked.
+  </p>
+
+  <!-- Set this href to the App Store / TestFlight link once the listing is live. -->
+  <a class="cta" href="#">Get GoBattleKit</a>
+
+  <footer>
+    GoBattleKit uses game data and rankings from
+    <a href="https://pvpoke.com">PvPoke</a> by EmpoleonDynamite, used under the MIT
+    license. GoBattleKit is an unofficial fan project. It is not affiliated with
+    Niantic, Nintendo, The Pokémon Company, Game Freak, or PokeGenie.
+  </footer>
+</main>
+</body>
+</html>
