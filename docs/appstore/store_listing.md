@@ -22,7 +22,7 @@ pokemon go,pvp,iv,gbl,great league,ultra league,pokegenie,move counts,trainer ba
 
 GoBattleKit helps you prep for PvP in Pokémon GO.
 
-The quizzes cover the parts of a battle that come down to reflexes and memory. One asks how many fast moves it takes to reach a charged move. Another teaches the timing that lets a slower move go off first. A third runs you through type matchups until they are second nature. They are useful for any trainer, whether or not you track IVs.
+The quizzes cover the parts of a battle that come down to reflexes and memory. One asks how many fast moves it takes to reach a charged move. Another teaches when to throw a charged move so you hand your opponent the fewest free turns. A third runs you through type matchups until they are second nature. They are useful for any trainer, whether or not you track IVs.
 
 The IV tools help you decide which Pokémon are worth building. Import a CSV from PokeGenie and GoBattleKit checks every Pokémon against the IV spreads that deep-dive analysis has shown to matter in each league. No CSV on hand? Type a Pokémon in by hand and get the same answer.
 
