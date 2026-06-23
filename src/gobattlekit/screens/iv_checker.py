@@ -11,7 +11,7 @@ from toga.style.pack import COLUMN, ROW
 from ..data.iv_checker import (
     check_thresholds, get_pokemon_index, cp_to_level, append_user_generated,
     qualifying_ivs, compute_rank_table, pareto_badges, all_iv_stats,
-    LEAGUE_CAPS
+    _scaled_triple, LEAGUE_CAPS
 )
 from ..data.thresholds import (
     DEFAULT_THRESHOLDS, EVOLUTION_LINES, target_class,
@@ -1024,7 +1024,16 @@ class IVCheckerScreen:
             species, base['atk'], base['def'], base['hp'],
             max_level=51, max_cp=max_cp, shadow=shadow,
         )
-        return pareto_badges(hits, all_stats)
+        # Comparison points go through the SAME _scaled_triple path as the
+        # universe so Aegislash (Blade) rounds down identically on both sides;
+        # the card still shows the un-rounded hit['stats'].
+        points = [
+            _scaled_triple(species, m['atk_iv'], m['def_iv'], m['sta_iv'],
+                           base['atk'], base['def'], base['hp'],
+                           51, max_cp, shadow)
+            for m in (h['mon'] for h in hits)
+        ]
+        return pareto_badges(hits, all_stats, points=points)
 
     _BADGE_EMOJI = {'crown': '👑', 'trophy': '🏆'}
 

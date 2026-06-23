@@ -15,6 +15,8 @@ from gobattlekit.data.iv_checker import (
     append_user_generated,
     check_thresholds,
     pareto_badges,
+    all_iv_stats,
+    _scaled_triple,
     _rank_cache,
 )
 
@@ -84,6 +86,24 @@ class TestParetoBadges:
         X, C = (100, 90, 80), (80, 80, 80)
         hits = [_hit(*X), _hit(*X), _hit(*X), _hit(*C)]
         assert pareto_badges(hits, universe) == ['trophy', 'trophy', 'trophy', None]
+
+    def test_aegislash_blade_rounds_down_no_spurious_crown(self):
+        # Blade powers up in whole levels only, so the Pareto verdict must
+        # compare whole-level-rounded stats on BOTH sides. Regression: the
+        # universe rounded (all_iv_stats) but the hit stats didn't, so a
+        # bottom-tier spread (0/0/9, level 24.5) dodged domination and got a
+        # spurious crown. Base stats hardcoded so no gamemaster is needed.
+        BA, BD, BS = 272, 97, 155  # Aegislash (Blade) GL base stats
+        universe = all_iv_stats('Aegislash (Blade)', BA, BD, BS, 51, 1500, False)
+        rounded = _scaled_triple('Aegislash (Blade)', 0, 0, 9,
+                                 BA, BD, BS, 51, 1500, False)
+        assert pareto_badges([_hit(0, 0, 0)], universe, points=[rounded]) == [None]
+        # The un-rounded half-level stats are the bug: they beat the rounded
+        # universe and crown. This documents why _scaled_triple is needed.
+        raw = ivs_to_stats(0, 0, 9, 1, base_atk=BA, base_def=BD, base_sta=BS,
+                           max_level=51, max_cp=1500, shadow=False)
+        raw_pt = (raw['attack'], raw['defense'], raw['stamina'])
+        assert pareto_badges([_hit(0, 0, 0)], universe, points=[raw_pt]) == ['crown']
 
 
 # ── get_species_name ──────────────────────────────────────────────

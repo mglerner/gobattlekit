@@ -349,40 +349,55 @@ def append_user_generated(csv_path, name, atk_iv, def_iv, sta_iv, cp, level):
 _iv_stats_cache = {}
 
 
+def _scaled_triple(species, atk_iv, def_iv, sta_iv,
+                   base_atk, base_def, base_sta, max_level, max_cp, shadow):
+    """(attack, defense, stamina) scaled-stat triple for one IV spread, with
+    Aegislash (Blade)'s whole-level round-down applied. Returns None if the
+    spread is over-cap even at level 1.
+
+    Both sides of the Pareto verdict — the all_iv_stats universe AND each hit's
+    comparison point — must go through this one path so they round identically.
+    Otherwise a half-level Blade hit keeps un-rounded stats, dodges domination
+    against the rounded universe, and earns a spurious crown. Mirrors gopvpsim,
+    which rounds Blade down before the efficiency comparison.
+    """
+    stats = ivs_to_stats(
+        atk_iv, def_iv, sta_iv, start_level=1,
+        base_atk=base_atk, base_def=base_def, base_sta=base_sta,
+        max_level=max_level, max_cp=max_cp, shadow=shadow,
+    )
+    if stats is None:
+        return None
+    if species == 'Aegislash (Blade)' and stats['level'] % 1.0 != 0:
+        stats = ivs_to_stats(
+            atk_iv, def_iv, sta_iv, start_level=1,
+            base_atk=base_atk, base_def=base_def, base_sta=base_sta,
+            max_level=stats['level'] - 0.5, max_cp=max_cp, shadow=shadow,
+        )
+        if stats is None:
+            return None
+    return (stats['attack'], stats['defense'], stats['stamina'])
+
+
 def all_iv_stats(species, base_atk, base_def, base_sta,
                  max_level, max_cp, shadow=False):
     """List of (attack, defense, stamina) scaled-stat triples for every IV
     combo that fits under the cap. Cached per (species, level/cap, shadow).
 
-    Used to decide whether a spread is globally Pareto-efficient (no other
-    spread beats it on all three stats). Mirrors compute_rank_table's scan,
-    including Aegislash (Blade)'s whole-level round-down.
+    Built via _scaled_triple so the universe rounds Aegislash (Blade) down
+    exactly the way each hit's comparison point does.
     """
     key = (species, max_level, max_cp, shadow)
     if key in _iv_stats_cache:
         return _iv_stats_cache[key]
-    blade_round_down = (species == 'Aegislash (Blade)')
     out = []
     for a in range(16):
         for d in range(16):
             for s in range(16):
-                stats = ivs_to_stats(
-                    a, d, s, start_level=1,
-                    base_atk=base_atk, base_def=base_def, base_sta=base_sta,
-                    max_level=max_level, max_cp=max_cp, shadow=shadow,
-                )
-                if stats is None:
-                    continue
-                if blade_round_down and stats['level'] % 1.0 != 0:
-                    stats = ivs_to_stats(
-                        a, d, s, start_level=1,
-                        base_atk=base_atk, base_def=base_def, base_sta=base_sta,
-                        max_level=stats['level'] - 0.5, max_cp=max_cp,
-                        shadow=shadow,
-                    )
-                    if stats is None:
-                        continue
-                out.append((stats['attack'], stats['defense'], stats['stamina']))
+                triple = _scaled_triple(species, a, d, s, base_atk, base_def,
+                                        base_sta, max_level, max_cp, shadow)
+                if triple is not None:
+                    out.append(triple)
     _iv_stats_cache[key] = out
     return out
 
@@ -393,20 +408,25 @@ def _dominates(a, b):
     return a != b and a[0] >= b[0] and a[1] >= b[1] and a[2] >= b[2]
 
 
-def pareto_badges(hits, all_stats=None):
+def pareto_badges(hits, all_stats=None, points=None):
     """Badge each hit in a displayed group by how Pareto-optimal it is.
 
     Each hit carries scaled stats in hit['stats']; we compare the
-    (attack, defense, stamina) triples. Returns a list aligned to `hits`:
+    (attack, defense, stamina) triples. `points` optionally overrides those
+    comparison triples (aligned to hits) when the verdict must use different
+    stats than the card displays — Aegislash (Blade), whose stats round down
+    to a whole level for the comparison while the card shows the raw values.
+    Returns a list aligned to `hits`:
 
       'crown'  — globally efficient: no IV spread beats this one on all three
                  stats at once, so it is Pareto-optimal among ALL spreads that
                  could meet the target. Pass `all_stats` (every spread's
                  triple, from all_iv_stats) to enable this. The "efficient
                  IVs" idea from orgodemir's r/TheSilphArena webapp.
-      'trophy' — not a crown, but it beats at least one other hit in the group
-                 on all three stats while nothing in the group beats it: the
-                 best of what you own, short of optimal.
+      'trophy' — not a crown, but it is on the LOCAL Pareto frontier (no other
+                 hit in the group beats it on all three stats) AND at least one
+                 hit in the group is dominated, so the badge distinguishes the
+                 keepers from strictly-worse mons you own.
       None     — dominated by one of your own hits, the lone hit when it is not
                  globally efficient, or one of several mutually non-dominated
                  hits (badging them all would say nothing).
@@ -423,8 +443,9 @@ def pareto_badges(hits, all_stats=None):
     badges = [None] * n
     if n == 0:
         return badges
-    pts = [(h['stats']['attack'], h['stats']['defense'], h['stats']['stamina'])
-           for h in hits]
+    pts = points if points is not None else [
+        (h['stats']['attack'], h['stats']['defense'], h['stats']['stamina'])
+        for h in hits]
 
     crown = [False] * n
     if all_stats is not None:
