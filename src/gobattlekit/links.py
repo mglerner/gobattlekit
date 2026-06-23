@@ -10,6 +10,11 @@ from .platform import ON_ANDROID
 
 logger = logging.getLogger(__name__)
 
+# Hold strong references to fire-and-forget dialog tasks: the event loop only
+# keeps a weak reference, so without this a task can be GC'd before it runs and
+# the "Could not open link" dialog silently never appears.
+_pending_tasks = set()
+
 
 def open_url(app, url):
     """Open a URL in the system browser, surfacing failures in a dialog."""
@@ -34,7 +39,9 @@ def open_url(app, url):
                     f"Try opening this URL manually:\n{url}",
                 ))
 
-            asyncio.create_task(_show_dialog())
+            task = asyncio.create_task(_show_dialog())
+            _pending_tasks.add(task)
+            task.add_done_callback(_pending_tasks.discard)
     else:
         import webbrowser
         webbrowser.open(url)
