@@ -1,7 +1,12 @@
 Index,Name,Form,Gender,CP,HP,Atk IV,Def IV,Sta IV,Level Min,Shadow/Purified,Lucky
-1,Azumarill,Normal,,1500,151,0,15,15,40.0,0,0
-2,Registeel,Normal,,1492,123,2,14,15,41.5,0,0
-3,Lanturn,Normal,,1490,160,1,15,13,33.0,0,0
-4,Medicham,Normal,,1498,103,0,15,14,50.0,1,0
-5,Stunfisk,Galarian,,1500,142,0,14,15,28.5,0,0
-6,Swampert,Normal,,1499,140,12,13,11,28.0,0,0
+1,Azumarill,Normal,,733,103,0,15,15,15.0,0,0
+2,Azumarill,Normal,,812,99,15,13,12,15.0,0,0
+3,Stunfisk,Galarian,,690,98,0,12,15,15.0,0,0
+4,Stunfisk,Galarian,,760,84,12,4,6,15.0,0,0
+5,Lapras,Normal,,701,118,0,15,15,15.0,0,0
+6,Lapras,Normal,,742,104,15,2,3,15.0,0,0
+7,Clodsire,Normal,,688,121,0,15,14,15.0,0,0
+8,Quagsire,Normal,,705,110,1,15,15,15.0,0,0
+9,Medicham,Normal,,612,72,0,15,15,15.0,1,0
+10,Jellicent,Normal,,694,128,0,14,15,15.0,0,0
+11,Swampert,Normal,,820,116,12,13,11,15.0,0,0
