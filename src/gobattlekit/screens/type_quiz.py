@@ -9,7 +9,7 @@ from toga.style import Pack
 from toga.style.pack import COLUMN
 from ..data.effectiveness import effectiveness, effectiveness_to_words
 from ..theme import (
-    CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
+    CONTAINER, COLOR_ACCENT, COLOR_BG, COLOR_TEXT_LIGHT, COLOR_YELLOW,
     btn_nav, answer_color_gradient
 )
 
@@ -97,7 +97,12 @@ class TypeQuizScreen:
             style=btn_nav(height=44)
         ))
 
-        return self.container
+        # Scroll-wrap so the bottom controls stay reachable on small phones;
+        # inert (no scroll) when the content already fits.
+        return toga.ScrollContainer(
+            content=self.container,
+            style=Pack(flex=1, background_color=COLOR_BG)
+        )
 
     def _load_question(self):
         # Guards against a natively queued duplicate tap double-resolving

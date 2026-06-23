@@ -10,7 +10,7 @@ from toga.style.pack import COLUMN, ROW
 from ..data.gamemaster import get_moves, get_rankings, counters_to_charge, charge_sequence
 from ..platform import ON_ANDROID
 from ..theme import (
-    CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW,
+    CONTAINER, COLOR_ACCENT, COLOR_BG, COLOR_TEXT_LIGHT, COLOR_YELLOW,
     btn_nav, answer_color_gradient
 )
 
@@ -117,7 +117,12 @@ class QuizScreen:
             style=btn_nav(height=44)
         ))
 
-        return self.container
+        # Scroll-wrap so the bottom controls stay reachable on small phones;
+        # inert (no scroll) when the content already fits.
+        return toga.ScrollContainer(
+            content=self.container,
+            style=Pack(flex=1, background_color=COLOR_BG)
+        )
 
     def _pick_question_type(self):
         """Pick question type with weighted probability and streak limits."""
