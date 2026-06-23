@@ -6,7 +6,7 @@ import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from ..theme import (
-    CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT,
+    CONTAINER, COLOR_ACCENT, COLOR_BG, COLOR_TEXT_LIGHT,
     COLOR_SECONDARY_BTN, COLOR_NAV,
     btn_primary, btn_secondary, label_section, btn_help,
     btn_great, btn_ultra, btn_master
@@ -23,11 +23,19 @@ class HomeScreen:
         container.add(toga.Label(
             "GoBattleKit",
             style=Pack(font_size=32, font_weight="bold",
-                       margin_bottom=20, text_align="center",
+                       margin_bottom=16, text_align="center",
                        color=COLOR_ACCENT)
         ))
 
-        container.add(toga.Label(
+        # Scroll the menu so the About/Help row stays reachable on smaller
+        # phones (the fixed layout clipped it below the iPhone 17 Pro size).
+        menu = toga.Box(style=Pack(direction=COLUMN, flex=1))
+        scroll = toga.ScrollContainer(
+            content=menu,
+            style=Pack(flex=1, background_color=COLOR_BG)
+        )
+
+        menu.add(toga.Label(
             "Quizzes",
             style=label_section(margin_top=0)
         ))
@@ -36,38 +44,40 @@ class HomeScreen:
             ("ultra",  "Ultra League Move Counts", btn_ultra),
             ("master", "Master League Move Counts", btn_master),
         ):
-            container.add(toga.Button(
+            menu.add(toga.Button(
                 label,
                 on_press=self._make_league_handler(league),
                 style=btn_fn()
             ))
 
-        container.add(toga.Button(
+        menu.add(toga.Button(
             "Optimal Move Timing",
             on_press=lambda w: self.app.show_timing_quiz(),
             style=btn_primary(margin_top=8)
         ))
 
-        container.add(toga.Button(
+        menu.add(toga.Button(
             "Type Effectiveness",
             on_press=self._start_type_quiz,
             style=btn_primary()
         ))
 
-        container.add(toga.Label(
+        menu.add(toga.Label(
             "IV Analysis",
             style=label_section()
         ))
-        container.add(toga.Button(
+        menu.add(toga.Button(
             "PvP IV Checker",
             on_press=self._start_iv_checker,
             style=btn_primary()
         ))
-        container.add(toga.Button(
+        menu.add(toga.Button(
             "My PvP IV Targets",
             on_press=self._start_user_iv_checker,
             style=btn_primary()
         ))
+
+        container.add(scroll)
 
         bottom_row = toga.Box(style=Pack(direction=ROW, margin_top=8))
         bottom_row.add(toga.Button(
