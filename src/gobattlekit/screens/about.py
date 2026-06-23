@@ -58,6 +58,25 @@ class AboutScreen:
             style=btn_secondary(height=40, margin_bottom=16)
         ))
 
+        # Support
+        content.add(toga.Label(
+            "Support Development",
+            style=Pack(font_size=16, font_weight="bold", margin_top=16, margin_bottom=4,
+                       color=COLOR_YELLOW)
+        ))
+        if ON_ANDROID:
+            content.add(toga.Button(
+                "Tip jar — Venmo @mglerner",
+                on_press=lambda w: self._open_url("https://venmo.com/u/mglerner"),
+                style=btn_secondary(height=40, margin_bottom=16)
+            ))
+        else:
+            content.add(toga.Button(
+                "Support via mglerner.com",
+                on_press=lambda w: self._open_url("https://mglerner.com/gobattlekit/support.html"),
+                style=btn_secondary(height=40, margin_bottom=16)
+            ))
+
         # Credits
         content.add(toga.Label(
             "Credits",
@@ -96,25 +115,6 @@ class AboutScreen:
             style=Pack(font_size=14, margin_bottom=16, color=COLOR_TEXT_LIGHT)
         ))
 
-
-        # Support
-        content.add(toga.Label(
-            "Support Development",
-            style=Pack(font_size=16, font_weight="bold", margin_top=16, margin_bottom=4,
-                       color=COLOR_YELLOW)
-        ))
-        if ON_ANDROID:
-            content.add(toga.Button(
-                "Tip jar — Venmo @mglerner",
-                on_press=lambda w: self._open_url("https://venmo.com/u/mglerner"),
-                style=btn_secondary(height=40, margin_bottom=16)
-            ))
-        else:
-            content.add(toga.Button(
-                "Support via mglerner.com",
-                on_press=lambda w: self._open_url("https://mglerner.com/gobattlekit/support.html"),
-                style=btn_secondary(height=40, margin_bottom=16)
-            ))
 
         # Trademark / affiliation disclaimer
         content.add(toga.Label(
