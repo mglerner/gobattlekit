@@ -98,9 +98,6 @@ class QuizSummaryScreen:
                 ))
             container.add(breakdown_card)
 
-        # Spacer
-        container.add(toga.Box(style=Pack(flex=1)))
-
         # Back to Home
         container.add(toga.Button(
             "← Back to Home",
@@ -108,5 +105,10 @@ class QuizSummaryScreen:
             style=btn_nav(height=44)
         ))
 
-        return container
+        # Scroll-wrap so the bottom control stays reachable on small phones;
+        # inert (no scroll) when the content already fits.
+        return toga.ScrollContainer(
+            content=container,
+            style=Pack(flex=1, background_color=COLOR_BG)
+        )
 
