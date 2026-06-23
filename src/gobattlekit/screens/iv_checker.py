@@ -10,7 +10,8 @@ from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from ..data.iv_checker import (
     check_thresholds, get_pokemon_index, cp_to_level, append_user_generated,
-    qualifying_ivs, compute_rank_table, LEAGUE_CAPS
+    qualifying_ivs, compute_rank_table, pareto_badges, all_iv_stats,
+    LEAGUE_CAPS
 )
 from ..data.thresholds import (
     DEFAULT_THRESHOLDS, EVOLUTION_LINES, target_class,
@@ -892,8 +893,9 @@ class IVCheckerScreen:
             return
 
         hits = sorted(hits, key=lambda h: h['stats']['stat_prod'], reverse=True)
-        for hit in hits:
-            self._add_hit_display(self.hits_box, hit, league_targets)
+        badges = self._pareto_badges_for(species, hits)
+        for hit, badge in zip(hits, badges):
+            self._add_hit_display(self.hits_box, hit, league_targets, badge=badge)
 
     def _refresh_source_label(self, species, current, thresholds):
         """Provenance line under the cycler: the current target's source
@@ -948,8 +950,9 @@ class IVCheckerScreen:
             ))
             league_targets = thresholds.get(sp, {}).get(league_label, {})
             hits = sorted(hits, key=lambda h: h['stats']['stat_prod'], reverse=True)
-            for hit in hits:
-                self._add_hit_display(self.results_box, hit, league_targets)
+            badges = self._pareto_badges_for(sp, hits)
+            for hit, badge in zip(hits, badges):
+                self._add_hit_display(self.results_box, hit, league_targets, badge=badge)
 
     # ------------------------------------------------------------------
     # League selection
@@ -1006,14 +1009,36 @@ class IVCheckerScreen:
     # Hit display
     # ------------------------------------------------------------------
 
-    def _add_hit_display(self, box, hit, league_targets=None):
+    def _pareto_badges_for(self, species, hits):
+        """Pareto badges for a displayed group of hits. Builds the species'
+        full spread universe so a globally-efficient spread earns the crown;
+        falls back to local-only (trophies, no crown) if base stats are
+        unavailable."""
+        pokemon_index = get_pokemon_index()
+        if not hits or species not in pokemon_index:
+            return pareto_badges(hits)
+        base = pokemon_index[species]
+        max_cp = LEAGUE_CAPS.get(self.league, 1500)
+        shadow = hits[0]['mon']['is_shadow']
+        all_stats = all_iv_stats(
+            species, base['atk'], base['def'], base['hp'],
+            max_level=51, max_cp=max_cp, shadow=shadow,
+        )
+        return pareto_badges(hits, all_stats)
+
+    _BADGE_EMOJI = {'crown': '👑', 'trophy': '🏆'}
+
+    def _add_hit_display(self, box, hit, league_targets=None, badge=None):
         """league_targets is the {name: spec} dict for the hit's
-        species/league — used to label generated (SIM) matches."""
+        species/league — used to label generated (SIM) matches. badge is
+        'crown'/'trophy'/None from pareto_badges() for the displayed group."""
         league_targets = league_targets or {}
         m = hit['mon']
         s = hit['stats']
         pre = f" ({hit['csv_species']})" if hit['is_pre_evo'] else ""
         iv_str = f"{m['atk_iv']}/{m['def_iv']}/{m['sta_iv']}{pre} (CP {m['cp']})"
+        if badge:
+            iv_str = f"{self._BADGE_EMOJI.get(badge, '')} {iv_str}"
         line1 = (f"Atk:{s['attack']:.2f} "
                  f"Def:{s['defense']:.2f} "
                  f"HP:{s['stamina']}")

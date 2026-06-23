@@ -91,6 +91,10 @@ class AboutScreen:
             on_press=lambda w: self._open_url("https://discord.gg/UkCdztFf2n"),
             style=btn_secondary(height=40, margin_bottom=16)
         ))
+        content.add(toga.Label(
+            "🏆/👑 efficient-IV badges inspired by orgodemir's PvP IV webapp",
+            style=Pack(font_size=14, margin_bottom=16, color=COLOR_TEXT_LIGHT)
+        ))
 
 
         # Support

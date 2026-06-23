@@ -14,8 +14,67 @@ from gobattlekit.data.iv_checker import (
     parse_csv,
     append_user_generated,
     check_thresholds,
+    pareto_badges,
     _rank_cache,
 )
+
+
+def _hit(a, d, s):
+    """Minimal hit shape that pareto_badges reads (scaled stats only)."""
+    return {'stats': {'attack': a, 'defense': d, 'stamina': s}}
+
+
+class TestParetoBadges:
+    def test_empty(self):
+        assert pareto_badges([]) == []
+
+    def test_local_only_disables_crown(self):
+        # all_stats=None -> no global universe, so only local trophy logic.
+        hits = [_hit(100, 90, 80), _hit(90, 100, 80), _hit(80, 80, 80)]
+        assert pareto_badges(hits) == ['trophy', 'trophy', None]
+
+    def test_crown_for_globally_efficient(self):
+        universe = [(100, 100, 100), (90, 90, 90)]
+        hits = [_hit(100, 100, 100), _hit(90, 90, 90)]
+        # First is efficient (nothing dominates it); second is dominated.
+        assert pareto_badges(hits, universe) == ['crown', None]
+
+    def test_best_of_yours_is_not_a_crown(self):
+        # An unowned super-spread dominates all your hits, so none is
+        # globally efficient -> no crown, just local trophies.
+        universe = [(110, 110, 110), (100, 90, 80), (90, 100, 80), (80, 80, 80)]
+        hits = [_hit(100, 90, 80), _hit(90, 100, 80), _hit(80, 80, 80)]
+        assert pareto_badges(hits, universe) == ['trophy', 'trophy', None]
+
+    def test_two_efficient_both_crowned(self):
+        # Two efficient spreads (attack vs defense niche); a dominated third.
+        universe = [(100, 80, 80), (80, 100, 80), (70, 70, 70)]
+        hits = [_hit(100, 80, 80), _hit(80, 100, 80), _hit(70, 70, 70)]
+        assert pareto_badges(hits, universe) == ['crown', 'crown', None]
+
+    def test_single_efficient_hit_crowned(self):
+        universe = [(50, 50, 50), (40, 60, 40)]
+        assert pareto_badges([_hit(50, 50, 50)], universe) == ['crown']
+
+    def test_single_inefficient_hit_blank(self):
+        universe = [(60, 60, 60), (50, 50, 50)]
+        assert pareto_badges([_hit(50, 50, 50)], universe) == [None]
+
+    def test_crown_beats_trophy_worked_example(self):
+        # A and D are efficient; B is dominated by an unowned Z but beats C;
+        # C is dominated by your own B. Crown outranks trophy for A and D.
+        A, D, B, C, Z = ((100, 95, 90), (90, 100, 92), (98, 96, 88),
+                         (95, 90, 85), (99, 96, 89))
+        universe = [A, D, B, C, Z]
+        hits = [_hit(*A), _hit(*D), _hit(*B), _hit(*C)]
+        assert pareto_badges(hits, universe) == ['crown', 'crown', 'trophy', None]
+
+    def test_tied_efficient_both_crowned(self):
+        # Two owned mons share the one efficient spread -> both crowned
+        # (neither strictly beats the other), the worse one blank.
+        universe = [(100, 100, 100), (50, 50, 50)]
+        hits = [_hit(100, 100, 100), _hit(100, 100, 100), _hit(50, 50, 50)]
+        assert pareto_badges(hits, universe) == ['crown', 'crown', None]
 
 
 # ── get_species_name ──────────────────────────────────────────────
