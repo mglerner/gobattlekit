@@ -4,7 +4,7 @@ About screen — credits and links.
 """
 import toga
 from toga.style import Pack
-from toga.style.pack import COLUMN
+from toga.style.pack import COLUMN, ROW
 from ..platform import ON_ANDROID
 from ..links import open_url
 from ..theme import (
@@ -111,9 +111,25 @@ class AboutScreen:
             style=btn_secondary(height=40, margin_bottom=16)
         ))
         content.add(toga.Label(
-            "🏆/👑 efficient-IV badges\ninspired by orgodemir's webapp",
-            style=Pack(font_size=14, margin_bottom=16, color=COLOR_TEXT_LIGHT)
+            "🏆/👑 efficient-IV badges",
+            style=Pack(font_size=14, color=COLOR_TEXT_LIGHT)
         ))
+        # "inspired by orgodemir" with orgodemir as an inline text link
+        # (accent-colored, page-background button so it reads as hypertext,
+        # not one of the filled link buttons above).
+        badge_credit = toga.Box(style=Pack(direction=ROW, margin_bottom=16))
+        badge_credit.add(toga.Label(
+            "inspired by ",
+            style=Pack(font_size=14, color=COLOR_TEXT_LIGHT)
+        ))
+        badge_credit.add(toga.Button(
+            "orgodemir",
+            on_press=lambda w: self._open_url(
+                "https://www.reddit.com/r/TheSilphArena/comments/yxzg7f/"),
+            style=Pack(font_size=14, color=COLOR_ACCENT,
+                       background_color=COLOR_BG)
+        ))
+        content.add(badge_credit)
 
 
         # Trademark / affiliation disclaimer
