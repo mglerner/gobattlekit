@@ -49,13 +49,13 @@ uv run pytest -q
    every `briefcase create iOS` since the build directory is wiped each time.
 
 2. Open `build/gobattlekit/ios/xcode/GoBattleKit.xcodeproj` in Xcode
-3. Confirm the signing team is **Michael Lerner** (team `MF55GHNQC2`, the paid
-   Apple Developer Program account). `development_team` in `pyproject.toml` is
-   now set to this, so a fresh `briefcase create iOS` should default to it; just
-   verify rather than re-set it. There is only one team; leave "Automatically
-   manage signing" checked so
-   Xcode mints the distribution cert during Archive/Distribute. If you ever
-   hit "No iOS Distribution cert" / "PLA Update available", accept the
+3. Set the signing team to **Michael Lerner** (team `MF55GHNQC2`, the paid
+   Apple Developer Program account). Briefcase does NOT write a team into the
+   iOS Xcode project (`development_team` in `pyproject.toml` is inert for iOS),
+   so the team field is blank after every `prepare_ios.sh` and you must pick it
+   each time. There is only one team; leave "Automatically manage signing"
+   checked so Xcode mints the distribution cert during Archive/Distribute. If
+   you ever hit "No iOS Distribution cert" / "PLA Update available", accept the
    updated Program License Agreement at developer.apple.com/account first —
    an outstanding PLA blocks cert creation.
 4. Product → Clean Build Folder (Cmd+Shift+K)
