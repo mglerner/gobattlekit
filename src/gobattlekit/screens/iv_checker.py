@@ -129,7 +129,7 @@ class IVCheckerScreen:
 
         self.results_box = toga.Box(
             style=Pack(direction=COLUMN, flex=1, background_color=COLOR_BG))
-        scroll = toga.ScrollContainer(content=self.results_box,
+        scroll = toga.ScrollContainer(horizontal=False, content=self.results_box,
                                       style=Pack(flex=1, background_color=COLOR_BG))
         self.container.add(scroll)
 
@@ -264,7 +264,7 @@ class IVCheckerScreen:
         self._show_back_btn(False)
 
         form_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
-        scroll = toga.ScrollContainer(
+        scroll = toga.ScrollContainer(horizontal=False, 
             content=form_box,
             style=Pack(flex=1),
             horizontal=False,
@@ -368,7 +368,7 @@ class IVCheckerScreen:
         self.results_box.add(self._manual_search)
 
         self._manual_species_list_box = toga.Box(style=Pack(direction=COLUMN))
-        scroll = toga.ScrollContainer(
+        scroll = toga.ScrollContainer(horizontal=False, 
             content=self._manual_species_list_box,
             style=Pack(flex=1),
             horizontal=False,

@@ -133,7 +133,7 @@ class EditThresholdsScreen:
         self.container.add(self._help_btn)
 
         self.content_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
-        scroll = toga.ScrollContainer(content=self.content_box, style=Pack(flex=1))
+        scroll = toga.ScrollContainer(horizontal=False, content=self.content_box, style=Pack(flex=1))
         self.container.add(scroll)
 
         self.container.add(toga.Button(
@@ -476,7 +476,7 @@ class EditThresholdsScreen:
         self.content_box.add(self.species_search)
 
         self.species_list_box = toga.Box(style=Pack(direction=COLUMN))
-        scroll = toga.ScrollContainer(
+        scroll = toga.ScrollContainer(horizontal=False, 
             content=self.species_list_box,
             style=Pack(flex=1)
         )

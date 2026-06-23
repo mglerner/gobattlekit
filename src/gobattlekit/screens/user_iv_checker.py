@@ -98,7 +98,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
 
         self.results_box = toga.Box(
             style=Pack(direction=COLUMN, flex=1, background_color=COLOR_BG))
-        scroll = toga.ScrollContainer(content=self.results_box,
+        scroll = toga.ScrollContainer(horizontal=False, content=self.results_box,
                                       style=Pack(flex=1, background_color=COLOR_BG))
         self.container.add(scroll)
 
