@@ -49,9 +49,11 @@ uv run pytest -q
    every `briefcase create iOS` since the build directory is wiped each time.
 
 2. Open `build/gobattlekit/ios/xcode/GoBattleKit.xcodeproj` in Xcode
-3. Set signing team to **Michael Lerner** (team `MF55GHNQC2`, the paid
-   Apple Developer Program account) — resets on each run of `prepare_ios.sh`.
-   There is only one team; leave "Automatically manage signing" checked so
+3. Confirm the signing team is **Michael Lerner** (team `MF55GHNQC2`, the paid
+   Apple Developer Program account). `development_team` in `pyproject.toml` is
+   now set to this, so a fresh `briefcase create iOS` should default to it; just
+   verify rather than re-set it. There is only one team; leave "Automatically
+   manage signing" checked so
    Xcode mints the distribution cert during Archive/Distribute. If you ever
    hit "No iOS Distribution cert" / "PLA Update available", accept the
    updated Program License Agreement at developer.apple.com/account first —
@@ -69,8 +71,9 @@ Before distributing, you can verify the fix worked:
 ### TestFlight Notes
 - Internal testers get access immediately after upload
 - External testers require Beta App Review (can take hours, stricter than internal)
-- Apple requires a new version or build number for each upload
-- Update `version` in `pyproject.toml` before each build
+- Apple requires a new build number (CFBundleVersion) for each upload
+- For a new public release, bump `version` in `pyproject.toml`. For a re-upload
+  of the same marketing version (a fix), keep `version` and bump `build` instead.
 
 ## Android Build Process
 ```zsh

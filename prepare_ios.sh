@@ -24,8 +24,18 @@ for d in "${dynload_dirs[@]}"; do
     echo "  ${d}"
 done
 
+# Assert the manifests actually landed so a template change can't silently
+# ship a build with no privacy manifest (which fails ITMS-91061 at upload).
+manifest_count=$(find build/gobattlekit/ios/xcode -name '*.xcprivacy' | wc -l | tr -d ' ')
+if [[ "${manifest_count}" -eq 0 ]]; then
+    echo "ERROR: no .xcprivacy files present after copy; the build would fail" >&2
+    echo "Apple's privacy-manifest review (ITMS-91061). Aborting." >&2
+    exit 1
+fi
+echo "Privacy manifests present: ${manifest_count}"
+
 echo "Done! Next steps:"
 echo "  1. Open build/gobattlekit/ios/xcode/GoBattleKit.xcodeproj in Xcode"
-echo "  2. Set signing team to Michael Lerner (Personal Team)"
+echo "  2. Set signing team to Michael Lerner (team MF55GHNQC2, the paid Apple Developer Program account)"
 echo "  3. Product → Clean Build Folder (Cmd+Shift+K)"
 echo "  4. Product → Archive → Distribute → App Store Connect → Upload"

@@ -2,7 +2,7 @@
 [tool.briefcase]
 project_name = "GoBattleKit"
 bundle = "com.mglerner"
-version = "0.0.31"
+version = "1.0.0"
 url = "https://mglerner.com/gobattlekit"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -11,8 +11,12 @@ author_email = "mglerner@protonmail.com"
 
 [tool.briefcase.app.gobattlekit]
 formal_name = "GoBattleKit"
-description = "MGL's GoBattleKit App"
-long_description = """More details about the app should go here.
+# build number bumps independently of the marketing `version` above so a
+# second build of the same public version can be re-uploaded (App Store
+# requires a unique CFBundleVersion per upload). Increment it each upload.
+build = 1
+description = "Pokémon GO PvP IV checking and move-count training"
+long_description = """GoBattleKit helps Pokémon GO PvP players check whether their Pokémon hit the IV spreads that matter for ranked leagues. Import a PokeGenie CSV or enter a Pokémon by hand, and the app tells you which battle targets it meets. It also has quizzes for move counts and type matchups so you can practice the timing that decides close fights.
 """
 icon = "src/gobattlekit/resources/icon"
 splash = "src/gobattlekit/resources/splash"
@@ -170,7 +174,12 @@ requires = [
 
 # Mobile deployments
 [tool.briefcase.app.gobattlekit.iOS]
-development_team = "6TV57R6ZCC"
+# Paid Apple Developer Program team (Individual), the one that can upload to
+# App Store Connect. The stale "6TV57R6ZCC" keychain entry is NOT the team.
+development_team = "MF55GHNQC2"
+# Pin the minimum iOS the build targets so it stops floating with the
+# Briefcase template default (which currently resolves to 13.0).
+min_os_version = "13.0"
 requires = [
     "toga-iOS~=0.5.0",
     "std-nslog~=1.0.3",
@@ -191,9 +200,6 @@ info."LSApplicationCategoryType" = "public.app-category.utilities"
 # The app is dark-themed only (design decision 2026-06-12, review #11):
 # force dark so iOS light mode can't render dark text on dark cards.
 info."UIUserInterfaceStyle" = "Dark"
-# Still to verify against real `briefcase create iOS` output in the
-# App Store readiness session: explicit deployment target, build number
-# strategy (currently: bump `version` per upload, per DEVELOPER_NOTES).
 
 [tool.briefcase.app.gobattlekit.android]
 requires = [
