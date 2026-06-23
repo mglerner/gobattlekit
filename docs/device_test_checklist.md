@@ -1,10 +1,33 @@
-# Device test checklist — post-deep-review (for 0.0.28+)
+# Device test checklist — pre-1.0.0 App Store release
 
-Everything below changed in the 2026-06-11/12 review fixes and needs eyes
-on a real device or emulator. Source findings in
-`docs/reviews/2026-06-11_fable5_deep_codebase_review.md`.
+Everything below needs eyes on a real device or emulator before the public
+release. Two groups: the 2026-06-11/12 review fixes (never device-verified;
+source in `docs/reviews/2026-06-11_fable5_deep_codebase_review.md`), and the
+0.0.29–1.0.0 changes that post-date the original checklist (threshold
+pipeline + provenance UI, plus the 1.0.0 scroll/legal changes).
 
-## iOS (TestFlight 0.0.28 or `briefcase run iOS`)
+## iOS (TestFlight 1.0.0 or `briefcase run iOS`)
+
+Small-screen layout (1.0.0 scroll changes):
+- [ ] Run on a SMALL device (iPhone SE, the minimum the iOS 13 target
+      allows) and a LARGE one: Home and About now scroll. Confirm the
+      About/Help row on Home and the Help/Back buttons on About are
+      reachable, and nothing clips at the bottom.
+- [ ] About screen: the new "Legal" disclaimer paragraph wraps fully (no
+      clipping), and the PvPoke credit reads "by EmpoleonDynamite".
+- [ ] Quiz / quiz-summary screens (still NOT wrapped on purpose): on the
+      small device, confirm a question + its answers + any reveal still fit
+      without clipping. If one clips, flag it — do not assume it's fine.
+
+Threshold-pipeline UI (0.0.29–1.0.0, never device-verified):
+- [ ] My PvP IV Targets: provenance shows correctly (expert vs generated
+      vs user badges), SIM badges render, and per-hit stat-product rank
+      appears for all hits (not just onlytop).
+- [ ] The expanded species set (~47) loads and the Edit Targets species
+      picker is complete.
+- [ ] Add a target, then confirm a forced save failure surfaces the
+      "Could not save target" error instead of silently dropping it
+      (hard to trigger on-device; at minimum confirm a normal add works).
 
 Visual / theme:
 - [ ] Force-dark (`UIUserInterfaceStyle=Dark`): set the PHONE to light
