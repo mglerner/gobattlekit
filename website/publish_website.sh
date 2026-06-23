@@ -1,31 +1,72 @@
-#!/bin/zsh
-# Publish the GoBattleKit web pages to mglerner.com.
-# Run this after bumping the app version (see DEVELOPER_NOTES "Releasing").
+#!/usr/bin/env bash
+# Publish website/public/ to mglerner.com/gobattlekit/.
 #
-# Only website/public/ is uploaded; this script and the README stay local.
+# Run this after bumping the app version (see DEVELOPER_NOTES "TestFlight Notes")
+# so the live pages stay in step with a release.
 #
-# One-time setup: create website/.publish_env (gitignored) with your server:
-#   MGLERNER_WEB_DEST="user@host:/var/www/mglerner.com"   # rsync target (web root)
-#   MGLERNER_WEB_SSH="user@host"                          # optional, for the /GoBattleKit alias
-set -e
+# Flow:
+#   1. Verify no em/en-dashes in the pages (Michael's house style; aborts on a
+#      hit unless --skip-verify).
+#   2. rsync website/public/ to mglerner.com:mglerner.com/gobattlekit/ with
+#      --delete, so anything removed locally is also removed on the server.
+#   3. Symlink /GoBattleKit -> /gobattlekit on the server so both URLs serve the
+#      same pages.
+#
+# Default is dry-run. Pass --push to actually send the files.
+#
+# Usage:
+#     website/publish_website.sh                 # dry run (safe default)
+#     website/publish_website.sh --push          # actually push
+#     website/publish_website.sh --push --skip-verify
 
-here="${0:A:h}"
-[[ -f "$here/.publish_env" ]] && source "$here/.publish_env"
-: ${MGLERNER_WEB_DEST:?Set MGLERNER_WEB_DEST in website/.publish_env (user@host:/webroot)}
+set -euo pipefail
 
-echo "Publishing website/public/ -> ${MGLERNER_WEB_DEST}"
-# No --delete: this only adds/updates the GoBattleKit files, never touches the
-# rest of the site.
-rsync -av --no-perms "$here/public/" "${MGLERNER_WEB_DEST%/}/"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SRC="${SCRIPT_DIR}/public/"
+DEST="mglerner.com:mglerner.com/gobattlekit/"
+SSH_HOST="mglerner.com"
 
-# Case alias so /GoBattleKit serves the same files as /gobattlekit.
-if [[ -n "${MGLERNER_WEB_SSH:-}" ]]; then
-    webpath="${MGLERNER_WEB_DEST#*:}"
-    ssh "$MGLERNER_WEB_SSH" "ln -sfn gobattlekit '${webpath%/}/GoBattleKit'"
-    echo "Linked /GoBattleKit -> /gobattlekit"
-else
-    echo "Note: set MGLERNER_WEB_SSH to auto-create the /GoBattleKit alias, or"
-    echo "      run once on the server: ln -sfn gobattlekit <webroot>/GoBattleKit"
+PUSH=false
+SKIP_VERIFY=false
+for arg in "$@"; do
+  case "$arg" in
+    --push) PUSH=true ;;
+    --skip-verify) SKIP_VERIFY=true ;;
+    *) echo "error: unknown arg '$arg'" >&2; exit 2 ;;
+  esac
+done
+
+if [ ! -d "$SRC" ]; then
+  echo "error: $SRC does not exist" >&2
+  exit 1
 fi
 
-echo "Done. Live at https://mglerner.com/gobattlekit/"
+if [ "$SKIP_VERIFY" = true ]; then
+  echo "Skipping em/en-dash check (--skip-verify)."
+else
+  echo "Checking for em/en-dashes..."
+  if hits=$(grep -rlE '—|–' "$SRC"); then
+    echo "error: em/en-dash found (use ASCII hyphens, or --skip-verify):" >&2
+    echo "$hits" >&2
+    exit 1
+  fi
+  echo
+fi
+
+if [ "$PUSH" = true ]; then
+  echo "Pushing ${SRC} -> ${DEST}"
+  rsync -avzh --delete "$SRC" "$DEST"
+  echo
+  echo "Linking /GoBattleKit -> /gobattlekit"
+  ssh "$SSH_HOST" "ln -sfn gobattlekit mglerner.com/GoBattleKit"
+  echo
+  echo "Done. Live at https://mglerner.com/gobattlekit/"
+else
+  echo "Dry run (pass --push to actually push)"
+  echo "Source: ${SRC}"
+  echo "Dest:   ${DEST}"
+  echo
+  rsync -avzhn --delete "$SRC" "$DEST"
+  echo
+  echo "(dry run - nothing was sent; pass --push to publish)"
+fi
