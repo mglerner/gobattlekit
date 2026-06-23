@@ -108,7 +108,7 @@ class AboutScreen:
         else:
             content.add(toga.Button(
                 "Support via mglerner.com",
-                on_press=lambda w: self._open_url("http://mglerner.com/support.html"),
+                on_press=lambda w: self._open_url("https://mglerner.com/gobattlekit/support.html"),
                 style=btn_secondary(height=40, margin_bottom=16)
             ))
 

@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <!--
-  GoBattleKit landing page, styled to match support.html. The pyproject `url`
-  (https://mglerner.com/gobattlekit) currently 404s and App Store Connect uses it
-  as the Marketing URL. Publish this there. Set the App Store link on the button
-  once the public listing exists.
+  GoBattleKit landing page. Canonical for https://mglerner.com/gobattlekit/.
+  Set the App Store link on the button once the public listing is live.
 -->
 <html lang="en">
 <head>
@@ -20,45 +18,19 @@
             padding: 40px 20px;
             text-align: center;
         }
-        h1 {
-            color: #00BCD4;
-            font-size: 2em;
-            margin-bottom: 8px;
-        }
-        h2 {
-            color: #FFCC00;
-            font-size: 1.2em;
-            font-weight: normal;
-            margin-bottom: 32px;
-        }
-        p {
-            line-height: 1.6;
-            color: #cccccc;
-            margin-bottom: 24px;
-        }
-        .features {
-            text-align: left;
-            display: inline-block;
-            color: #cccccc;
-            line-height: 1.8;
-        }
+        h1 { color: #00BCD4; font-size: 2em; margin-bottom: 8px; }
+        h2 { color: #FFCC00; font-size: 1.2em; font-weight: normal; margin-bottom: 32px; }
+        p { line-height: 1.6; color: #cccccc; margin-bottom: 24px; }
+        .features { text-align: left; display: inline-block; color: #cccccc; line-height: 1.8; }
         .btn {
-            display: inline-block;
-            background-color: #00BCD4;
-            color: #1a3a5c;
-            font-size: 1.1em;
-            font-weight: bold;
-            padding: 14px 32px;
-            border-radius: 8px;
-            text-decoration: none;
-            margin: 8px;
+            display: inline-block; background-color: #00BCD4; color: #1a3a5c;
+            font-size: 1.1em; font-weight: bold; padding: 14px 32px;
+            border-radius: 8px; text-decoration: none; margin: 8px;
         }
         .btn:hover { background-color: #0097A7; }
-        .credits {
-            margin-top: 48px;
-            font-size: 0.9em;
-            color: #888888;
-        }
+        .nav { margin-top: 28px; font-size: 0.95em; }
+        .nav a { color: #00BCD4; margin: 0 8px; }
+        .credits { margin-top: 40px; font-size: 0.9em; color: #888888; }
         .credits a { color: #00BCD4; }
     </style>
 </head>
@@ -100,6 +72,11 @@
 
     <!-- Set this href to the App Store link once the listing is live. -->
     <a href="#" class="btn">Get GoBattleKit</a>
+
+    <div class="nav">
+        <a href="/gobattlekit/privacy.html">Privacy</a> ·
+        <a href="/gobattlekit/support.html">Support</a>
+    </div>
 
     <div class="credits">
         Game data and rankings from

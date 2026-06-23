@@ -12,11 +12,11 @@ Battle Quizzes & PvP IV checks
 
 ## Promotional Text (≤170)
 
-Drill yourself on type matchups, and move counts and timing for PvP. Check which of your Pokémon are worth building for PvP!
+Drill yourself on type matchups, PvP move counts, and PvP move timing. Check which of your Pokémon are worth building for PvP!
 
 ## Keywords (≤100, comma separated, no spaces after commas)
 
-pokemon go,pvp,iv,gbl,great league,ultra league,pokegenie,move counts,trainer battle
+pokemon go,pvp,iv,gbl,great league,ultra league,pokegenie,move counts,trainer battle,timing
 
 ## Description
 
