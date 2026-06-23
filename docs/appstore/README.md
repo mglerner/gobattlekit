@@ -6,25 +6,17 @@ items that need a human are flagged. Full context is in the plan and in
 
 ## What is here
 
-| File                            | Use                                                                                |
-| ------------------------------- | ---------------------------------------------------------------------------------- |
-| `store_listing.md`              | Name, subtitle, promo text, keywords, description for App Store Connect            |
-| `privacy_policy.html`           | Host it, then put the URL in App Store Connect (hard blocker)                      |
-| `marketing_landing.html`        | Fixes the 404 marketing URL; host at `mglerner.com/gobattlekit` or repoint the URL |
-| `app_review_notes.md`           | Paste into App Review Information > Notes                                          |
-| `sample_pokegenie.csv`          | Attach for the reviewer to test the CSV import (6 GL meta mons, parses clean)      |
-| `privacy_and_rating_answers.md` | Pre-filled App Privacy + Age Rating answers                                        |
+| File                            | Use                                                                                        |
+| ------------------------------- | ------------------------------------------------------------------------------------------ |
+| `store_listing.md`              | Name, subtitle, promo text, keywords, description for App Store Connect                    |
+| `privacy_policy.html`           | Host it, then put the URL in App Store Connect (hard blocker)                              |
+| `marketing_landing.html`        | Fixes the 404 marketing URL; host at `mglerner.com/gobattlekit` or repoint the URL         |
+| `app_review_notes.md`           | Paste into App Review Information > Notes                                                  |
+| `sample_pokegenie.csv`          | Attach for the reviewer to test CSV import (11 mons, deliberate hit/miss mix, GL-verified) |
+| `privacy_and_rating_answers.md` | Pre-filled App Privacy + Age Rating answers                                                |
 
-## Needs a human before submit
-
-- [ ] Set the contact email in `privacy_policy.html` (line marked CONTACT)
-- [ ] Host `privacy_policy.html` and enter the URL in App Store Connect
-- [ ] Host `marketing_landing.html` at the `pyproject` url, or change the url; set
-      the App Store link in the page once the listing is live
-- [ ] Confirm the 1024 app icon is original art (no Niantic/Nintendo assets);
-      check it has no alpha: `sips -g hasAlpha src/gobattlekit/resources/icon-1024.png`
-- [ ] Capture screenshots (below)
-- [ ] Run `docs/device_test_checklist.md` on a real device at 1.0.0
+Live status of the remaining human steps is tracked in the working session, not
+here. The screenshots come last, after the UI and all other items are settled.
 
 ## Screenshot shot list
 

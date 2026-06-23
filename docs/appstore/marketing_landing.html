@@ -1,73 +1,112 @@
 <!DOCTYPE html>
 <!--
-  GoBattleKit landing page. The pyproject `url` (https://mglerner.com/gobattlekit)
-  currently 404s, and App Store Connect uses it as the Marketing URL. Publish this
-  there, or repoint the URL to something already live. Restyle to match the rest
-  of mglerner.com if you prefer. Set the TestFlight/App Store link below once the
-  public listing exists.
+  GoBattleKit landing page, styled to match support.html. The pyproject `url`
+  (https://mglerner.com/gobattlekit) currently 404s and App Store Connect uses it
+  as the Marketing URL. Publish this there. Set the App Store link on the button
+  once the public listing exists.
 -->
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GoBattleKit</title>
-  <style>
-    body {
-      margin: 0;
-      background: #0f2030;
-      color: #e8eef4;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      line-height: 1.6;
-    }
-    main { max-width: 720px; margin: 0 auto; padding: 48px 22px 60px; }
-    h1 { color: #4ea1d3; font-size: 34px; margin-bottom: 2px; }
-    .tag { color: #9fb3c4; font-size: 16px; margin-top: 0; }
-    h2 { color: #ffcb3a; font-size: 18px; margin-top: 30px; }
-    ul { padding-left: 20px; }
-    a { color: #4ea1d3; }
-    .cta {
-      display: inline-block; margin-top: 22px; padding: 12px 20px;
-      background: #4ea1d3; color: #0f2030; border-radius: 8px;
-      text-decoration: none; font-weight: 600;
-    }
-    footer { color: #9fb3c4; font-size: 13px; margin-top: 44px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoBattleKit</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #0d1520;
+            color: #ffffff;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #00BCD4;
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+        h2 {
+            color: #FFCC00;
+            font-size: 1.2em;
+            font-weight: normal;
+            margin-bottom: 32px;
+        }
+        p {
+            line-height: 1.6;
+            color: #cccccc;
+            margin-bottom: 24px;
+        }
+        .features {
+            text-align: left;
+            display: inline-block;
+            color: #cccccc;
+            line-height: 1.8;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #00BCD4;
+            color: #1a3a5c;
+            font-size: 1.1em;
+            font-weight: bold;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin: 8px;
+        }
+        .btn:hover { background-color: #0097A7; }
+        .credits {
+            margin-top: 48px;
+            font-size: 0.9em;
+            color: #888888;
+        }
+        .credits a { color: #00BCD4; }
+    </style>
 </head>
 <body>
-<main>
-  <h1>GoBattleKit</h1>
-  <p class="tag">A Pokémon GO PvP companion app</p>
+    <div style="font-size: 3em; margin-bottom: 16px;">⚙️</div>
+    <h1>GoBattleKit</h1>
+    <h2>A Pokémon GO PvP companion app</h2>
 
-  <p>
-    GoBattleKit helps you decide which Pokémon are worth building for ranked PvP,
-    then helps you practice the parts of a battle that come down to timing and
-    move counts.
-  </p>
+    <p>
+        The quizzes sharpen the parts of a battle that come down to reflexes and
+        memory. One asks how many fast moves it takes to reach a charged move.
+        Another teaches the timing that lets a slower move go off first. A third
+        runs you through type matchups until they are second nature. They work for
+        any trainer, whether or not you track IVs.
+    </p>
 
-  <h2>What it does</h2>
-  <ul>
-    <li>Checks your Pokémon against the IV spreads that matter in Great League, Ultra League, and Master League</li>
-    <li>Imports a PokeGenie CSV, or lets you enter a Pokémon by hand</li>
-    <li>Stores your own IV targets, with import from pogo-simulator deep dives</li>
-    <li>Quizzes you on move counts, move timing, and type matchups</li>
-  </ul>
+    <p>
+        The IV tools help you decide which Pokémon are worth building. Import a
+        CSV from PokeGenie, or enter a Pokémon by hand, and the app checks it
+        against the IV spreads that deep-dive analysis has shown to matter in each
+        league.
+    </p>
 
-  <h2>Your data stays with you</h2>
-  <p>
-    The app downloads public game data and rankings from PvPoke. Your imported CSV
-    and saved targets stay on your device. There are no accounts and no ads, and
-    nothing you do is tracked.
-  </p>
+    <div class="features">
+        <strong style="color:#FFCC00;">What you get</strong>
+        <ul>
+            <li>Quizzes for move counts, move timing, and type effectiveness</li>
+            <li>IV target checking for Great League, Ultra League, and Master League</li>
+            <li>PokeGenie CSV import, or manual entry one Pokémon at a time</li>
+            <li>Your own saved IV targets, with import from pogo-simulator deep dives</li>
+        </ul>
+    </div>
 
-  <!-- Set this href to the App Store / TestFlight link once the listing is live. -->
-  <a class="cta" href="#">Get GoBattleKit</a>
+    <p>
+        Your data stays on your device. The app downloads public game data and
+        rankings from PvPoke. Your imported CSV and saved targets stay local.
+        There are no accounts and no ads, and nothing you do is tracked.
+    </p>
 
-  <footer>
-    GoBattleKit uses game data and rankings from
-    <a href="https://pvpoke.com">PvPoke</a> by EmpoleonDynamite, used under the MIT
-    license. GoBattleKit is an unofficial fan project. It is not affiliated with
-    Niantic, Nintendo, The Pokémon Company, Game Freak, or PokeGenie.
-  </footer>
-</main>
+    <!-- Set this href to the App Store link once the listing is live. -->
+    <a href="#" class="btn">Get GoBattleKit</a>
+
+    <div class="credits">
+        Game data and rankings from
+        <a href="https://pvpoke.com">PvPoke</a> by EmpoleonDynamite, used under the
+        MIT license. GoBattleKit is an unofficial fan project. It is not affiliated
+        with Niantic, Nintendo, The Pokémon Company, Game Freak, or PokeGenie.
+        Pokémon and Pokémon GO are trademarks of their respective owners.
+    </div>
 </body>
 </html>
