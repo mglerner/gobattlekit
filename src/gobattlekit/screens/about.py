@@ -4,7 +4,7 @@ About screen — credits and links.
 """
 import toga
 from toga.style import Pack
-from toga.style.pack import COLUMN, ROW
+from toga.style.pack import COLUMN, ROW, CENTER
 from ..platform import ON_ANDROID
 from ..links import open_url
 from ..theme import (
@@ -117,7 +117,8 @@ class AboutScreen:
         # "inspired by orgodemir" with orgodemir as an inline text link
         # (accent-colored, page-background button so it reads as hypertext,
         # not one of the filled link buttons above).
-        badge_credit = toga.Box(style=Pack(direction=ROW, margin_bottom=16))
+        badge_credit = toga.Box(style=Pack(direction=ROW, align_items=CENTER,
+                                           margin_bottom=16))
         badge_credit.add(toga.Label(
             "inspired by ",
             style=Pack(font_size=14, color=COLOR_TEXT_LIGHT)

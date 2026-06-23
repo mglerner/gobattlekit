@@ -29,11 +29,15 @@ in-app purchases. Expected result is 4+.
 
 Two questions to answer carefully:
 
-- Unrestricted web access: the About and Help screens have buttons that open
-  external links (a developer page, a community Discord, a YouTube channel) in
-  the system browser. This is not an in-app web browser. If the questionnaire
-  asks whether the app can access the open web, the honest answer is that it
-  opens specific external links in Safari, not arbitrary browsing inside the app.
+- Unrestricted web access: the About and Help screens have buttons that open a
+  fixed set of specific external links in the system browser — the developer's
+  GitHub, PvPoke, a YouTube channel, a Discord invite, a Reddit post (the
+  orgodemir webapp the IV badges are credited to), and the support page. This is
+  not an in-app web browser, and there is no arbitrary browsing inside the app.
+  If the questionnaire asks whether the app can access the open web, the honest
+  answer is that it opens specific external links in Safari. The Reddit/YouTube/
+  Discord links are the same category as any other outbound link and do not need
+  a separate declaration.
 - In-app purchases: none. The iOS build has no payment links. (A Venmo tip link
   exists only on the Android build and is gated off for iOS.)
 
