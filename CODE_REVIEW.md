@@ -48,13 +48,17 @@ re-test. Android CSV import (file picker) still untested.
       ("Wrapping paragraph text") and at the constants in theme.py.
 
 ### Session 4 — App Store readiness
-- [ ] #6 `pyproject.toml` / Info.plist verification against real `briefcase build iOS`
-- [ ] Screenshots for required device sizes
+See `docs/reviews/2026-06-23_prerelease_review.md` for the full pre-1.0.0 pass.
+- [~] #6 `pyproject.toml` / Info.plist config — keys set + `build` field + pinned
+      `min_os_version=13.0`; still verify against a real `briefcase create iOS`
+      / Xcode archive
+- [ ] Screenshots for required device sizes (6.9" + 6.5" iPhone)
 - [ ] App Store Connect metadata (description, keywords, support URL, privacy policy URL)
-- [ ] Privacy nutrition labels
+- [ ] Privacy nutrition labels (answer: Data Not Collected)
 - [ ] Age rating questionnaire
-- [ ] IP / trademark review (Pokémon naming, icons, data sourcing)
-- [ ] App Review notes / demo account
+- [x] IP / trademark review — disclaimer added to About + `THIRD_PARTY_NOTICES.md`
+      (PvPoke MIT notice retained); confirm the 1024 icon is original art on submit
+- [ ] App Review notes / demo account (sample PokeGenie CSV)
 
 ---
 
