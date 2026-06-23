@@ -74,6 +74,8 @@ Before distributing, you can verify the fix worked:
 - Apple requires a new build number (CFBundleVersion) for each upload
 - For a new public release, bump `version` in `pyproject.toml`. For a re-upload
   of the same marketing version (a fix), keep `version` and bump `build` instead.
+- After bumping `version`, publish the website so the live pages stay in step:
+  `website/publish_website.sh` (see `website/README.md`).
 
 ## Android Build Process
 ```zsh

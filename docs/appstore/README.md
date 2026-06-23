@@ -9,11 +9,14 @@ items that need a human are flagged. Full context is in the plan and in
 | File                            | Use                                                                                        |
 | ------------------------------- | ------------------------------------------------------------------------------------------ |
 | `store_listing.md`              | Name, subtitle, promo text, keywords, description for App Store Connect                    |
-| `privacy_policy.html`           | Host it, then put the URL in App Store Connect (hard blocker)                              |
-| `marketing_landing.html`        | Fixes the 404 marketing URL; host at `mglerner.com/gobattlekit` or repoint the URL         |
 | `app_review_notes.md`           | Paste into App Review Information > Notes                                                  |
 | `sample_pokegenie.csv`          | Attach for the reviewer to test CSV import (11 mons, deliberate hit/miss mix, GL-verified) |
 | `privacy_and_rating_answers.md` | Pre-filled App Privacy + Age Rating answers                                                |
+
+The web pages (privacy policy, marketing landing, support) live in `../../website/`
+and are deployed with `website/publish_website.sh`. The App Store Privacy Policy URL
+is `https://mglerner.com/gobattlekit/privacy.html`; the Marketing URL is
+`https://mglerner.com/gobattlekit/`.
 
 Live status of the remaining human steps is tracked in the working session, not
 here. The screenshots come last, after the UI and all other items are settled.
