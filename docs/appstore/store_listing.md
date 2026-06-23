@@ -26,7 +26,7 @@ The quizzes cover the parts of a battle that come down to reflexes and memory. O
 
 The IV tools help you decide which Pokémon are worth building. Import a CSV from PokeGenie and GoBattleKit checks every Pokémon against the IV spreads that deep-dive analysis has shown to matter in each league. No CSV on hand? Type a Pokémon in by hand and get the same answer.
 
-What you get:
+You get:
 - Quizzes for move counts, move timing, and type effectiveness
 - IV target checking for Great League, Ultra League, and Master League
 - PokeGenie CSV import, or manual entry one Pokémon at a time
