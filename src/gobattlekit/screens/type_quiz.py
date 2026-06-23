@@ -99,7 +99,7 @@ class TypeQuizScreen:
 
         # Scroll-wrap so the bottom controls stay reachable on small phones;
         # inert (no scroll) when the content already fits.
-        return toga.ScrollContainer(
+        return toga.ScrollContainer(horizontal=False, 
             content=self.container,
             style=Pack(flex=1, background_color=COLOR_BG)
         )
