@@ -31,8 +31,9 @@ Two questions to answer carefully:
 
 - Unrestricted web access: the About and Help screens have buttons that open a
   fixed set of specific external links in the system browser — the developer's
-  GitHub, PvPoke, a YouTube channel, a Discord invite, a Reddit post (the
-  orgodemir webapp the IV badges are credited to), and the support page. This is
+  GitHub and Discord profile (contact the developer), PvPoke, a YouTube channel,
+  a community Discord invite, a Reddit post (the orgodemir webapp the IV badges
+  are credited to), and the support page. This is
   not an in-app web browser, and there is no arbitrary browsing inside the app.
   If the questionnaire asks whether the app can access the open web, the honest
   answer is that it opens specific external links in Safari. The Reddit/YouTube/
