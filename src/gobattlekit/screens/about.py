@@ -53,6 +53,11 @@ class AboutScreen:
             style=Pack(font_size=14, margin_bottom=4, color=COLOR_TEXT_LIGHT)
         ))
         content.add(toga.Button(
+            "Discord: TitanTrainers15",
+            on_press=lambda w: self._open_url("https://discord.com/users/460510521112920105"),
+            style=btn_secondary(height=40, margin_bottom=8)
+        ))
+        content.add(toga.Button(
             "github.com/mglerner",
             on_press=lambda w: self._open_url("https://github.com/mglerner"),
             style=btn_secondary(height=40, margin_bottom=16)
