@@ -50,5 +50,5 @@ package is included in its own `.dist-info` directory inside the app bundle.
 ## Data sources for IV thresholds
 
 The IV target spreads bundled with GoBattleKit credit their individual sources
-(GamePress, JRE47 / Pokémon GO Hub, RyanSwag, pogo-simulator, and others) in
+(GamePress, JRE47 / Pokémon GO Hub, RyanSwag, pogo-dives / gopvpsim, and others) in
 the in-app IV Credits screen, with dates and links where available.

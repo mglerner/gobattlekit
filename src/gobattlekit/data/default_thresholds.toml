@@ -201,7 +201,7 @@ ivs = [[15, 15, 15], [15, 15, 14], [15, 15, 13], [15, 15, 12]]
 ivs = [[11, 10, 2], [15, 12, 5], [11, 11, 0], [15, 13, 4], [11, 9, 3], [11, 9, 2], [15, 14, 3], [15, 14, 2], [11, 10, 1], [11, 10, 0], [12, 9, 1], [12, 9, 0], [15, 15, 1], [15, 15, 0], [15, 12, 4], [15, 13, 3], [15, 13, 2], [11, 9, 1], [11, 9, 0], [15, 14, 1], [15, 14, 0], [15, 12, 3], [15, 12, 2], [15, 13, 1], [15, 13, 0], [15, 12, 1], [15, 12, 0]]
 
 ["Aegislash (Blade)"]
-sources = "pogo-simulator hypothetical always-Blade dive (no PvPoke ranking); form-change mechanic is modeled natively by src/gopvpsim/formchange.py but the realistic path starts from Shield."
+sources = "gopvpsim hypothetical always-Blade dive (no PvPoke ranking); form-change mechanic is modeled natively by src/gopvpsim/formchange.py but the realistic path starts from Shield."
 
 ["Aegislash (Blade)".Great."Gen bulk 71.75"]
 class = "generated"
