@@ -210,14 +210,14 @@ class IVCheckerScreen:
 
         if ON_IOS:
             steps = (
-                "1. Open PokeGenie (requires iVision subscription)\n"
+                "1. Open PokeGenie (requires Scan Pro)\n"
                 "2. Tap the export/share button in PokeGenie\n"
                 "3. Choose 'Share' and select GoBattleKit\n"
                 "4. Your CSV will be imported automatically"
             )
         else:
             steps = (
-                "1. Open PokeGenie (requires iVision subscription)\n"
+                "1. Open PokeGenie (requires Scan Pro)\n"
                 "2. Export your Pokémon data as a CSV file\n"
                 "3. Come back here and tap 'Import PokeGenie CSV'\n"
                 "4. Select the exported CSV file"
@@ -235,8 +235,8 @@ class IVCheckerScreen:
         # paragraph_text, not Label — this sentence is wider than a phone
         # screen and Labels never wrap (DEVELOPER_NOTES).
         self.results_box.add(paragraph_text(
-            "Note: CSV export requires PokeGenie's iVision subscription. "
-            "Without iVision, you can enter Pokémon manually instead.",
+            "Note: CSV export requires PokeGenie's Scan Pro upgrade. "
+            "Without Scan Pro, you can enter Pokémon manually instead.",
             font_size=13, margin_bottom=12,
         ))
 
