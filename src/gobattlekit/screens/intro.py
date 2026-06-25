@@ -60,7 +60,7 @@ INTROS = {
             ("", "Check your Pokémon against curated PvP IV targets for "
              "Great, Ultra, and Master League."),
             ("Getting your data in", "You can import a CSV export from "
-             "PokeGenie (requires iVision subscription), or enter "
+             "PokeGenie (requires Scan Pro), or enter "
              "Pokémon one at a time using manual entry."),
             ("Reading results", "Tap a species to see which of your "
              "Pokémon meet the targets. SP (stat product) measures "

@@ -37,13 +37,13 @@ HELP_CONTENT = {
     "Getting Started": [
         ("", "GoBattleKit helps you prepare for Pokemon GO PvP battles. It has two main features: quizzes to help you learn move timing and type matchups, and an IV checker to find your best PvP Pokemon."),
         ("IV Checker", "The IV checker lets you find Pokémon that meet PvP IV targets. You can import a CSV from PokeGenie, or enter Pokémon manually one at a time."),
-        ("PokeGenie import", "To import from PokeGenie, you need PokeGenie's iVision subscription. With iVision, tap the export button in PokeGenie and share the CSV to GoBattleKit. Your CSV is remembered between sessions."),
-        ("Manual entry", "If you don't have iVision, you can enter Pokémon manually. Tap 'Enter a Pokémon manually' on the IV Checker screen, pick a species, enter IVs and CP, and tap Check. Results are saved and remembered between sessions."),
+        ("PokeGenie import", "To import from PokeGenie, you need PokeGenie's Scan Pro upgrade. With Scan Pro, tap the export button in PokeGenie and share the CSV to GoBattleKit. Your CSV is remembered between sessions."),
+        ("Manual entry", "If you don't have Scan Pro, you can enter Pokémon manually. Tap 'Enter a Pokémon manually' on the IV Checker screen, pick a species, enter IVs and CP, and tap Check. Results are saved and remembered between sessions."),
     ],
     "PvP IV Checker": [
         ("", "The PvP IV Checker checks your Pokémon against a curated list of targets for Great, Ultra, and Master League."),
-        ("PokeGenie import", "Export your Pokémon from PokeGenie and share to GoBattleKit on iOS, or use Import on Android. Note: CSV export requires PokeGenie's iVision subscription."),
-        ("Manual entry", "No iVision? Tap 'Enter a Pokémon manually' to add Pokémon one at a time. Enter the species, IVs (0-15 each), and CP. GoBattleKit will calculate the level and check against targets. Manually entered Pokémon are saved between sessions."),
+        ("PokeGenie import", "Export your Pokémon from PokeGenie and share to GoBattleKit on iOS, or use Import on Android. Note: CSV export requires PokeGenie's Scan Pro upgrade."),
+        ("Manual entry", "No Scan Pro? Tap 'Enter a Pokémon manually' to add Pokémon one at a time. Enter the species, IVs (0-15 each), and CP. GoBattleKit will calculate the level and check against targets. Manually entered Pokémon are saved between sessions."),
         ("Results", "Results show each Pokémon's IVs, CP, and stats. SP (stat product) measures overall PvP performance - higher is better. Rank shows how this IV combination compares to all 4096 possible combinations for that species."),
         ("👑 and 🏆 badges", "A 👑 means the spread is efficient: no other IV spread beats it on Attack, Defense, and Stamina at once, so it is one of the best possible for that Pokémon. A 🏆 means that among the matching Pokémon you own, this one is not beaten on all three stats by any of your others, but a better spread exists that you have not caught. A Pokémon with no badge is beaten on every stat by one of your own that you see here, so it is a safe candidate to transfer. The 👑/🏆 efficient-IV idea comes from orgodemir's PvP IV webapp."),
         ("Pre-evolutions", "If you import a Frigibax, it is checked against Baxcalibur's targets and labelled with the pre-evolution in parentheses, like \"7/15/5 (Frigibax)\". A Pokémon you have not evolved yet still shows up under the final form it would become. One that can evolve into more than one final form, like an Eevee, is checked against each of them."),
@@ -56,7 +56,7 @@ HELP_CONTENT = {
         ("👑 and 🏆 badges", "Your matching Pokémon show the same 👑 and 🏆 badges as the PvP IV Checker: 👑 marks an efficient spread (one of the best possible for that Pokémon), 🏆 marks the best of what you own that no other of yours beats on all three stats, and no badge means another of your Pokémon beats it on every stat. See the PvP IV Checker help for the full explanation."),
         ("Target buttons", "Each target has four buttons:\n✎ Edit - modify the target's stats or label\n⧉ Duplicate - copy the target as a starting point for a new one\n📤 Share - export the target as text to share with friends\n✕ Delete - remove the target"),
         ("Import from Text", "Lets you paste a target shared by someone else, or a \"Copy for IV scanner\" snippet from a deep-dive page. This is useful for importing targets from the PvP community."),
-        ("PokeGenie note", "Importing a CSV from PokeGenie requires the iVision subscription. Alternatively, use manual entry to add Pokémon one at a time."),
+        ("PokeGenie note", "Importing a CSV from PokeGenie requires the Scan Pro upgrade. Alternatively, use manual entry to add Pokémon one at a time."),
     ],
     "Move Count Quizzes": [
         ("", "Practice counting how many fast moves it takes to charge a move."),
