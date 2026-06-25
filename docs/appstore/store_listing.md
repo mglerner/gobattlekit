@@ -30,7 +30,7 @@ You get:
 - Quizzes for move counts, move timing, and type effectiveness
 - IV target checking for Great League, Ultra League, and Master League
 - Enter Pokémon by hand, or bulk-import a CSV from PokeGenie's Scan Pro export
-- Your own saved IV targets, with import from pogo-simulator deep dives
+- Your own saved IV targets, with import from pogo-dives deep dives
 
 Your data stays on your device. The app downloads public game data and rankings from PvPoke and keeps your imported CSV and saved targets locally. There are no accounts and no ads. Nothing you do in the app is tracked.
 
