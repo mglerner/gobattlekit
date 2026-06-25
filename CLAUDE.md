@@ -109,8 +109,7 @@ replay blobs; `bundle_into_app.py` merges them in. The bundler is
    steps remaining: host the privacy policy + marketing page, capture
    6.9"/6.5" screenshots, fill App Store Connect from the drafts, archive +
    upload + submit (see Part C of the approved plan / docs/appstore/README.md)
-3. Haptic feedback (unexplored)
-4. Google Play beta testing (blocked on SI5 Android emulator fix; independent
+3. Google Play beta testing (blocked on SI5 Android emulator fix; independent
    of the iOS App Store release)
 
 Review status: the 2026-06-23 pre-release review
