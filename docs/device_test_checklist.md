@@ -15,6 +15,9 @@ Small-screen layout (1.0.0 scroll changes):
       reachable, and nothing clips at the bottom.
 - [ ] About screen: the new "Legal" disclaimer paragraph wraps fully (no
       clipping), and the PvPoke credit reads "by EmpoleonDynamite".
+- [ ] About screen contact: the new "Discord: TitanTrainers15" button (Developer
+      section) opens the right Discord profile, and the two Discord buttons
+      (contact-the-dev vs XehrFelrose community invite) don't read as confusing.
 - [ ] Quiz / quiz-summary screens (still NOT wrapped on purpose): on the
       small device, confirm a question + its answers + any reveal still fit
       without clipping. If one clips, flag it — do not assume it's fine.
