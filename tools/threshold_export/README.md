@@ -10,7 +10,13 @@ The pogo-simulator repo is treated as read-only input.
 
 The gobattlekit venv has no numpy, so run with the pogo-simulator pyenv
 interpreter (gopvpsim is editable-installed there; the script falls back to
-`pogo-simulator/src` on sys.path otherwise):
+the sibling checkout's `src/` on sys.path otherwise).
+
+**Sibling-checkout path is centralized.** The location of the gopvpsim
+checkout lives in one file, `sibling_path`, read by both
+`export_thresholds.py` and `run_overnight_batch.sh`. Edit that single line to
+repoint it — e.g. when the `pogo-simulator` dir is renamed to `gopvpsim`. The
+example paths below use the current location.
 
 ```sh
 cd tools/threshold_export

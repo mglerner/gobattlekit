@@ -11,7 +11,9 @@
 # mid-batch (cache coherence — see pogo-simulator cache notes).
 set -u
 
-SIM=/Users/mglerner/coding/MGLPoGo/pogo-simulator
+# Sibling gopvpsim checkout — SINGLE SOURCE OF TRUTH in ./sibling_path (edit
+# that one file to repoint, e.g. on the pogo-simulator -> gopvpsim rename).
+SIM=$(cat "$(dirname "$0")/sibling_path")
 EXPORT_DIR=/Users/mglerner/coding/MGLPoGo/gobattlekit/tools/threshold_export
 PYRUN="pyenv exec python"
 export PYENV_VERSION=3.13.12
