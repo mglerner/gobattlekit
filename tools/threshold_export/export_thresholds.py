@@ -36,9 +36,13 @@ from collections import Counter
 from datetime import date
 from pathlib import Path
 
-# gopvpsim lives in the pogo-simulator checkout (editable-installed in the
-# 3.13.12 pyenv; fall back to the source tree for any other interpreter).
-SIM_SRC = "/Users/mglerner/coding/MGLPoGo/pogo-simulator/src"
+# gopvpsim lives in the sibling checkout. Its path is the SINGLE SOURCE OF
+# TRUTH in tools/threshold_export/sibling_path — edit that one file to repoint
+# it (e.g. when the pogo-simulator dir is renamed to gopvpsim). gopvpsim is
+# editable-installed in the 3.13.12 pyenv; SIM_SRC is the source-tree fallback
+# for any other interpreter.
+SIM_DIR = Path(__file__).with_name("sibling_path").read_text().strip()
+SIM_SRC = str(Path(SIM_DIR) / "src")
 try:
     import gopvpsim  # noqa: F401
 except ImportError:
