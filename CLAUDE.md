@@ -12,7 +12,8 @@ A Pokémon GO PvP companion app built with Python/BeeWare (Briefcase + Toga).
 - Release status: EmpoleonDynamite (PvPoke author) gave explicit permission
   (2026-06-23) to release the app + the gopvpsim Python port publicly.
   Going to the App Store as 1.0.0, iPhone-only.
-- venv: ~/coding/MGLPoGo/.venv
+- venv: ~/coding/MGLPoGo/gobattlekit/.venv (activate with `source
+  .venv/bin/activate`; direnv `.envrc` also auto-activates)
 - Project: ~/coding/MGLPoGo/gobattlekit
 
 ## Build process
