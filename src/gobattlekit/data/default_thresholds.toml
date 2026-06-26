@@ -119,7 +119,7 @@ stamina = 149
 [Corviknight.Great."Gen attack 113.39"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs mirror."
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, altaria, altaria shadow, annihilape +35 more."
 attack = 113.39
 defense = 0
 stamina = 0
@@ -130,7 +130,7 @@ sources = "replay blob (no authored TOML)"
 ["Drapion (Shadow)".Great."Gen bulk 118.34"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs annihilape, feraligatr, guzzlord, jellicent +4 more."
+desc = "Clears strongest in-range bulkpoints vs feraligatr, guzzlord, jellicent, lickilicky +2 more."
 attack = 0
 defense = 118.34
 stamina = 0
@@ -146,7 +146,7 @@ stamina = 0
 ["Drapion (Shadow)".Great."Gen attack 149.91"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs azumarill."
+desc = "Clears strongest in-range breakpoints/CMP vs azumarill, lickilicky."
 attack = 149.91
 defense = 0
 stamina = 0
@@ -201,12 +201,12 @@ ivs = [[15, 15, 15], [15, 15, 14], [15, 15, 13], [15, 15, 12]]
 ivs = [[11, 10, 2], [15, 12, 5], [11, 11, 0], [15, 13, 4], [11, 9, 3], [11, 9, 2], [15, 14, 3], [15, 14, 2], [11, 10, 1], [11, 10, 0], [12, 9, 1], [12, 9, 0], [15, 15, 1], [15, 15, 0], [15, 12, 4], [15, 13, 3], [15, 13, 2], [11, 9, 1], [11, 9, 0], [15, 14, 1], [15, 14, 0], [15, 12, 3], [15, 12, 2], [15, 13, 1], [15, 13, 0], [15, 12, 1], [15, 12, 0]]
 
 ["Aegislash (Blade)"]
-sources = "gopvpsim hypothetical always-Blade dive (no PvPoke ranking); form-change mechanic is modeled natively by src/gopvpsim/formchange.py but the realistic path starts from Shield."
+sources = "pogo-simulator hypothetical always-Blade dive (no PvPoke ranking); form-change mechanic is modeled natively by src/gopvpsim/formchange.py but the realistic path starts from Shield."
 
 ["Aegislash (Blade)".Great."Gen bulk 71.75"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +51 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +47 more."
 attack = 0
 defense = 71.75
 stamina = 0
@@ -214,7 +214,7 @@ stamina = 0
 ["Aegislash (Blade)".Great."Gen attack 186.51"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, annihilape, azumarill, clodsire +43 more."
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, annihilape, azumarill, clodsire +42 more."
 attack = 186.51
 defense = 0
 stamina = 0
@@ -249,7 +249,7 @@ stamina = 139
 [Altaria.Great."Gen attack 110.27"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs dragonair shadow, lickilicky."
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, annihilape, corviknight shadow, dragonair +27 more."
 attack = 110.27
 defense = 0
 stamina = 0
@@ -260,24 +260,24 @@ sources = "replay blob (no authored TOML)"
 ["Altaria (Shadow)".Great."Gen bulk 131.70"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs azumarill, corsola galarian, dragonair shadow, jumpluff +5 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +40 more."
 attack = 0
 defense = 131.7
 stamina = 0
 
-["Altaria (Shadow)".Great."Gen bulk 130.41"]
+["Altaria (Shadow)".Great."Gen bulk 130.60"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs medicham."
+desc = "Clears strongest in-range bulkpoints vs clodsire, corviknight, diggersby, forretress +3 more."
 attack = 0
-defense = 130.41
+defense = 130.6
 stamina = 0
 
-["Altaria (Shadow)".Great."Gen attack 131.48"]
+["Altaria (Shadow)".Great."Gen attack 132.32"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs dragonair shadow, jumpluff, lickilicky."
-attack = 131.48
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, altaria shadow, annihilape, azumarill +31 more."
+attack = 132.32
 defense = 0
 stamina = 0
 
@@ -352,37 +352,37 @@ defense = 116.45
 stamina = 0
 
 ["Corsola (Galarian)"]
-sources = "Simulator-derived (no known expert IV writeup). Matchup selection from\nPvPoke GL rankings, post-June-2026 move rebalance (rank 7 overall;\nclosest scored matchups: Corviknight 490, Tinkaton 464, Jellicent 528,\nQuagsire 543, Ninetales (Shadow) 579, Altaria 600), against the\n2026-06-10 opponent pool opponent_pools/gl_top50_plus_cs.txt. Reverse\nbulkpoint evidence for the Tinkaton matchup in thresholds/tinkaton.toml\n(HomeSliceHenry's Discord, acidicArisen).\n"
+sources = "Simulator-derived (no known expert IV writeup). Matchup selection from\nPvPoke GL rankings, post-June-2026 move rebalance (rank 7 overall;\nclosest scored matchups: Corviknight 490, Tinkaton 464, Jellicent 528,\nQuagsire 543, Ninetales (Shadow) 579, Altaria 600), against the\n2026-06-10 opponent pool opponent_pools/gl_top50_plus_cs.txt. Reverse\nbulkpoint evidence for the Tinkaton matchup in thresholds/tinkaton.toml\n(HomeSliceHenry's Discord).\n"
 
 ["Corsola (Galarian)".Great."Gen bulk 165.53"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs altaria, corviknight, feraligatr, mirror +2 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, clodsire +26 more."
 attack = 0
 defense = 165.53
 stamina = 0
 
-["Corsola (Galarian)".Great."Gen bulk 164.55"]
+["Corsola (Galarian)".Great."Gen bulk 164.69"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs annihilape, jellicent."
+desc = "Clears strongest in-range bulkpoints vs annihilape, azumarill, fearow, feraligatr shadow +10 more."
 attack = 0
-defense = 164.55
+defense = 164.69
 stamina = 0
 
-["Corsola (Galarian)".Great."Gen bulk 163.56"]
+["Corsola (Galarian)".Great."Gen bulk 163.85"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs tinkaton."
+desc = "Clears strongest in-range bulkpoints vs diggersby, grumpig, sealeo, sealeo shadow +2 more."
 attack = 0
-defense = 163.56
+defense = 163.85
 stamina = 0
 
-["Corsola (Galarian)".Great."Gen attack 107.78"]
+["Corsola (Galarian)".Great."Gen attack 108.11"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs corviknight, jellicent."
-attack = 107.78
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, altaria, azumarill, clodsire +20 more."
+attack = 108.11
 defense = 0
 stamina = 0
 
@@ -392,7 +392,7 @@ sources = "Simulator-derived (no known expert writeup). Opponent selection from 
 [Dragonair.Great."Gen bulk 115.97"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs altaria, altaria shadow, azumarill, dragonair shadow +6 more."
+desc = "Clears strongest in-range bulkpoints vs altaria, altaria shadow, azumarill, dragonair shadow +5 more."
 attack = 0
 defense = 115.97
 stamina = 0
@@ -411,7 +411,7 @@ sources = "replay blob (no authored TOML)"
 ["Dragonair (Shadow)".Great."Gen bulk 96.64"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs altaria, altaria shadow, azumarill, dragonair shadow +6 more."
+desc = "Clears strongest in-range bulkpoints vs altaria, altaria shadow, azumarill, dragonair shadow +5 more."
 attack = 0
 defense = 96.64
 stamina = 0
@@ -444,7 +444,7 @@ stamina = 122
 [Empoleon.Great."Gen bulk 120.07"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs altaria, altaria shadow, corviknight, diggersby +5 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +41 more."
 attack = 0
 defense = 120.07
 stamina = 0
@@ -452,7 +452,7 @@ stamina = 0
 [Empoleon.Great."Gen attack 132.72"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs diggersby, malamar."
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, altaria, clodsire, corsola galarian +33 more."
 attack = 132.72
 defense = 0
 stamina = 0
@@ -463,15 +463,23 @@ sources = "replay blob (no authored TOML)"
 ["Empoleon (Shadow)".Great."Gen bulk 100.06"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs altaria, altaria shadow, corviknight, diggersby +6 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +45 more."
 attack = 0
 defense = 100.06
+stamina = 0
+
+["Empoleon (Shadow)".Great."Gen bulk 99.06"]
+class = "generated"
+source = "deep-dive resolved anchors (replay blob)"
+desc = "Clears strongest in-range bulkpoints vs corsola galarian, kingdra."
+attack = 0
+defense = 99.06
 stamina = 0
 
 ["Empoleon (Shadow)".Great."Gen attack 159.26"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs diggersby, jellicent, malamar."
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, altaria shadow, annihilape, azumarill +37 more."
 attack = 159.26
 defense = 0
 stamina = 0
@@ -482,15 +490,23 @@ sources = "Simulator-derived (no expert writeup). Anchor set designed 2026-06-12
 [Fearow.Great."Gen bulk 107.38"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs annihilape, azumarill, furret, jumpluff +5 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +46 more."
 attack = 0
 defense = 107.38
+stamina = 0
+
+[Fearow.Great."Gen bulk 106.47"]
+class = "generated"
+source = "deep-dive resolved anchors (replay blob)"
+desc = "Clears strongest in-range bulkpoints vs clodsire."
+attack = 0
+defense = 106.47
 stamina = 0
 
 [Fearow.Great."Gen attack 141.00"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs azumarill, cmp vs cohort, jumpluff, lickilicky +1 more."
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, annihilape, azumarill, clodsire +34 more."
 attack = 141
 defense = 0
 stamina = 0
@@ -501,7 +517,7 @@ sources = "Simulator-derived: PvPoke GL rankings (overall rank 15, post-June-202
 [Feraligatr.Great."Gen bulk 122.17"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs altaria, azumarill, corsola galarian, jellicent +1 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +37 more."
 attack = 0
 defense = 122.17
 stamina = 0
@@ -509,16 +525,16 @@ stamina = 0
 [Feraligatr.Great."Gen bulk 121.27"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs medicham, mirror, mirror shadow, quagsire +1 more."
+desc = "Clears strongest in-range bulkpoints vs feraligatr, feraligatr shadow, grumpig, lapras +6 more."
 attack = 0
 defense = 121.27
 stamina = 0
 
-[Feraligatr.Great."Gen attack 129.03"]
+[Feraligatr.Great."Gen attack 129.77"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs lickilicky."
-attack = 129.03
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, altaria, altaria shadow, annihilape +35 more."
+attack = 129.77
 defense = 0
 stamina = 0
 
@@ -528,7 +544,7 @@ sources = "Simulator-derived: PvPoke GL rankings (overall rank 15, post-June-202
 ["Feraligatr (Shadow)".Great."Gen bulk 101.81"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs altaria, corsola galarian, jellicent, lickilicky +4 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +44 more."
 attack = 0
 defense = 101.81
 stamina = 0
@@ -536,16 +552,16 @@ stamina = 0
 ["Feraligatr (Shadow)".Great."Gen bulk 101.06"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs azumarill, mirror."
+desc = "Clears strongest in-range bulkpoints vs azumarill, feraligatr, grumpig."
 attack = 0
 defense = 101.06
 stamina = 0
 
-["Feraligatr (Shadow)".Great."Gen attack 155.02"]
+["Feraligatr (Shadow)".Great."Gen attack 155.73"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs lickilicky."
-attack = 155.02
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, altaria, altaria shadow, annihilape +34 more."
+attack = 155.73
 defense = 0
 stamina = 0
 
@@ -555,24 +571,32 @@ sources = "Simulator-derived. 1-1 shield sim sweep (sim_score/pvpoke_dp, rank-1\
 [Forretress.Great."Gen bulk 149.85"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs annihilape, jellicent, kingdra, lickilicky +2 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +34 more."
 attack = 0
 defense = 149.85
 stamina = 0
 
-[Forretress.Great."Gen bulk 148.40"]
+[Forretress.Great."Gen bulk 148.49"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs corsola galarian, guzzlord."
+desc = "Clears strongest in-range bulkpoints vs corsola galarian, corviknight shadow, furret, grumpig +5 more."
 attack = 0
-defense = 148.4
+defense = 148.49
 stamina = 0
 
-[Forretress.Great."Gen attack 116.22"]
+[Forretress.Great."Gen bulk 147.73"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs guzzlord, lickilicky."
-attack = 116.22
+desc = "Clears strongest in-range bulkpoints vs greedent, guzzlord, medicham, oinkologne female."
+attack = 0
+defense = 147.73
+stamina = 0
+
+[Forretress.Great."Gen attack 116.37"]
+class = "generated"
+source = "deep-dive resolved anchors (replay blob)"
+desc = "Clears strongest in-range breakpoints/CMP vs azumarill, corviknight shadow, feraligatr, greedent +17 more."
+attack = 116.37
 defense = 0
 stamina = 0
 
@@ -582,15 +606,23 @@ sources = "replay blob (no authored TOML)"
 ["Forretress (Shadow)".Great."Gen bulk 124.88"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs annihilape, corsola galarian, guzzlord, jellicent +4 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +42 more."
 attack = 0
 defense = 124.88
+stamina = 0
+
+["Forretress (Shadow)".Great."Gen bulk 123.74"]
+class = "generated"
+source = "deep-dive resolved anchors (replay blob)"
+desc = "Clears strongest in-range bulkpoints vs clodsire, corviknight, sealeo, sliggoo +1 more."
+attack = 0
+defense = 123.74
 stamina = 0
 
 ["Forretress (Shadow)".Great."Gen attack 139.64"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs guzzlord, lickilicky."
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, altaria shadow, corviknight, dusclops shadow +20 more."
 attack = 139.64
 defense = 0
 stamina = 0
@@ -682,7 +714,7 @@ sources = "Simulator-derived (no expert IV writeup known as of 2026-06-12). Oppo
 [Jumpluff.Great."Gen bulk 161.92"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs altaria, feraligatr, jumpluff shadow, medicham +2 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, clodsire +31 more."
 attack = 0
 defense = 161.92
 stamina = 0
@@ -690,24 +722,24 @@ stamina = 0
 [Jumpluff.Great."Gen bulk 161.10"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs azumarill, lickilicky, umbreon."
+desc = "Clears strongest in-range bulkpoints vs annihilape, azumarill, corviknight shadow, forretress shadow +7 more."
 attack = 0
 defense = 161.1
 stamina = 0
 
-[Jumpluff.Great."Gen bulk 159.94"]
+[Jumpluff.Great."Gen bulk 160.28"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs dragonair shadow."
+desc = "Clears strongest in-range bulkpoints vs dragonair, dragonair shadow, dusclops, sableye."
 attack = 0
-defense = 159.94
+defense = 160.28
 stamina = 0
 
-[Jumpluff.Great."Gen attack 103.85"]
+[Jumpluff.Great."Gen attack 104.31"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs azumarill, medicham."
-attack = 103.85
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, altaria shadow, annihilape, azumarill +35 more."
+attack = 104.31
 defense = 0
 stamina = 0
 
@@ -717,15 +749,23 @@ sources = "Simulator-derived (no known expert writeup). Opponent selection: oppo
 [Kingdra.Great."Gen bulk 130.95"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs altaria, altaria shadow, dragonair shadow, feraligatr shadow +6 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +43 more."
 attack = 0
 defense = 130.95
+stamina = 0
+
+[Kingdra.Great."Gen bulk 129.69"]
+class = "generated"
+source = "deep-dive resolved anchors (replay blob)"
+desc = "Clears strongest in-range bulkpoints vs corviknight shadow, feraligatr, greedent, tinkaton."
+attack = 0
+defense = 129.69
 stamina = 0
 
 [Kingdra.Great."Gen attack 128.83"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs altaria, dragonair shadow, guzzlord."
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, altaria, altaria shadow, annihilape +35 more."
 attack = 128.83
 defense = 0
 stamina = 0
@@ -736,7 +776,7 @@ sources = "replay blob (no authored TOML)"
 ["Kingdra (Shadow)".Great."Gen bulk 109.12"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs altaria, altaria shadow, dragonair shadow, feraligatr shadow +5 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +44 more."
 attack = 0
 defense = 109.12
 stamina = 0
@@ -744,16 +784,16 @@ stamina = 0
 ["Kingdra (Shadow)".Great."Gen bulk 108.08"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs jellicent."
+desc = "Clears strongest in-range bulkpoints vs corviknight, greedent, jellicent."
 attack = 0
 defense = 108.08
 stamina = 0
 
-["Kingdra (Shadow)".Great."Gen attack 153.85"]
+["Kingdra (Shadow)".Great."Gen attack 154.60"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs altaria, dragonair shadow, guzzlord."
-attack = 153.85
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, altaria, azumarill, clodsire +32 more."
+attack = 154.6
 defense = 0
 stamina = 0
 
@@ -782,16 +822,32 @@ sources = "Simulator-derived: PvPoke GL rankings + key-matchup ratings, post-Jun
 [Lickilicky.Great."Gen bulk 127.61"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs altaria, azumarill, feraligatr, forretress shadow +6 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +44 more."
 attack = 0
 defense = 127.61
 stamina = 0
 
-[Lickilicky.Great."Gen attack 111.47"]
+[Lickilicky.Great."Gen bulk 126.27"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs mirror."
-attack = 111.47
+desc = "Clears strongest in-range bulkpoints vs dusclops shadow, guzzlord."
+attack = 0
+defense = 126.27
+stamina = 0
+
+[Lickilicky.Great."Gen bulk 124.92"]
+class = "generated"
+source = "deep-dive resolved anchors (replay blob)"
+desc = "Clears strongest in-range bulkpoints vs corsola galarian."
+attack = 0
+defense = 124.92
+stamina = 0
+
+[Lickilicky.Great."Gen attack 111.52"]
+class = "generated"
+source = "deep-dive resolved anchors (replay blob)"
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, annihilape, clodsire, cmp vs cohort +27 more."
+attack = 111.52
 defense = 0
 stamina = 0
 
@@ -825,7 +881,7 @@ stamina = 136
 [Malamar.Great."Gen attack 125.65"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs cmp vs cohort, medicham, mirror, stunfisk galarian."
+desc = "Clears strongest in-range breakpoints/CMP vs cmp vs cohort, medicham."
 attack = 125.65
 defense = 0
 stamina = 0
@@ -836,7 +892,7 @@ sources = "Simulator-derived (no expert writeup): anchors designed from current-
 [Mantine.Great."Gen bulk 171.87"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs azumarill, feraligatr, guzzlord, lickilicky +3 more."
+desc = "Clears strongest in-range bulkpoints vs azumarill, feraligatr, guzzlord, lickilicky +2 more."
 attack = 0
 defense = 171.87
 stamina = 0
@@ -920,16 +976,16 @@ ivs = [[0, 15, 15]]
 [Ninetales.Great."Gen bulk 139.63"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs annihilape, azumarill, corsola galarian, empoleon +7 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +47 more."
 attack = 0
 defense = 139.63
 stamina = 0
 
-[Ninetales.Great."Gen attack 121.56"]
+[Ninetales.Great."Gen attack 122.23"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs annihilape, azumarill, empoleon."
-attack = 121.56
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, altaria shadow, annihilape, azumarill +37 more."
+attack = 122.23
 defense = 0
 stamina = 0
 
@@ -939,7 +995,7 @@ sources = "replay blob (no authored TOML)"
 ["Ninetales (Shadow)".Great."Gen bulk 116.36"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs annihilape, azumarill, corsola galarian, empoleon +7 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +47 more."
 attack = 0
 defense = 116.36
 stamina = 0
@@ -947,7 +1003,7 @@ stamina = 0
 ["Ninetales (Shadow)".Great."Gen attack 146.67"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs annihilape, empoleon."
+desc = "Clears strongest in-range breakpoints/CMP vs annihilape, corsola galarian, corviknight, dragonair +19 more."
 attack = 146.67
 defense = 0
 stamina = 0
@@ -966,7 +1022,7 @@ stamina = 163
 [Quagsire.Great."Gen bulk 114.87"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs clodsire, lickilicky, mirror, pelipper +4 more."
+desc = "Clears strongest in-range bulkpoints vs clodsire, lickilicky, mirror, quagsire shadow +2 more."
 attack = 0
 defense = 114.87
 stamina = 0
@@ -993,7 +1049,7 @@ sources = "replay blob (no authored TOML)"
 ["Quagsire (Shadow)".Great."Gen bulk 95.73"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs clodsire, lickilicky, medicham, mirror +5 more."
+desc = "Clears strongest in-range bulkpoints vs clodsire, lickilicky, medicham, mirror +3 more."
 attack = 0
 defense = 95.73
 stamina = 0
@@ -1020,16 +1076,24 @@ sources = "replay blob (no authored TOML)"
 ["Sableye (Shadow)".Great."Gen bulk 105.73"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs altaria, greedent, jellicent, lapras +5 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +42 more."
 attack = 0
 defense = 105.73
 stamina = 0
 
-["Sableye (Shadow)".Great."Gen attack 155.83"]
+["Sableye (Shadow)".Great."Gen bulk 104.79"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs greedent, jellicent, mirror."
-attack = 155.83
+desc = "Clears strongest in-range bulkpoints vs corviknight, dragonair, medicham, sealeo +1 more."
+attack = 0
+defense = 104.79
+stamina = 0
+
+["Sableye (Shadow)".Great."Gen attack 156.83"]
+class = "generated"
+source = "deep-dive resolved anchors (replay blob)"
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, corsola galarian, corviknight shadow, dusclops +17 more."
+attack = 156.83
 defense = 0
 stamina = 0
 
@@ -1039,7 +1103,7 @@ sources = "Simulator-derived. PvPoke GL rankings (post-June-2026 move rebalance;
 [Seaking.Great."Gen bulk 112.45"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs altaria, azumarill, empoleon, feraligatr +6 more."
+desc = "Clears strongest in-range bulkpoints vs altaria, azumarill, empoleon, feraligatr +5 more."
 attack = 0
 defense = 112.45
 stamina = 0
@@ -1058,7 +1122,7 @@ sources = "Simulator-derived (no expert writeup). Anchor set designed 2026-06-12
 [Sealeo.Great."Gen bulk 116.17"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs azumarill, feraligatr, jellicent, lapras +5 more."
+desc = "Clears strongest in-range bulkpoints vs azumarill, feraligatr, jellicent, lapras +4 more."
 attack = 0
 defense = 116.17
 stamina = 0
@@ -1066,7 +1130,7 @@ stamina = 0
 [Sealeo.Great."Gen attack 116.75"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs azumarill, lickilicky, stunfisk galarian."
+desc = "Clears strongest in-range breakpoints/CMP vs azumarill, lickilicky."
 attack = 116.75
 defense = 0
 stamina = 0
@@ -1077,7 +1141,7 @@ sources = "replay blob (no authored TOML)"
 ["Sealeo (Shadow)".Great."Gen bulk 96.81"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs azumarill, feraligatr, jellicent, lapras +5 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +47 more."
 attack = 0
 defense = 96.81
 stamina = 0
@@ -1085,7 +1149,7 @@ stamina = 0
 ["Sealeo (Shadow)".Great."Gen attack 140.50"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs azumarill, lickilicky."
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, altaria, annihilape, azumarill +19 more."
 attack = 140.5
 defense = 0
 stamina = 0
@@ -1096,7 +1160,7 @@ sources = "Simulator-derived (no known expert writeup); opponents from GL meta p
 [Seismitoad.Great."Gen bulk 104.55"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs azumarill, clodsire, jellicent, lickilicky +4 more."
+desc = "Clears strongest in-range bulkpoints vs aegislash blade, altaria, altaria shadow, annihilape +46 more."
 attack = 0
 defense = 104.55
 stamina = 0
@@ -1112,7 +1176,7 @@ stamina = 0
 [Seismitoad.Great."Gen attack 127.19"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range breakpoints/CMP vs azumarill, mirror, stunfisk galarian."
+desc = "Clears strongest in-range breakpoints/CMP vs aegislash blade, altaria, altaria shadow, annihilape +31 more."
 attack = 127.19
 defense = 0
 stamina = 0
@@ -1123,7 +1187,7 @@ sources = "Simulator-derived (no expert writeup on record): opponent pool gl_top
 [Shelgon.Great."Gen bulk 122.29"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs altaria, altaria shadow, dragonair, dragonair shadow +6 more."
+desc = "Clears strongest in-range bulkpoints vs altaria, altaria shadow, dragonair, dragonair shadow +4 more."
 attack = 0
 defense = 122.29
 stamina = 0
@@ -1142,7 +1206,7 @@ sources = "replay blob (no authored TOML)"
 ["Shelgon (Shadow)".Great."Gen bulk 101.91"]
 class = "generated"
 source = "deep-dive resolved anchors (replay blob)"
-desc = "Clears strongest in-range bulkpoints vs altaria, altaria shadow, dragonair, dragonair shadow +6 more."
+desc = "Clears strongest in-range bulkpoints vs altaria, altaria shadow, dragonair, dragonair shadow +4 more."
 attack = 0
 defense = 101.91
 stamina = 0

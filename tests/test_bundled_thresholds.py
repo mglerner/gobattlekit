@@ -240,3 +240,43 @@ class TestLoaderRobustness:
     def test_bundled_path_points_at_packaged_asset(self):
         assert BUNDLED_THRESHOLDS_PATH.name == 'default_thresholds.toml'
         assert BUNDLED_THRESHOLDS_PATH.exists()
+
+
+class TestBundlerRegressionGuards:
+    """Pin two bugs the re-dive pipeline hit on 2026-06-26, both of which kept
+    the suite green at the time:
+      * bundle_into_app.py double-quoted already-quoted species headers,
+        grafting junk keys like '"Corsola (Galarian)"' (literal quote chars in
+        the key) and silently NOT updating those species;
+      * that same skipped-update path left a contributor's personal handle in a
+        species' `sources` string instead of replacing it with the scrubbed
+        source. Per the privacy rule the handle may live only in .md dev docs /
+        git history, never in shipped (bundled) data.
+    """
+
+    # Personal handles that must never appear in shipped thresholds.
+    FORBIDDEN_HANDLES = ('acidicarisen', 'mercuryish')
+
+    def test_no_junk_double_quoted_species_keys(self):
+        for species in DEFAULT_THRESHOLDS:
+            assert '"' not in species, f'junk (double-quoted) species key: {species!r}'
+
+    def test_no_private_handles_in_bundled_dict(self):
+        def strings(obj):
+            if isinstance(obj, dict):
+                for k, v in obj.items():
+                    yield k
+                    yield from strings(v)
+            elif isinstance(obj, list):
+                for v in obj:
+                    yield from strings(v)
+            elif isinstance(obj, str):
+                yield obj
+        blob = '\n'.join(strings(DEFAULT_THRESHOLDS)).lower()
+        for h in self.FORBIDDEN_HANDLES:
+            assert h not in blob, f'private handle {h!r} present in bundled thresholds'
+
+    def test_no_private_handles_in_bundled_file_text(self):
+        text = BUNDLED_THRESHOLDS_PATH.read_text().lower()
+        for h in self.FORBIDDEN_HANDLES:
+            assert h not in text, f'private handle {h!r} present in {BUNDLED_THRESHOLDS_PATH}'
