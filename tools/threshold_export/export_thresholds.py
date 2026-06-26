@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Export app-consumable thresholds + parity vectors from a pogo-simulator
+"""Export app-consumable thresholds + parity vectors from a gopvpsim
 deep-dive replay blob.
 
-Run with the pogo-simulator pyenv interpreter (the gobattlekit venv has no
-numpy):
+Run with the gopvpsim uv-managed venv interpreter (the gobattlekit venv has
+no numpy); the interpreter is `<sibling_path>/.venv/bin/python`:
 
-    PYENV_VERSION=3.13.12 pyenv exec python export_thresholds.py \
+    /Users/mglerner/coding/MGLPoGo/gopvpsim/.venv/bin/python export_thresholds.py \
         /path/to/<run>.replay.pkl.gz --out out/
 
 Emits three files into --out:
