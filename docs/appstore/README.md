@@ -21,19 +21,27 @@ is `https://mglerner.com/gobattlekit/privacy.html`; the Marketing URL is
 Live status of the remaining human steps is tracked in the working session, not
 here. The screenshots come last, after the UI and all other items are settled.
 
-## Screenshot shot list
+## Screenshots — captured set in `screenshots/6.9/`
 
-iPhone-only, portrait. Apple wants a 6.9-inch set and a 6.5-inch set.
+iPhone-only, portrait. As of 2026 App Store Connect requires only the **6.9"**
+set (1320x2868); the 6.5" slot is only needed if you skip 6.9". The captured
+set (all 1320x2868) lives in `screenshots/6.9/`:
 
-- Devices: iPhone 16 Pro Max (6.9") and iPhone 11 Pro Max or 8 Plus (6.5").
-  In the Simulator: `briefcase run iOS` and pick the device, or open the built
-  Xcode project and run on the simulator, then Cmd+S to save each screenshot.
-- Screens to capture (3 to 10 each, same set on both sizes):
-  1. Home
-  2. PvP IV Checker with results (import `sample_pokegenie.csv` to populate)
-  3. My PvP IV Targets
-  4. A quiz mid-question (move counts or type effectiveness)
-  5. About (shows the credits and the disclaimer)
+  1. `01_home.png` — Home
+  2. `02_iv_checker.png` — PvP IV Checker with results (👑/🏆 badges, [SIM])
+  3. `03_my_targets.png` — My PvP IV Targets (empty "getting started" state)
+  4. `04_quiz.png` — Type Effectiveness quiz mid-question
+  5. `05_about.png` — About (credits + attributions)
+
+How they were captured (repeatable):
+- **Emoji-bug workaround:** the iOS 26.x simulator renders color emoji as tofu
+  (`?` boxes) — a known xcodes/runtime bug. Capture on an **iOS 18.6** runtime
+  with **iPhone 16 Pro Max** (same 6.9"/1320x2868, emoji render correctly).
+- Build for the sim (`briefcase build iOS`), `xcrun simctl install`, then
+  `xcrun simctl status_bar <udid> override --time 9:41 ...` for a clean status
+  bar and `xcrun simctl io <udid> screenshot ...` for exact-resolution PNGs.
+- The IV Checker shot is populated by dropping `sample_pokegenie.csv` into the
+  app container at `Documents/gobattlekit_cache/pokegenie_export.csv`.
 
 ## Submission walkthrough
 
