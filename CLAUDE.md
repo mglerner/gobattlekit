@@ -100,6 +100,15 @@ replay blobs; `bundle_into_app.py` merges them in. The bundler is
 `default_thresholds.toml` and preserved across re-bundles. See
 `tools/threshold_export/README.md` for the contract.
 
+## UI text wrapping (recurring gotcha)
+
+`toga.Label` does NOT auto-wrap on iOS — a too-long line clips / scrolls off the
+right edge on narrow phones. Fix with explicit `\n` breaks (short static labels)
+or `theme.paragraph_text()` (long body text). Run `python
+tools/check_label_wrapping.py` to find offenders; it is enforced by
+`tests/test_label_wrapping.py`. Full method + the reverted `horizontal=False`
+alternative: `docs/responsive_layout_plan.md` ("Horizontal clipping").
+
 ## Current priorities
 1. TestFlight 1.0.0 build + device verification — run the full
    `docs/device_test_checklist.md` on a real device (covers the never-verified
