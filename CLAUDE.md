@@ -8,7 +8,7 @@ A Pokémon GO PvP companion app built with Python/BeeWare (Briefcase + Toga).
   2027-03-21). NOTE: an old "Apple Development" cert for a stale team
   `6TV57R6ZCC` lingers in the keychain — it is NOT the team, ignore it.
 - Repo: https://github.com/mglerner/gobattlekit
-- Current version: 1.0.0 (first public App Store target; 0.0.24 on TestFlight)
+- Current version: 1.0.0 (first public App Store target)
 - Release status: EmpoleonDynamite (PvPoke author) gave explicit permission
   (2026-06-23) to release the app + the gopvpsim Python port publicly.
   Going to the App Store as 1.0.0, iPhone-only.
