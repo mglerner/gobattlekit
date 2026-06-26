@@ -1,7 +1,7 @@
 # Website
 
 The public pages for GoBattleKit on mglerner.com. Deployed by rsync, same style
-as `../../pogo-simulator/scripts/publish_website.sh`.
+as `../../gopvpsim/scripts/publish_website.sh`.
 
 ## Layout
 
