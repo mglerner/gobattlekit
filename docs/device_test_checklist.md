@@ -67,7 +67,7 @@ Destructive-action guards:
 - [ ] Edit Targets → Clear All: arm it, go into Add Target, cancel, come
       back — button must read "Clear All" again and need two taps (SI4).
 
-Import from Text (the live pogo-simulator contract):
+Import from Text (the live gopvpsim contract):
 - [ ] Paste a "Copy for IV scanner" JSON fragment from a dive page —
       imports (multi-target fragments too); check the target appears and
       matches expected mons (IV1).
