@@ -10,7 +10,7 @@ A Pokémon GO PvP companion app built with Python/BeeWare (Briefcase + Toga).
 - Repo: https://github.com/mglerner/gobattlekit
 - Current version: 1.0.0 (first public App Store target; 0.0.24 on TestFlight)
 - Release status: EmpoleonDynamite (PvPoke author) gave explicit permission
-  (2026-06-23) to release the app + the pogo-simulator Python port publicly.
+  (2026-06-23) to release the app + the gopvpsim Python port publicly.
   Going to the App Store as 1.0.0, iPhone-only.
 - venv: ~/coding/MGLPoGo/.venv
 - Project: ~/coding/MGLPoGo/gobattlekit
@@ -90,10 +90,10 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - `src/gobattlekit/theme.py` — all colors and button styles
 - `src/gobattlekit/app.py` — main app, screen navigation
 
-## Threshold spreads come from pogo-simulator (read-only input)
+## Threshold spreads come from gopvpsim (read-only input)
 
 App IV thresholds in `src/gobattlekit/data/default_thresholds.toml` are
-produced from the `../pogo-simulator` repo: `tools/threshold_export/`
+produced from the `../gopvpsim` repo: `tools/threshold_export/`
 `export_thresholds.py` reads that repo's `thresholds/*.toml` + deep-dive
 replay blobs; `bundle_into_app.py` merges them in. The bundler is
 **Great-league only** — Ultra/Master targets are hand-maintained in
