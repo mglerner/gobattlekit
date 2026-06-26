@@ -549,7 +549,7 @@ class EditThresholdsScreen:
 
         cls = (self._form_class or '').strip().lower()
         if cls and cls not in ('expert', 'generated'):
-            self.form_error.text = ("Class must be 'expert', 'generated', "
+            self.form_error.text = ("Class must be 'expert', 'generated',\n"
                                     "or blank.")
             return
         source = (self._form_source or '').strip()
@@ -566,7 +566,7 @@ class EditThresholdsScreen:
                                    attack, defense, stamina, onlytop,
                                    cls=cls, source=source, desc=desc)
             if not ok:
-                self.form_error.text = ("Could not save changes — your "
+                self.form_error.text = ("Could not save changes — your\n"
                                         "original target is unchanged.")
                 return
             self._editing_original = None

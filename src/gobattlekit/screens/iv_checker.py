@@ -978,8 +978,8 @@ class IVCheckerScreen:
         if not self._clear_csv_pending:
             self._clear_csv_pending = True
             self.status_label_stats.text = (
-                "Tap ✕ again to delete the imported CSV and all manually "
-                "entered Pokémon."
+                "Tap ✕ again to delete the imported\n"
+                "CSV and all manually entered Pokémon."
             )
             return
         self._clear_csv_pending = False

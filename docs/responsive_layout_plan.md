@@ -70,6 +70,36 @@ is untouched.
 - **`paragraph_text()` narrow-width robustness** — a separate follow-up (below);
   the affected screens already scroll, so it is low priority.
 
+## Horizontal clipping (non-wrapping Labels) — THE recurring bug
+
+Separate axis from the vertical scroll safety-net above. `toga.Label` does NOT
+auto-wrap on iOS: it renders on one line and, because our ScrollContainers allow
+horizontal scrolling, a too-long line scrolls off the RIGHT edge (looks like
+text running past the screen). This has bitten us repeatedly.
+
+THE RULE: any text that becomes a `toga.Label` must have each physical line fit
+the narrowest phone (iPhone SE, ~320pt). Fix a too-long line by either:
+  * adding explicit `\n` breaks (the convention for short static labels — see
+    `GETTING_STARTED` in `user_iv_checker.py`), or
+  * rendering long *body* text via `theme.paragraph_text()` (a wrapping
+    MultilineTextInput), NOT a Label.
+
+HOW TO FIND THEM — `python tools/check_label_wrapping.py`. This is the
+committed, reproducible version of the old by-hand "AST sweep" (commit
+`303826e`). It is enforced by `tests/test_label_wrapping.py`, so a new
+over-long Label fails the suite. The hand sweep regressed twice because it only
+inspected string literals passed *directly* to `toga.Label(...)`; the tool also
+resolves module-level string constants and `widget.text = ...` assignments —
+that blind spot is exactly what let `NO_TARGETS_MESSAGE` (and three error
+labels) ship clipped. `MAX_LINE` (40) is a tripwire tuned to the dev's accepted
+hand-wraps, not a pixel-exact width model — still eyeball flagged lines on an SE.
+
+The systematic alternative — `horizontal=False` on every ScrollContainer
+(commit `c1066b8`) — would width-constrain content so nothing scrolls sideways.
+It was REVERTED (`3d8a7e9`) with no recorded reason. If you want to retire the
+per-label sweep, re-investigate that revert first; until then, the sweep + test
+is the supported method.
+
 ## paragraph_text() heuristic (known sharp edge, follow-up)
 
 `theme.paragraph_text()` sets a FIXED height on a read-only MultilineTextInput

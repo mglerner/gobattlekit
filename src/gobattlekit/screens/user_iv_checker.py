@@ -23,7 +23,7 @@ from ..theme import (
 
 logger = logging.getLogger(__name__)
 
-NO_TARGETS_MESSAGE = "No user IV targets defined. Tap 'Edit My Targets' to add some."
+NO_TARGETS_MESSAGE = "No user IV targets defined.\nTap 'Edit My Targets' to add some."
 GETTING_STARTED = (
     "To get started:\n1. Tap 'Edit My Targets'\n2. Tap 'Add Target'\n"
     "3. Choose a species and\nset minimum stats\n4. Tap 'Save Target'"
