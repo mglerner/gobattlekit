@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ultra League Auto-Bundle — Follow-up Plan (2026-06-26)</title>
+<style>
+  :root { --bg:#fafafa; --card:#fff; --ink:#1c1e21; --muted:#5f6368; --teal:#0e7c7b; --yellow:#b8860b; --red:#b3392f; --green:#2e7d32; --border:#e0e0e0; }
+  body { font:16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); margin:0; padding:2rem 1rem 4rem; }
+  main { max-width: 920px; margin:0 auto; }
+  h1 { font-size:1.6rem; border-bottom:3px solid var(--teal); padding-bottom:.4rem; }
+  h2 { font-size:1.25rem; margin-top:2.2rem; color:var(--teal); }
+  h3 { font-size:1.05rem; margin-top:1.4rem; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:1rem 1.2rem; margin:1rem 0; }
+  .pill { display:inline-block; border-radius:10px; padding:0 .55em; font-size:.78em; font-weight:600; vertical-align:middle; color:#fff; }
+  .pill.done { background:var(--green); } .pill.run { background:var(--yellow); } .pill.todo { background:#888; } .pill.exp { background:var(--teal); } .pill.dec { background:var(--red); }
+  table { border-collapse:collapse; width:100%; font-size:.9em; }
+  th, td { border:1px solid var(--border); padding:.3rem .5rem; text-align:left; vertical-align:top; }
+  th { background:#f0f4f4; }
+  pre { background:#1c1e21; color:#e8eaed; padding:1rem; border-radius:8px; overflow-x:auto; font-size:.85em; line-height:1.45; }
+  code { background:#eef0f1; padding:.1em .35em; border-radius:4px; font-size:.9em; }
+  pre code { background:none; padding:0; }
+  .muted { color:var(--muted); }
+  .warn { border-left:4px solid var(--red); padding-left:.9rem; margin:.9rem 0; }
+  .ok { border-left:4px solid var(--green); padding-left:.9rem; margin:.9rem 0; }
+</style>
+</head>
+<body><main>
+
+<h1>Ultra League Auto-Bundle — Follow-up Plan</h1>
+<p class="muted">2026-06-26 · GoBattleKit × gopvpsim · PROPOSAL (not yet executed). Sequel to the GL re-ship that landed today (commits <code>6e4b464..bffc5c7</code>).</p>
+
+<h2>Goal</h2>
+<div class="card">
+Ship simulator-derived <b>Ultra League</b> thresholds in the app the same way Great League works today:
+a <code>[SIM]</code>-badged set of <code>generated</code> targets per UL-meta species, re-derived from gopvpsim
+replay blobs and merged into <code>default_thresholds.toml</code> by the bundler. The UL sweep in gopvpsim is
+<b>done</b> (locked data), so this is purely a gobattlekit-side pipeline extension — no new simulation.
+</div>
+
+<h2>Where we are now</h2>
+<table>
+<tr><th>Piece</th><th>State</th></tr>
+<tr><td>Exporter (<code>export_thresholds.py</code>)</td><td><span class="pill done">READY</span> already per-league — it emitted <code>lickilicky_ultra.toml</code> etc. during today's run. Takes <code>--rankings</code> for curation.</td></tr>
+<tr><td>Bundler (<code>bundle_into_app.py</code>)</td><td><span class="pill todo">GL-ONLY</span> by design: it only writes each species' <code>Great</code> and preserves <code>Ultra</code>/<code>Master</code> verbatim (Rule 1, lines 29-33). Must be extended.</td></tr>
+<tr><td>App UL data today</td><td><span class="pill todo">1 SPECIES</span> only Baxcalibur ships UL (and ML), hand-maintained. Nothing else has UL targets.</td></tr>
+<tr><td>Curation (<code>curation.toml</code>)</td><td><span class="pill todo">GL-ONLY</span> <code>rank_threshold</code> is read against the GL top-50 pool; <code>keep_names</code> are GL picks.</td></tr>
+<tr><td>UL roster</td><td><span class="pill todo">NONE</span> the GL <code>BASE_DIVES</code>/<code>SHADOW_DIVES</code> roster is not the UL meta (the UL sweep has Zygarde, Moltres-G, Mimikyu, …).</td></tr>
+<tr><td>Export-only harness</td><td><span class="pill done">REUSABLE</span> <code>export_only_from_blobs.sh</code> (added today) generalizes — swap the league suffix + roster.</td></tr>
+<tr><td>Adversarial verify harness</td><td><span class="pill done">REUSABLE</span> today's 5-adversary + completeness-critic workflow re-runs against UL.</td></tr>
+</table>
+
+<h2 id="decisions">Decisions needed first <span class="pill dec">OWNER</span></h2>
+<div class="warn">
+<ol>
+  <li><b>Baxcalibur UL/ML.</b> It is the only hand-maintained UL/ML in the app. If the UL sweep includes Baxcalibur, do we <b>overwrite</b> it with sim-derived targets, or <b>preserve</b> the hand spread? (Recommend: preserve-list, like <code>keep_names</code> but for "don't auto-replace this species' UL/ML".)</li>
+  <li><b>Master League.</b> Same question, broader: auto-bundle ML too, or leave ML hand-maintained (Florges + Baxcalibur)? Recommend: <b>UL now, ML later</b> — keep scope tight.</li>
+  <li><b>UL roster.</b> Who's in it? Derive from the gopvpsim UL sweep ∩ PvPoke UL (rank-2500) rankings. Needs your "in/out" call like the GL ditch/keep triages.</li>
+</ol>
+</div>
+
+<h2>Work items</h2>
+
+<h3>1. Bundler: add Ultra support <span class="pill dec">design</span></h3>
+<div class="card">
+<ul>
+  <li>Glob <code>*_ultra.toml</code> (and <code>*_ultra_shadow.toml</code> — confirm the exporter's shadow-UL filename) alongside <code>*_great.toml</code>.</li>
+  <li>Per species: replace the <code>Ultra</code> league from the export (mirroring the Great rule), preserve the others.</li>
+  <li>Honor a new <b>preserve-list</b> so hand-maintained UL (Baxcalibur) is not clobbered unless opted in (decision&nbsp;1).</li>
+  <li>Keep the round-trip self-check and the audit (updated/added/preserved/dropped_empty).</li>
+</ul>
+</div>
+
+<h3>2. Curation inputs for UL</h3>
+<div class="card">
+<ul>
+  <li>Add the UL rankings file (<code>rankings-2500.json</code>) and pass it via the exporter's existing <code>--rankings</code>.</li>
+  <li>A UL <code>keep_names</code> (out-of-pool keeps) — own decision, like the GL triage. Either a second <code>curation_ultra.toml</code> or a league-keyed section.</li>
+</ul>
+</div>
+
+<h3>3. UL export-only pass</h3>
+<div class="card">
+Clone <code>export_only_from_blobs.sh</code> → a UL roster, league suffix <code>_ultra</code>/<code>_ultra_shadow</code>, and the UL curation/rankings. Same "require the league suffix so a recent sweep of another league can't poison the newest-blob pick" guard. No re-sim.
+</div>
+
+<h3>4. Export → bundle → diff → adversarial verify</h3>
+<div class="ok">
+Reuse today's exact harness: run the UL export, bundle, produce a per-species semantic diff (blast radius), then the 5-adversary + completeness-critic workflow (privacy is N/A for UL unless a UL source carries a handle — still scan). Report the blast radius before committing.
+</div>
+
+<h3>5. Tests + UI</h3>
+<div class="card">
+<ul>
+  <li>Update the data-pinned species count in <code>test_bundled_thresholds.py::test_species_count_grew_to_47</code> and add UL-presence pins.</li>
+  <li>UL parity vectors are emitted per species (<code>*_parity.json</code>) — wire a UL parity fixture if we want pytest to pin the new numbers (the completeness critic noted GL parity fixtures cover only 3 species; consider widening for both leagues).</li>
+  <li>The junk-key / private-handle regression guards added today already cover UL data.</li>
+  <li>UI: confirm the IV-checker league selector + <code>[SIM]</code> badging surface UL targets (likely league-agnostic already — verify on device).</li>
+</ul>
+</div>
+
+<h2>Sequencing</h2>
+<table>
+<tr><th>#</th><th>Step</th><th>Gate</th></tr>
+<tr><td>0</td><td>Resolve the 3 owner decisions above</td><td>Baxcalibur policy, ML scope, UL roster</td></tr>
+<tr><td>1</td><td>UL curation inputs (rankings-2500 + keep list)</td><td>roster decided</td></tr>
+<tr><td>2</td><td>Bundler Ultra support + preserve-list + UL export-only script</td><td>—</td></tr>
+<tr><td>3</td><td>Export → bundle → blast-radius diff → adversarial verify</td><td>green + clean diff</td></tr>
+<tr><td>4</td><td>Tests + on-device UI check → ship (bump build, TestFlight)</td><td>suite green</td></tr>
+</table>
+
+<h2>Out of scope</h2>
+<p class="muted">No new simulation (gopvpsim sweep is locked). No GL changes (today's re-ship stands). Master League deferred unless decision 2 pulls it in.</p>
+
+</main></body>
+</html>
