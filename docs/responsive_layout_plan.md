@@ -112,13 +112,20 @@ in its OWN commit (it changes fixed heights app-wide and needs SE + 17 Pro eyes)
 
 ## Screenshot process (App Store)
 
-1. Build for the simulator via `./prepare_ios.sh`.
-2. Capture on the required device classes: an SE-class (smallest), a mid 6.1",
-   and a Pro Max (largest). Boot each in the iOS Simulator, run, and screenshot
-   Home + a representative quiz + IV checker + About.
-3. On the SE, walk each quiz to the bottom and confirm the End Quiz / nav buttons
-   are reachable (scroll engages).
-4. On the Pro Max, confirm no scroll thumb appears on the quizzes (inert = fits).
+Two separate things — don't conflate them:
+
+**Screenshot UPLOAD sizes** — App Store Connect now requires only ONE iPhone
+set, **6.9"** (1320x2868); ASC auto-downscales it for smaller iPhones, and the
+6.5" slot is only needed if you skip 6.9". (This changed; the old rule was
+6.7"/6.5"/5.5".) The captured set and the repeatable simctl capture method live
+in `docs/appstore/README.md` — including the iOS-26.x color-emoji tofu bug
+workaround (capture on iOS 18.6 + iPhone 16 Pro Max).
+
+**Layout VERIFICATION across sizes** (app correctness, NOT upload) — still worth
+doing:
+1. On an SE-class device, walk each quiz to the bottom and confirm the End Quiz
+   / nav buttons are reachable (scroll engages).
+2. On a Pro Max, confirm no scroll thumb appears on the quizzes (inert = fits).
 
 ## The dials to turn later
 
