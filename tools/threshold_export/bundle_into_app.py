@@ -205,14 +205,19 @@ def species_key_for(path: Path, in_file_name: str) -> str:
 def _read_export_toml(path: Path) -> dict:
     """Parse an export TOML, tolerating unquoted species names in headers.
 
-    The exporter emits species table headers as bare keys (e.g.
-    ``[Corsola (Galarian)]`` and ``[Corsola (Galarian).great.targets."..."]``).
-    Species names with spaces/parens are NOT valid TOML bare keys, so tomllib
-    rejects those files. We don't own the export files, so rather than edit
-    them we fix the headers in memory: quote the leading species segment when
-    it isn't bare-safe, leaving the rest of the dotted path (which is already
+    The exporter may emit species table headers either as bare keys (e.g.
+    ``[Corsola (Galarian)]``) or already-quoted (``["Corsola (Galarian)"]``,
+    which the current exporter does). Species names with spaces/parens are NOT
+    valid TOML bare keys, so for the bare form tomllib would reject the file.
+    We don't own the export files, so rather than edit them we fix the headers
+    in memory: quote the leading species segment when it isn't bare-safe AND
+    isn't already a quoted string, leaving the rest of the dotted path (already
     correctly quoted) intact. The species name is everything up to the first
     ``.great`` boundary, or the whole bracket contents for the species table.
+
+    Re-quoting an already-quoted header would embed literal quote chars in the
+    parsed key (``'"Corsola (Galarian)"'``), so it would never match the app's
+    ``'Corsola (Galarian)'`` and would silently graft a junk duplicate species.
     """
     out_lines = []
     for line in path.read_text().splitlines():
@@ -227,7 +232,8 @@ def _read_export_toml(path: Path) -> dict:
                 species, rest = inner[:idx], inner[idx:]
             else:
                 species, rest = inner, ""
-            if not _is_bare_key(species):
+            already_quoted = len(species) >= 2 and species.startswith('"') and species.endswith('"')
+            if not already_quoted and not _is_bare_key(species):
                 species = _escape_basic(species)
             out_lines.append(f"[{species}{rest}]")
         else:
