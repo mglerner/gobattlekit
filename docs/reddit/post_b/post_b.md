@@ -28,7 +28,7 @@ As a bonus, I added an optimal timing quiz. Big caveat: I'm just a filthy casual
 
 ## The quizzes
 
-**[IMAGE: 01-quizzes.png -- the three quizzes side by side: move-count (Corviknight / Air Cutter), move-timing (Incinerate vs Geomancy), type-effectiveness (water vs ice). Insert/upload here.]**
+**[IMAGE: 01-quizzes.png -- the three quizzes side by side: type-effectiveness (water vs ice), move-count (Corviknight / Air Cutter), move-timing (Incinerate vs Geomancy). Insert/upload here.]**
 
 - **Type effectiveness**: Quiz yourself about type effectivenesses until it's automatic. This one's useful for PVE and PVP.
 - **Move counts**: Questions like "how many Shadow Claws does Sableye need for a Foul Play" and "how many Mud Shots does it take Swampert to reach the first four Hydro Cannons?" The answer to that last one is 5/4/5/4 btw.
