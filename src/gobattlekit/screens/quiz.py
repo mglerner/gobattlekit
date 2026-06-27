@@ -73,6 +73,7 @@ class QuizScreen:
         self.sequence_total = 0
         self.question_type = None
         self._type_streak = 0
+        self._prev_fast_turns = None
         self._load_question()
 
         self.container = toga.Box(style=CONTAINER)
@@ -138,10 +139,21 @@ class QuizScreen:
         # Guards against a natively queued duplicate tap double-resolving
         # the question (double score + orphaned advance task).
         self._question_over = False
-        mon = random.choice(self.mons)
+        # Don't ask about a fast move with the same turn count twice in a row
+        # (three 1-turn moves running felt repetitive). Fall back to the full
+        # pool only if no other turn count is available.
+        candidates = self.mons
+        if self._prev_fast_turns is not None:
+            varied = [m for m in self.mons
+                      if self.fastmoves[m['moveset'][0]].get('turns', 1)
+                      != self._prev_fast_turns]
+            if varied:
+                candidates = varied
+        mon = random.choice(candidates)
         self.fast_id = mon['moveset'][0]
         self.charged_id = random.choice(mon['moveset'][1:])
         self.fast_name = self.fastmoves[self.fast_id]['name']
+        self._prev_fast_turns = self.fastmoves[self.fast_id].get('turns', 1)
         self.charged_name = self.chargedmoves[self.charged_id]['name']
         self.mon_name = mon['speciesName']
         self.attempts = 0
