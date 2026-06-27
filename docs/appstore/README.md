@@ -6,12 +6,12 @@ items that need a human are flagged. Full context is in the plan and in
 
 ## What is here
 
-| File                            | Use                                                                                        |
-| ------------------------------- | ------------------------------------------------------------------------------------------ |
-| `store_listing.md`              | Name, subtitle, promo text, keywords, description for App Store Connect                    |
-| `app_review_notes.md`           | Paste into App Review Information > Notes                                                  |
-| `sample_pokegenie.csv`          | Attach for the reviewer to test CSV import (11 mons, deliberate hit/miss mix, GL-verified) |
-| `privacy_and_rating_answers.md` | Pre-filled App Privacy + Age Rating answers                                                |
+| File                            | Use                                                                                                                        |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `store_listing.md`              | Name, subtitle, promo text, keywords, description for App Store Connect                                                    |
+| `app_review_notes.md`           | Paste into App Review Information > Notes                                                                                  |
+| `sample_pokegenie.csv`          | Attach for the reviewer to test CSV import (12 mons, deliberate hit/miss mix, GL-verified; two Clodsire show the 🏆 trophy) |
+| `privacy_and_rating_answers.md` | Pre-filled App Privacy + Age Rating answers                                                                                |
 
 The web pages (privacy policy, marketing landing, support) live in `../../website/`
 and are deployed with `website/publish_website.sh`. The App Store Privacy Policy URL
