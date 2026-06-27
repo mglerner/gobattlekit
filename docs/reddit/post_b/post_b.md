@@ -28,7 +28,7 @@ As a bonus, I added an optimal timing quiz. Big caveat: I'm just a filthy casual
 
 ## The quizzes
 
-**[IMAGE: 01-quizzes.png -- the three quizzes side by side: type-effectiveness (water vs ice), move-count (Corviknight / Air Cutter), move-timing (Incinerate vs Geomancy). Insert/upload here.]**
+**[IMAGE: 01-quizzes.png -- the four quiz modes side by side: type-effectiveness (water vs ice), move-count (Jumpluff / Acrobatics), move-count sequence (Machamp / Cross Chops), move-timing (Incinerate vs Geomancy). Insert/upload here.]**
 
 - **Type effectiveness**: Quiz yourself about type effectivenesses until it's automatic. This one's useful for PVE and PVP.
 - **Move counts**: Questions like "how many Shadow Claws does Sableye need for a Foul Play" and "how many Mud Shots does it take Swampert to reach the first four Hydro Cannons?" The answer to that last one is 5/4/5/4 btw.
@@ -38,13 +38,19 @@ As a bonus, I added an optimal timing quiz. Big caveat: I'm just a filthy casual
 
 Oh man. This one makes me happy because I've wanted it for so long. Just me? Who knows.
 
-You know how RyanSwag [TAG] or JRE47 [TAG]
+You know how RyanSwag [TAG] or JRE47 [TAG] or awesome people on HSH's discord
+are always posting deep dives? I always want to know which of my mons would be
+Swag-approved etc. If you have PokeGenie's Scan Pro, you can export all of your
+scanned mons as a CSV to my app (important note: the app stores everything on
+the phone, and never does anything sneaky with it. If you're super paranoid, you
+can see all the code on github [LINK]). If you **don't** have Scan Pro, you can
+still enter your IVs by hand. So, works for FTP folks.
 
-- Import a CSV that PokeGenie's Scan Pro exports, and the app flags which of
-  your own mons meet the IV spreads from the deep dives. No CSV? Type a mon in
-  by hand and get the same answer. It runs on your phone; nothing is uploaded.
-- The spreads come from the same deep-dive analysis as the website (companion
-  post linked below).
+**[IMAGE: 02-iv-checker.png -- the PvP IV Checker overview: your own mons checked against the deep-dive spreads, with a 👑 crown. Insert/upload here.]**
+**[IMAGE: 03-owned-breakdown.png -- drilling into one species (Clodsire): the owned spread with a 🏆 trophy and the deep-dive tiers it hits. Insert/upload here.]**
+
+Then you can see which of your mons hit the spreads you're looking for.
+
 - Efficient-IV badges: a crown (👑) marks a Pareto-efficient spread (no other
   IV beats it on Attack, Defense, and Stamina at once), and a trophy marks the
   best of the mons you actually own. Inspired by u/orgodemir's post; credited
@@ -52,9 +58,6 @@ You know how RyanSwag [TAG] or JRE47 [TAG]
 - [MICHAEL: 1-2 sentences. You did this by hand for years with custom Python +
   Jupyter going back to the SwagTips days; having it live on the phone is the
   upgrade.]
-
-**[IMAGE: 02-iv-checker.png -- the PvP IV Checker overview: your own mons checked against the deep-dive spreads, with a 👑 crown. Insert/upload here.]**
-**[IMAGE: 03-owned-breakdown.png -- drilling into one species (Clodsire): the owned spread with a 🏆 trophy and the deep-dive tiers it hits. Insert/upload here.]**
 
 ## Free and open source
 
