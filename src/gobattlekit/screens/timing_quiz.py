@@ -21,6 +21,13 @@ from ..theme import (
 MAX_ATTEMPTS = 3
 POINTS = {1: 3, 2: 2, 3: 1}
 
+# Target frequency of "doesn't matter" answers. The natural ranked move pool is
+# ~50% doesn't-matter (2-turn moves dominate and (2,2) is None), which feels
+# repetitive; we re-roll the move pair to hit this rate instead. Chosen
+# independently per question, so it leaks nothing about any single answer.
+DM_RATE = 0.30
+_MAX_SAMPLE_TRIES = 50
+
 
 class TimingQuizScreen:
     """Quiz screen for optimal move timing questions."""
@@ -54,6 +61,7 @@ class TimingQuizScreen:
         self.attempts = 0
         self.streak = 0
         self.max_streak = 0
+        self._prev_timing_pair = None
         self._load_question()
 
         self.container = toga.Box(style=CONTAINER)
@@ -110,16 +118,31 @@ class TimingQuizScreen:
         # the question (same pattern as quiz.py).
         self._question_over = False
         self.attempts = 0
-        your_id = random.choice(self.ranked_fast_move_ids)
-        their_id = random.choice(self.ranked_fast_move_ids)
+
+        # Decide the answer category up front so "doesn't matter" lands ~DM_RATE
+        # of the time (the natural pool is ~50%), then sample a move pair to
+        # match it. Bounded re-roll; fall back to the last draw if exhausted.
+        want_dm = random.random() < DM_RATE
+        prev_pair = self._prev_timing_pair
+        for _ in range(_MAX_SAMPLE_TRIES):
+            your_id = random.choice(self.ranked_fast_move_ids)
+            their_id = random.choice(self.ranked_fast_move_ids)
+            your_t = min(self.fastmoves[your_id].get('turns', 1), 5)
+            their_t = min(self.fastmoves[their_id].get('turns', 1), 5)
+            right = OPTIMAL_TIMING.get((your_t, their_t), None)
+            # Unordered turn-pair: (2,3) and (3,2) are the same matchup, so the
+            # same combo won't appear back-to-back. The turns are shown in the
+            # question, so unlike the doesn't-matter rate this leaks nothing.
+            pair = (min(your_t, their_t), max(your_t, their_t))
+            if (right is None) == want_dm and pair != prev_pair:
+                break
+
+        self._prev_timing_pair = pair
         self.your_fast_name = self.fastmoves[your_id]['name']
         self.their_fast_name = self.fastmoves[their_id]['name']
         self.your_turns = self.fastmoves[your_id].get('turns', 1)
         self.their_turns = self.fastmoves[their_id].get('turns', 1)
-
-        your_t = min(self.your_turns, 5)
-        their_t = min(self.their_turns, 5)
-        self.right_answer = OPTIMAL_TIMING.get((your_t, their_t), None)
+        self.right_answer = right
 
         self.timing_choices = list(ALL_TIMING_PATTERNS)
 
