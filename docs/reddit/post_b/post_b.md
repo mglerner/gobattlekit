@@ -38,13 +38,13 @@ As a bonus, I added an optimal timing quiz. Big caveat: I'm just a filthy casual
 
 Oh man. This one makes me happy because I've wanted it for so long. Just me? Who knows.
 
-You know how RyanSwag [TAG] or JRE47 [TAG] or awesome people on HSH's discord
+You know how RyanSwag (u/RyanoftheDay) or JRE47 (u/JRE47) or awesome people on HSH's discord
 are always posting deep dives? I always want to know which of my mons would be
 Swag-approved etc. If you have PokeGenie's Scan Pro, you can export all of your
 scanned mons as a CSV to my app (important note: the app stores everything on
 the phone, and never does anything sneaky with it. If you're super paranoid, you
 can see all the code on [github](https://github.com/mglerner/gobattlekit)). If you **don't** have Scan Pro, you can
-still enter your IVs by hand. So, works for FTP folks.
+still enter your IVs by hand. So, works for F2P folks.
 
 **[IMAGE: 02-iv-checker.png -- the PvP IV Checker overview: your own mons checked against the deep-dive spreads, with a 👑 crown. Insert/upload here.]**
 **[IMAGE: 03-owned-breakdown.png -- drilling into one species (Clodsire): the owned spread with a 🏆 trophy and the deep-dive tiers it hits. Insert/upload here.]**
