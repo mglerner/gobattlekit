@@ -69,11 +69,11 @@ class TimingQuizScreen:
         # text needs a fixed height across questions of varying length so
         # the answer buttons below don't jump around between questions.
         # See DEVELOPER_NOTES "Wrapping paragraph text".
-        question_height = 200 if ON_ANDROID else 160
+        question_height = 160 if ON_ANDROID else 120
         self.question_label = toga.MultilineTextInput(
             value="",
             readonly=True,
-            style=Pack(font_size=18, margin_bottom=20,
+            style=Pack(font_size=13, margin_bottom=20,
                        margin_left=10, margin_right=10,
                        height=question_height, flex=1,
                        color=COLOR_TEXT_LIGHT)
@@ -137,34 +137,28 @@ class TimingQuizScreen:
         cols_row.add(right_col)
         self.button_box.add(cols_row)
 
-        total_rows = ((len(pattern_choices) + 1) // 2) + 1
-        for i, pattern in enumerate(pattern_choices):
+        # "Doesn't matter" (None) is the last answer in the same 2-col grid —
+        # shortened from "Timing doesn't matter" so it fits a half-width cell.
+        answers = [(p, format_timing_pattern(p)) for p in pattern_choices]
+        answers.append((None, "Doesn't matter"))
+
+        total_rows = (len(answers) + 1) // 2
+        for i, (key, label) in enumerate(answers):
             row_index = i // 2
-            label = format_timing_pattern(pattern)
             btn = toga.Button(
                 label,
-                on_press=self._make_answer_handler(pattern),
+                on_press=self._make_answer_handler(key),
                 style=Pack(height=48, font_size=13, margin_bottom=4,
                            background_color=answer_color_gradient(total_rows, row_index),
                            color=COLOR_TEXT_LIGHT)
             )
-            # Keyed by the pattern VALUE (like quiz.py keys by answer), so
-            # highlight lookup can't desync from button layout.
-            self.answer_buttons[pattern] = btn
+            # Keyed by the answer VALUE (None = "Doesn't matter"), like
+            # quiz.py, so highlight lookup can't desync from button layout.
+            self.answer_buttons[key] = btn
             if i % 2 == 0:
                 left_col.add(btn)
             else:
                 right_col.add(btn)
-
-        tdm_btn = toga.Button(
-            "Timing doesn't matter",
-            on_press=self._make_answer_handler(None),
-            style=Pack(height=48, font_size=13, margin_bottom=4,
-                       background_color=answer_color_gradient(total_rows, total_rows - 1),
-                       color=COLOR_TEXT_LIGHT)
-        )
-        self.answer_buttons[None] = tdm_btn
-        self.button_box.add(tdm_btn)
 
     def _make_answer_handler(self, pattern):
         def handler(widget):
