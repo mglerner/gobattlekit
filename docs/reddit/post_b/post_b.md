@@ -10,7 +10,7 @@ Skeleton for the companion app post. Same conventions as Post A:
   no "What you get"; no comma-lists of exactly three items.
 
 TITLE:
-I made a free, open-source iOS app for PvP. It quizzes you on move counts, timing, and type matchups. It lets you check your actual mons (from PokeGenie or manual typing) against deep-dive strat spreads.
+I made a free, open-source iOS app for PvP. It quizzes you on move counts, timing, and type matchups. It lets you check your actual mons (from PokeGenie or manual typing) against deep-dive stat spreads.
 
 ==================== POST BODY ====================
 
