@@ -6,7 +6,7 @@ import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from ..theme import (
-    CONTAINER, COLOR_ACCENT, COLOR_BG, COLOR_TEXT_LIGHT,
+    CONTAINER, COLOR_ACCENT, COLOR_BG, COLOR_TEXT_LIGHT, COLOR_TEXT_DARK,
     COLOR_SECONDARY_BTN, COLOR_NAV,
     btn_primary, btn_secondary, label_section, btn_help,
     btn_great, btn_ultra, btn_master
@@ -50,32 +50,42 @@ class HomeScreen:
                 style=btn_fn()
             ))
 
+        # Uniform 8pt gap across all five quiz buttons (was 16/18 here because
+        # of margin_top=8 + btn_primary's default margin_bottom=18).
         menu.add(toga.Button(
             "Optimal Move Timing",
             on_press=lambda w: self.app.show_timing_quiz(),
-            style=btn_primary(margin_top=8)
+            style=btn_primary(margin_bottom=8)
         ))
 
         menu.add(toga.Button(
             "Type Effectiveness",
             on_press=self._start_type_quiz,
-            style=btn_primary()
+            style=btn_primary(margin_bottom=8)
         ))
 
         menu.add(toga.Label(
             "IV Analysis",
             style=label_section()
         ))
-        menu.add(toga.Button(
-            "PvP IV Checker",
+        # Two-up row to save vertical space on small screens. Renamed to fit
+        # side by side at half width ("My PvP IV Targets" is too wide there).
+        iv_row = toga.Box(style=Pack(direction=ROW))
+        iv_row.add(toga.Button(
+            "IV Checker",
             on_press=self._start_iv_checker,
-            style=btn_primary()
+            style=Pack(flex=1, height=50, font_size=16, margin_right=4,
+                       margin_bottom=8, background_color=COLOR_ACCENT,
+                       color=COLOR_TEXT_DARK)
         ))
-        menu.add(toga.Button(
-            "My PvP IV Targets",
+        iv_row.add(toga.Button(
+            "My Spreads",
             on_press=self._start_user_iv_checker,
-            style=btn_primary()
+            style=Pack(flex=1, height=50, font_size=16, margin_left=4,
+                       margin_bottom=8, background_color=COLOR_ACCENT,
+                       color=COLOR_TEXT_DARK)
         ))
+        menu.add(iv_row)
 
         container.add(scroll)
 
