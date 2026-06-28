@@ -31,3 +31,7 @@ tools/threshold_export/out/
 
 # Reddit launch-prep brief (internal strategy notes; mirrors gopvpsim)
 /REDDIT_POST_B_BRIEF.md
+
+# Point-in-time AI dev-review docs: kept local, not published (internal
+# code-review writeups; superseded by current state).
+/docs/reviews/
