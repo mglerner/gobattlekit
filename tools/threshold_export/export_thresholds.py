@@ -611,6 +611,15 @@ def main(argv=None) -> int:
     league = blob["league"]                      # e.g. "great"
     league_key = league.capitalize()             # registry key, e.g. "Great"
     shadow = bool(blob.get("shadow"))
+    # A limited-cup dive is mechanically its league (CP cap, iv_rank, registry
+    # lookup all stay league-native), but a cup dive's thresholds are a
+    # DIFFERENT meta and must NOT overwrite the species' real league
+    # thresholds in the app. Route cup exports to a cup-labelled filename +
+    # TOML table key so they can neither match bundle_into_app's
+    # `*_great.toml` glob NOR collide on the `Species.Great` schema key.
+    # (App-side cup toggles are Phase 3; this guard is naming-only.)
+    cup = blob.get("cup")
+    export_label = cup or league                 # "equinox" for a cup dive, else "great"
 
     registry = blob.get("threshold_registry")
     if args.thresholds is not None:
@@ -637,11 +646,11 @@ def main(argv=None) -> int:
     targets = targets[:MAX_TARGETS]
 
     args.out.mkdir(parents=True, exist_ok=True)
-    stem = f"{slugify(species)}{'_shadow' if shadow else ''}_{league}"
+    stem = f"{slugify(species)}{'_shadow' if shadow else ''}_{export_label}"
     blob_name = args.blob.name
 
     toml_path = args.out / f"{stem}.toml"
-    emit_toml(toml_path, species, league, sources, targets, blob_name)
+    emit_toml(toml_path, species, export_label, sources, targets, blob_name)
 
     vectors = parity_vectors(records, targets)
     parity_path = args.out / f"{stem}_parity.json"
