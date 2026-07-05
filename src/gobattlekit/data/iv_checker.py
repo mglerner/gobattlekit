@@ -316,7 +316,7 @@ def parse_csv(csv_path):
                     'lucky': row['Lucky'].strip() == '1',
                     'gender': gender,
                 })
-            except (KeyError, ValueError):
+            except (KeyError, ValueError, TypeError):
                 continue
     return mons
 
