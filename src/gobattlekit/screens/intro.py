@@ -103,7 +103,7 @@ class IntroScreen:
         container = toga.Box(style=CONTAINER)
 
         container.add(toga.Label(
-            title,
+            title,  # label-fits: authored INTROS[feature_key] title (short)
             style=Pack(font_size=24, font_weight="bold",
                        text_align="center", margin_bottom=16,
                        color=COLOR_ACCENT)
@@ -119,7 +119,7 @@ class IntroScreen:
             card = toga.Box(style=card_box(margin_bottom=12))
             if heading:
                 card.add(toga.Label(
-                    heading,
+                    heading,  # label-fits: authored INTROS section heading (short)
                     style=Pack(font_size=14, font_weight="bold",
                                margin_bottom=4, color=COLOR_YELLOW)
                 ))

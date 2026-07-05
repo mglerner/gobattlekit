@@ -184,7 +184,7 @@ class EditThresholdsScreen:
 
         for species in sorted(thresholds.keys()):
             self.content_box.add(toga.Label(
-                species,
+                species,  # label-fits: Pokemon species name (<= ~20 chars)
                 style=Pack(font_size=16, font_weight="bold",
                            margin_top=12, margin_bottom=4,
                            color=COLOR_ACCENT)
@@ -362,12 +362,12 @@ class EditThresholdsScreen:
         ]:
             col = toga.Box(style=Pack(direction=COLUMN, flex=1, margin_right=4))
             col.add(toga.Label(
-                label,
+                label,  # label-fits: loop label is one of Atk/Def/HP (3 chars)
                 style=Pack(font_size=12, text_align="center", color=COLOR_TEXT_LIGHT)
             ))
             value = getattr(self, form_attr, '0')
             col.add(toga.Label(
-                str(value),
+                str(value),  # label-fits: a form stat value (short numeric string)
                 style=Pack(font_size=14, text_align="center", color=COLOR_ACCENT)
             ))
             prompt = entry_prompt
@@ -402,11 +402,11 @@ class EditThresholdsScreen:
     def _add_field_row(self, label, value, handler):
         row = toga.Box(style=Pack(direction=ROW, margin_bottom=8))
         row.add(toga.Label(
-            label,
+            label,  # label-fits: fixed field label (League:/Species:/... <= 11 chars)
             style=Pack(width=90, font_size=14, color=COLOR_TEXT_LIGHT)
         ))
         row.add(toga.Label(
-            str(value),
+            str(value),  # label-fits: species name / short form value / '(none)'
             style=Pack(flex=1, font_size=14, color=COLOR_ACCENT)
         ))
         row.add(toga.Button(
@@ -436,7 +436,7 @@ class EditThresholdsScreen:
         self._set_outer_buttons_enabled(False)
 
         self.content_box.add(toga.Label(
-            prompt,
+            prompt,  # label-fits: one of a fixed set of entry prompts (<= 35 chars)
             style=Pack(font_size=18, font_weight="bold",
                        text_align="center", margin_bottom=16,
                        color=COLOR_ACCENT)

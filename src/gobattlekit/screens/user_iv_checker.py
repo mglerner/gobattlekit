@@ -75,6 +75,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
 
         status_row = toga.Box(style=Pack(direction=ROW, margin_bottom=2, height=36))
         self.status_label_file = toga.Label(
+            # label-fits: csv_path is always a fixed cache filename (<= 20 chars)
             pathlib.Path(self.csv_path).name if self.csv_path else "",
             style=Pack(flex=1, font_size=13, text_align="center",
                        color=COLOR_TEXT_LIGHT)
@@ -90,6 +91,7 @@ class UserIVCheckerScreen(IVCheckerScreen):
         self.container.add(status_row)
 
         self.status_label_stats = toga.Label(
+            # label-fits: _stats_line() (inherited) skeleton ~25 chars; NO_CSV_MESSAGE 24
             self._stats_line() if self.csv_path else self.NO_CSV_MESSAGE,
             style=Pack(font_size=13, text_align="center", margin_bottom=4,
                        color=COLOR_TEXT_LIGHT)
@@ -209,7 +211,8 @@ class UserIVCheckerScreen(IVCheckerScreen):
             if not self._get_thresholds_raw():
                 # CSV is still loaded — show its name; only the targets
                 # are missing. Don't clear the file label here.
-                self.status_label_file.text = pathlib.Path(self.csv_path).name
+                # csv_path is always a fixed cache filename (<= 20 chars)
+                self.status_label_file.text = pathlib.Path(self.csv_path).name  # label-fits: fixed cache filename
                 self._show_clear_btn(True)
                 self.status_label_stats.text = NO_TARGETS_MESSAGE
                 for child in list(self.results_box.children):
@@ -235,9 +238,11 @@ class UserIVCheckerScreen(IVCheckerScreen):
                 evolution_lines=EVOLUTION_LINES,
                 include_empty=True,
             )
-            self.status_label_file.text = pathlib.Path(self.csv_path).name
+            # csv_path is always a fixed cache filename (<= 20 chars)
+            self.status_label_file.text = pathlib.Path(self.csv_path).name  # label-fits: fixed cache filename
             self._show_clear_btn(True)
-            self.status_label_stats.text = self._stats_line()
+            # _stats_line() (inherited) skeleton is ~25 chars
+            self.status_label_stats.text = self._stats_line()  # label-fits: inherited _stats_line ~25 chars
             self._display_species_list()
         except Exception as e:
             logger.exception("check_thresholds failed")
