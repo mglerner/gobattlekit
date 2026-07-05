@@ -326,6 +326,13 @@ def append_user_generated(csv_path, name, atk_iv, def_iv, sta_iv, cp, level):
     import pathlib
     path = pathlib.Path(csv_path)
     write_header = not path.exists() or path.stat().st_size == 0
+    # The manual picker offers full gamemaster names like 'Ninetales
+    # (Shadow)'. Store PokeGenie-style (bare Name + Shadow/Purified=1) so
+    # parse_csv/get_species_name derive the shadow flag and scale stats,
+    # matching the qualifying-IVs view (which uses _is_shadow_species).
+    is_shadow = _is_shadow_species(name)
+    if is_shadow:
+        name = name[:-len(' (Shadow)')]
     with open(csv_path, 'a', newline='', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=[
             'Name', 'Form', 'CP', 'Atk IV', 'Def IV', 'Sta IV',
@@ -341,7 +348,7 @@ def append_user_generated(csv_path, name, atk_iv, def_iv, sta_iv, cp, level):
             'Def IV': def_iv,
             'Sta IV': sta_iv,
             'Level Min': level,
-            'Shadow/Purified': '0',
+            'Shadow/Purified': '1' if is_shadow else '0',
             'Lucky': '0',
         })
 
