@@ -47,10 +47,16 @@ class TimingQuizScreen:
             all_mons = []
             for league in ('great', 'ultra', 'master'):
                 all_mons.extend(get_rankings(league))
+            # Keep only ids that actually resolve in get_moves' fast-move
+            # dict. Rankings and the gamemaster are fetched independently and
+            # get_moves classifies energyGain==0 moves (e.g. TRANSFORM) as
+            # charged, so a ranked moveset[0] can be absent from fastmoves on
+            # upstream data drift; indexing it bare later would KeyError. The
+            # sibling quiz.py guards the same join via _quizzable.
             self.ranked_fast_move_ids = list({
                 mon['moveset'][0]
                 for mon in all_mons
-                if mon.get('moveset')
+                if mon.get('moveset') and mon['moveset'][0] in self.fastmoves
             })
 
     def build(self):
@@ -227,6 +233,9 @@ class TimingQuizScreen:
                 self._disable_buttons()
                 self._advance_task = asyncio.create_task(self._advance_question(delay=2.5))
             else:
+                # Streak was just broken; refresh so the 🔥 disappears now,
+                # not only after the final attempt resolves.
+                self.score_label.text = self._score_text()
                 remaining = MAX_ATTEMPTS - self.attempts
                 self.feedback_label.text = (
                     f"❌ Try again! {remaining} attempt{'s' if remaining != 1 else ''} left."
