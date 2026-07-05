@@ -3,6 +3,7 @@
 Edit Thresholds screen — add, view, and delete user-defined IV thresholds.
 """
 import logging
+import math
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
@@ -558,8 +559,18 @@ class EditThresholdsScreen:
             defense = float(self._form_def or 0)
             stamina = int(float(self._form_sta or 0))
             onlytop = int(float(self._form_onlytop or 0))
-        except (ValueError, TypeError):
+        except (ValueError, TypeError, OverflowError):
+            # OverflowError: int(float('inf')) for the HP/Only-top-N fields
+            # would otherwise escape and leave Save silently dead.
             self.form_error.text = "Invalid stat values — use numbers only."
+            return
+
+        # Mirror user_thresholds._validate_spec: floors must be finite and
+        # non-negative. A negative floor matches every mon; NaN matches none
+        # — both silently, and the paste-import path already rejects them.
+        if (not math.isfinite(attack) or not math.isfinite(defense)
+                or attack < 0 or defense < 0 or stamina < 0 or onlytop < 0):
+            self.form_error.text = "Stats must be 0 or a positive number."
             return
 
         cls = (self._form_class or '').strip().lower()
