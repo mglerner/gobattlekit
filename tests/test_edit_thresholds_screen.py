@@ -132,3 +132,62 @@ class TestOfflineSpeciesPicker:
         assert screen._all_species is None
         joined = ' '.join(_widget_texts(screen.content_box))
         assert 'Could not load species list' in joined
+
+
+class TestFloorValidation:
+    """The edit form must reject the same non-finite / negative floors the
+    paste-import validator rejects, instead of silently storing a
+    match-everything (negative), match-nothing (NaN), or Save-dead (inf)
+    target."""
+
+    def test_negative_floor_rejected(self, screen):
+        screen._show_add_form()
+        screen._selected_species = 'Azumarill'
+        screen._selected_league = 'Great'
+        screen._form_name = 'Bulky'
+        screen._form_atk = '-92'
+        screen._save_threshold(None)
+        assert load_user_thresholds() == {}
+        assert screen.form_error.text
+
+    def test_nan_floor_rejected(self, screen):
+        screen._show_add_form()
+        screen._selected_species = 'Azumarill'
+        screen._selected_league = 'Great'
+        screen._form_name = 'Bulky'
+        screen._form_def = 'nan'
+        screen._save_threshold(None)
+        assert load_user_thresholds() == {}
+        assert screen.form_error.text
+
+    def test_inf_stamina_rejected_no_crash(self, screen):
+        screen._show_add_form()
+        screen._selected_species = 'Azumarill'
+        screen._selected_league = 'Great'
+        screen._form_name = 'Bulky'
+        screen._form_sta = 'inf'
+        # Must not raise OverflowError.
+        screen._save_threshold(None)
+        assert load_user_thresholds() == {}
+        assert screen.form_error.text
+
+    def test_inf_onlytop_rejected_no_crash(self, screen):
+        screen._show_add_form()
+        screen._selected_species = 'Azumarill'
+        screen._selected_league = 'Great'
+        screen._form_name = 'Bulky'
+        screen._form_onlytop = 'inf'
+        screen._save_threshold(None)
+        assert load_user_thresholds() == {}
+        assert screen.form_error.text
+
+    def test_valid_floor_still_saves(self, screen):
+        screen._show_add_form()
+        screen._selected_species = 'Azumarill'
+        screen._selected_league = 'Great'
+        screen._form_name = 'Bulky'
+        screen._form_def = '143.0'
+        screen._form_sta = '138'
+        screen._save_threshold(None)
+        data = load_user_thresholds()
+        assert data['Azumarill']['Great']['Bulky']['defense'] == 143.0
