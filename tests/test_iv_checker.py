@@ -388,6 +388,19 @@ class TestParseCsv:
         mons = parse_csv(str(p))
         assert len(mons) == 0
 
+    def test_truncated_row_skipped(self, tmp_path):
+        """A short/truncated trailing row (fewer columns than the header)
+        must be skipped, not abort the whole import. csv.DictReader fills
+        the missing fields with None, so int()/float() raise TypeError."""
+        lines = (
+            'Azumarill,,1500,8,15,15,40,0,0\n'
+            'Azumarill,,14\n'
+        )
+        path = self._write_csv(tmp_path, lines)
+        mons = parse_csv(path)
+        assert len(mons) == 1
+        assert mons[0]['name'] == 'Azumarill'
+
     def test_empty_file(self, tmp_path):
         p = tmp_path / 'test.csv'
         p.write_text('', encoding='utf-8-sig')
