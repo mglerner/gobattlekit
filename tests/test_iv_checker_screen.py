@@ -101,3 +101,33 @@ class TestClearCsvDisarm:
         s._clear_csv(None)  # confirm -> actually deletes
         assert s._clear_csv_pending is False
         assert s.csv_path is None
+
+
+class TestFormWipeOnError:
+    """A manual-entry validation error must redisplay the form with what the
+    user typed, not reset every field."""
+
+    def _fill(self, s, atk, dfn, sta, cp, species='Medicham'):
+        s._manual_species = species
+        s._manual_atk_input = toga.TextInput(value=atk)
+        s._manual_def_input = toga.TextInput(value=dfn)
+        s._manual_sta_input = toga.TextInput(value=sta)
+        s._manual_cp_input = toga.TextInput(value=cp)
+
+    def test_bad_cp_preserves_typed_values(self):
+        s = _screen()
+        self._fill(s, '15', '15', '15', '1,500')  # comma -> ValueError gate
+        s._submit_manual_entry(None)
+        assert s._manual_atk == '15'
+        assert s._manual_def == '15'
+        assert s._manual_sta == '15'
+        assert s._manual_cp == '1,500'
+
+    def test_missing_species_preserves_typed_values(self):
+        s = _screen()
+        self._fill(s, '12', '13', '14', '1500', species=None)
+        s._submit_manual_entry(None)
+        assert s._manual_atk == '12'
+        assert s._manual_def == '13'
+        assert s._manual_sta == '14'
+        assert s._manual_cp == '1500'
