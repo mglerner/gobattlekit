@@ -204,6 +204,39 @@ class TestScannerJsonContract:
         assert entries[0][1] == 'Great'
 
 
+class TestNonFiniteRejected:
+    """json.loads accepts Infinity, and int(float('inf')) raises
+    OverflowError (not ValueError) — both import parsers must surface a
+    displayable ValueError instead of letting it escape a ValueError-only
+    handler and leave Import silently dead."""
+
+    @pytest.mark.parametrize("fragment", [
+        '{"A": {"Great": {"X": {"attack": 0, "defense": 0, "stamina": 0, "onlytop": Infinity}}}}',
+        '{"A": {"Great": {"X": {"attack": 0, "defense": 0, "stamina": Infinity}}}}',
+        '{"A": {"Great": {"X": {"attack": Infinity, "defense": 0, "stamina": 0}}}}',
+        '{"A": {"Great": {"X": {"attack": NaN, "defense": 0, "stamina": 0}}}}',
+    ])
+    def test_json_non_finite_rejected(self, fragment):
+        with pytest.raises(ValueError):
+            parse_threshold_json(fragment)
+
+    @pytest.mark.parametrize("stat,value", [
+        ("Stamina", "inf"),
+        ("OnlyTop", "inf"),
+        ("Attack", "inf"),
+    ])
+    def test_text_infinity_rejected(self, stat, value):
+        fields = {
+            'Species': 'Azumarill', 'League': 'Great', 'Name': 'X',
+            'Attack': '0', 'Defense': '0', 'Stamina': '0', 'OnlyTop': '0',
+        }
+        fields[stat] = value
+        text = "GoBattleKit Threshold v1\n" + "\n".join(
+            f"{k}: {v}" for k, v in fields.items())
+        with pytest.raises(ValueError):
+            parse_threshold_text(text)
+
+
 class TestThresholdTextFormat:
     """The 'GoBattleKit Threshold v1' user-to-user share format (TS10)."""
 
