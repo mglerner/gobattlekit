@@ -187,6 +187,39 @@ def test_corrupt_cache_and_no_network_raises_nodata(cache_dir):
             fetcher._fetch_json("great")
 
 
+def test_304_on_corrupt_cache_refetches_not_nodata(cache_dir):
+    """DL5 (2026-07-04 hunt): a 304 that lands on a corrupt stale cache must
+    fall through to a full refetch, NOT surface NoDataError to an online user.
+    Before the fix, the 304 branch reset the mtime and then choked reading the
+    corrupt file, dropping through to the offline path."""
+    import os
+    cache_dir.mkdir(parents=True)
+    cache_file = cache_dir / "great.json"
+    meta_file = cache_dir / "great.meta.json"
+    cache_file.write_text("{not json")  # corrupt
+    meta_file.write_text(json.dumps({"etag": '"abc"'}))
+    stale = time.time() - fetcher.CACHE_TTL - 10
+    os.utime(cache_file, (stale, stale))
+
+    not_modified = urllib.error.HTTPError(
+        url="x", code=304, msg="Not Modified", hdrs=None, fp=io.BytesIO(b""),
+    )
+    fresh = _make_response({"healed": True})
+
+    def _urlopen(request, *a, **k):
+        # The server 304s only the conditional request; an unconditional
+        # refetch (no validators) gets fresh data.
+        if request.get_header("If-none-match"):
+            raise not_modified
+        return fresh
+
+    with patch("urllib.request.urlopen", side_effect=_urlopen):
+        result = fetcher._fetch_json("great")
+
+    assert result == {"healed": True}
+    assert json.loads(cache_file.read_text()) == {"healed": True}
+
+
 def test_meta_file_written_atomically(cache_dir):
     """DL3: no .tmp leftover for the validator sidecar after a 200."""
     cache_dir.mkdir(parents=True)

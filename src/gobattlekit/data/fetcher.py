@@ -134,10 +134,23 @@ def _fetch_json(key):
                 response_headers = r.headers
         except urllib.error.HTTPError as e:
             if e.code == 304:
-                # Remote unchanged: reset the cache mtime so we don't re-check
-                # for another CACHE_TTL, and serve the existing cache.
+                # Remote unchanged. Validate the cache content BEFORE touching
+                # its mtime: a corrupt cache must not be pinned fresh behind a
+                # 304 (that would surface NoDataError to an online user). If it
+                # parses, reset the mtime and serve it; if not, discard it and
+                # refetch fully — the same recovery the fresh-cache path uses.
+                try:
+                    cached = _read_cache(cache_file, key)
+                except (json.JSONDecodeError, OSError):
+                    logger.warning("Corrupt cache for %s behind 304; discarding and refetching", key)
+                    try:
+                        cache_file.unlink()
+                        meta_file.unlink(missing_ok=True)
+                    except OSError:
+                        logger.exception("Could not remove corrupt cache for %s", key)
+                    return _fetch_json(key)
                 os.utime(cache_file, None)
-                return _read_cache(cache_file, key)
+                return cached
             raise
 
         # Atomic write: write to .tmp then os.replace so a kill mid-write
