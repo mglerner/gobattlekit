@@ -75,3 +75,29 @@ class TestOfflineGuard:
         s._submit_manual_entry(None)  # must not raise, must not no-op
 
         assert 'Could not load' in ' '.join(_texts(s.results_box))
+
+
+class TestClearCsvDisarm:
+    """An armed two-tap Clear-CSV confirm must not survive in-screen
+    navigation, or a single later tap silently wipes all CSVs + manual mons."""
+
+    def test_navigation_disarms_pending_clear(self):
+        s = _screen()
+        s._clear_csv(None)  # first tap arms
+        assert s._clear_csv_pending is True
+        s._display_species_list()  # in-screen navigation
+        assert s._clear_csv_pending is False
+
+    def test_run_check_disarms_pending_clear(self):
+        s = _screen()
+        s._clear_csv(None)  # first tap arms
+        assert s._clear_csv_pending is True
+        s._run_check()  # e.g. league button -> re-check overwrites the warning
+        assert s._clear_csv_pending is False
+
+    def test_two_consecutive_taps_still_clear(self):
+        s = _screen()
+        s._clear_csv(None)  # arm
+        s._clear_csv(None)  # confirm -> actually deletes
+        assert s._clear_csv_pending is False
+        assert s.csv_path is None

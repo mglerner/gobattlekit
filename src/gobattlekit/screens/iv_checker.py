@@ -581,6 +581,10 @@ class IVCheckerScreen:
             self.status_label_stats.text = f"Error importing: {e}"
 
     def _run_check(self):
+        # This replaces the Clear-CSV warning text, so an armed two-tap
+        # confirm must not survive it (else a later single ✕ tap deletes
+        # everything with no prompt on screen).
+        self._clear_csv_pending = False
         if not self.csv_path:
             self._display_species_list()
             return
@@ -619,6 +623,9 @@ class IVCheckerScreen:
     # ------------------------------------------------------------------
 
     def _display_species_list(self):
+        # Any in-screen navigation back to the list disarms a pending
+        # Clear-CSV confirm (same reason as _run_check).
+        self._clear_csv_pending = False
         for child in list(self.results_box.children):
             self.results_box.remove(child)
 
