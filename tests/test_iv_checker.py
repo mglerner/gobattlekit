@@ -460,6 +460,17 @@ class TestAppendUserGenerated:
         assert mons[0]['name'] == 'Azumarill'
         assert mons[0]['atk_iv'] == 8
 
+    def test_shadow_name_recorded_as_shadow_flag(self, tmp_path):
+        """A ' (Shadow)'-suffixed species must be stored PokeGenie-style:
+        bare Name + Shadow/Purified=1, so parse_csv derives is_shadow and
+        get_species_name reconstructs the shadow name (no double suffix)."""
+        path = str(tmp_path / 'user.csv')
+        append_user_generated(path, 'Azumarill (Shadow)', 8, 15, 15, 1400, 20)
+        mons = parse_csv(path)
+        assert len(mons) == 1
+        assert mons[0]['name'] == 'Azumarill'
+        assert mons[0]['is_shadow'] is True
+
 
 # ── check_thresholds ─────────────────────────────────────────────
 
@@ -513,6 +524,37 @@ class TestCheckThresholds:
                                    evolution_lines=evo_lines)
         assert 'Azumarill' in results
         assert results['Azumarill'][0]['is_pre_evo'] is True
+
+    def test_shadow_manual_entry_scored_with_shadow_stats(self, tmp_path):
+        """A manually entered shadow mon must be scored with shadow
+        multipliers (x5/6 defense), not as its non-shadow self, so its
+        threshold verdict matches the qualifying-IVs view. Regression for
+        the false-positive-on-a-bulk-floor bug (append_user_generated used
+        to hardcode Shadow/Purified='0')."""
+        shadow_path = str(tmp_path / 'shadow.csv')
+        plain_path = str(tmp_path / 'plain.csv')
+        append_user_generated(shadow_path, 'Azumarill (Shadow)', 8, 15, 15, 1400, 20)
+        append_user_generated(plain_path, 'Azumarill', 8, 15, 15, 1400, 20)
+
+        r_plain = check_thresholds(
+            plain_path, {'Azumarill': {'Great': {'Bulk': {'defense': 0}}}},
+            league='great', max_level=40)
+        d_plain = r_plain['Azumarill'][0]['stats']['defense']
+
+        r_shadow = check_thresholds(
+            shadow_path, {'Azumarill (Shadow)': {'Great': {'Bulk': {'defense': 0}}}},
+            league='great', max_level=40)
+        d_shadow = r_shadow['Azumarill (Shadow)'][0]['stats']['defense']
+
+        # Shadow defense is exactly x5/6 of the non-shadow value.
+        assert d_shadow == pytest.approx(d_plain * (5 / 6))
+
+        # And a bulk floor the non-shadow form clears must be FAILED by the
+        # shadow form (the repro's false positive is now a correct no-match).
+        r_floor = check_thresholds(
+            shadow_path, {'Azumarill (Shadow)': {'Great': {'Bulk': {'defense': d_plain}}}},
+            league='great', max_level=40)
+        assert 'Azumarill (Shadow)' not in r_floor
 
     def test_iv_filter(self, tmp_path):
         path = self._write_csv(tmp_path,
