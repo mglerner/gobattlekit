@@ -118,7 +118,7 @@ class GoBattleKit(toga.App):
                     f"happening, reinstalling the app may help.")
         error_box = toga.Box(style=Pack(direction=COLUMN, margin=40))
         error_box.add(toga.Label(
-            title,
+            title,  # label-fits: one of two fixed error titles (<= 24 chars)
             style=Pack(font_size=24, font_weight="bold",
                        text_align="center", margin_bottom=20)
         ))

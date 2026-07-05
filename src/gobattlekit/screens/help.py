@@ -136,7 +136,7 @@ class HelpScreen:
         container = toga.Box(style=CONTAINER)
 
         container.add(toga.Label(
-            topic,
+            topic,  # label-fits: a fixed HELP_CONTENT topic title (short)
             style=Pack(font_size=22, font_weight="bold",
                        text_align="center", margin_bottom=16,
                        color=COLOR_ACCENT)
@@ -156,7 +156,7 @@ class HelpScreen:
             card = toga.Box(style=card_box(margin_bottom=12))
             if heading:
                 card.add(toga.Label(
-                    heading,
+                    heading,  # label-fits: authored HELP_CONTENT section heading (short)
                     style=Pack(font_size=14, font_weight="bold",
                                margin_bottom=4, color=COLOR_YELLOW)
                 ))

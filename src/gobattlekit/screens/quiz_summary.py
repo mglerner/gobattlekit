@@ -32,7 +32,7 @@ class QuizSummaryScreen:
             title = "Quiz Complete!"
 
         container.add(toga.Label(
-            title,
+            title,  # label-fits: one of the fixed quiz-complete titles (<= 28 chars)
             style=Pack(font_size=24, font_weight="bold",
                        text_align="center", margin_bottom=20,
                        color=COLOR_ACCENT)

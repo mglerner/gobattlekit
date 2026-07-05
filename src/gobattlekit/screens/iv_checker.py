@@ -108,6 +108,8 @@ class IVCheckerScreen:
 
         status_row = toga.Box(style=Pack(direction=ROW, margin_bottom=2, height=36))
         self.status_label_file = toga.Label(
+            # label-fits: csv_path is always a fixed cache filename
+            # (pokegenie_export.csv / user_generated.csv, <= 20 chars)
             pathlib.Path(self.csv_path).name if self.csv_path else "",
             style=Pack(flex=1, font_size=13, text_align="center",
                        color=COLOR_TEXT_LIGHT)
@@ -123,6 +125,7 @@ class IVCheckerScreen:
         self.container.add(status_row)
 
         self.status_label_stats = toga.Label(
+            # label-fits: _stats_line() skeleton is ~25 chars, NO_CSV_MESSAGE 24
             self._stats_line() if self.csv_path else self.NO_CSV_MESSAGE,
             style=Pack(font_size=13, text_align="center", margin_bottom=4,
                        color=COLOR_TEXT_LIGHT)
@@ -292,6 +295,7 @@ class IVCheckerScreen:
             style=Pack(width=90, font_size=14, color=COLOR_TEXT_LIGHT)
         ))
         species_row.add(toga.Label(
+            # label-fits: species name (<= ~20 chars) or 13-char fallback
             self._manual_species or "tap to select",
             style=Pack(flex=1, font_size=14, color=COLOR_ACCENT)
         ))
@@ -310,7 +314,7 @@ class IVCheckerScreen:
         for label, attr in [("Atk", '_manual_atk'), ("Def", '_manual_def'), ("HP", '_manual_sta')]:
             col = toga.Box(style=Pack(direction=COLUMN, flex=1, margin_right=4))
             col.add(toga.Label(
-                label,
+                label,  # label-fits: loop label is one of Atk/Def/HP (3 chars)
                 style=Pack(font_size=12, text_align="center", color=COLOR_TEXT_LIGHT)
             ))
             current = getattr(self, attr, '0')
@@ -624,7 +628,8 @@ class IVCheckerScreen:
                 evolution_lines=EVOLUTION_LINES,
                 include_empty=True,
             )
-            self.status_label_file.text = pathlib.Path(self.csv_path).name
+            # csv_path is always a fixed cache filename (<= 20 chars)
+            self.status_label_file.text = pathlib.Path(self.csv_path).name  # label-fits: fixed cache filename
             self._show_clear_btn(True)
             self.status_label_stats.text = self._stats_line()
             self._display_species_list()
@@ -824,7 +829,9 @@ class IVCheckerScreen:
             def handler(widget):
                 self._target_index = (self._target_index + direction) % len(self._target_options_raw)
                 current = self._target_options_raw[self._target_index]
-                self.target_label.text = _target_label_text(current)
+                # _target_label_text returns short strings
+                # ('All targets (N)' / 'SIM <name> (N)', name <= ~20 chars)
+                self.target_label.text = _target_label_text(current)  # label-fits: short target label
                 self._refresh_hits(species, hits)
             return handler
 
@@ -833,6 +840,7 @@ class IVCheckerScreen:
         target_row.add(toga.Button("◀", on_press=make_cycle_handler(-1),
                                    style=btn_icon(width=44, height=44)))
         self.target_label = toga.Label(
+            # label-fits: _target_label_text returns short strings (see cycler)
             _target_label_text(initial_target),
             style=Pack(flex=1, text_align="center", font_size=14,
                        color=COLOR_TEXT_LIGHT)
@@ -978,7 +986,7 @@ class IVCheckerScreen:
             self.source_box.add(paragraph_text(line, font_size=12))
         else:
             self.source_box.add(toga.Label(
-                line,
+                line,  # label-fits: else-branch of `if len(line) > 38` (<= 38 chars)
                 style=Pack(font_size=12, text_align="center",
                            color=COLOR_TEXT_LIGHT)
             ))
@@ -1058,7 +1066,7 @@ class IVCheckerScreen:
                 sibling.csv_path = None
                 sibling.results = {}
         self.status_label_file.text = ""
-        self.status_label_stats.text = self.NO_CSV_MESSAGE
+        self.status_label_stats.text = self.NO_CSV_MESSAGE  # label-fits: 24-char class constant
         self._show_clear_btn(False)
         self._show_back_btn(False)
         self._display_species_list()
@@ -1113,6 +1121,10 @@ class IVCheckerScreen:
 
         card = toga.Box(style=card_box())
         card.add(toga.Label(
+            # label-fits: compact hit line "AA/DD/SS (pre) (CP NNNN)" with an
+            # optional badge; ~38-40 chars worst-case (2-digit IVs + a long
+            # pre-evo species name). Borderline on iPhone SE — verify on device
+            # if a longer pre-evo name is ever added.
             iv_str,
             style=Pack(font_size=14, font_weight="bold", color=COLOR_TEXT_LIGHT)
         ))

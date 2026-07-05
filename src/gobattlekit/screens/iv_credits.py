@@ -72,7 +72,7 @@ class IVCreditsScreen:
 
             card = toga.Box(style=card_box(margin_bottom=12))
             card.add(toga.Label(
-                species,
+                species,  # label-fits: Pokemon species name (<= ~20 chars)
                 style=Pack(font_size=14, font_weight="bold",
                            margin_bottom=4, color=COLOR_YELLOW)
             ))
