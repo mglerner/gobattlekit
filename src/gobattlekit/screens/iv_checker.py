@@ -858,6 +858,9 @@ class IVCheckerScreen:
                 parts.append(f"{target['stamina']}S")
             if target.get('onlytop', 0):
                 parts.append(f"top{target['onlytop']}")
+            if target.get('ivs'):
+                n = len(target['ivs'])
+                parts.append(f"{n} IV spread{'s' if n != 1 else ''}")
             req_str = ', '.join(parts) if parts else 'any'
 
             pokemon_index = get_pokemon_index()

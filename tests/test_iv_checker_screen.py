@@ -131,3 +131,30 @@ class TestFormWipeOnError:
         assert s._manual_def == '13'
         assert s._manual_sta == '14'
         assert s._manual_cp == '1500'
+
+
+class TestIvsOnlyTargetSummary:
+    """A target that only lists explicit IV spreads must not be summarized as
+    'Requires: any' (which reads as 'any IVs qualify')."""
+
+    def test_refresh_hits_summarizes_ivs_only_target(self, monkeypatch):
+        s = _screen()
+        target = {'ivs': [[0, 0, 0], [1, 1, 1], [2, 2, 2]]}
+        s._get_thresholds = lambda: {
+            'Annihilape': {'Great': {'Ape Slayer': target}}}
+        s.league = 'great'
+        s.hits_box = toga.Box()
+        s.source_box = toga.Box()
+        s._targets_without_hits = {'Ape Slayer'}
+        s._target_options_raw = ['Ape Slayer']
+        s._target_index = 0
+        # Species absent from the index -> lightweight branch that still
+        # renders the requirement summary.
+        monkeypatch.setattr(
+            'gobattlekit.screens.iv_checker.get_pokemon_index', dict)
+
+        s._refresh_hits('Annihilape', [])
+
+        joined = ' '.join(_texts(s.hits_box))
+        assert '3 IV spreads' in joined
+        assert 'Requires: any' not in joined

@@ -95,6 +95,16 @@ from gobattlekit.data.user_thresholds import (  # noqa: E402
 )
 
 
+def _widget_texts_recursive(box):
+    """Flatten text/value of every widget under a box, recursing into rows."""
+    out = []
+    for child in getattr(box, 'children', []):
+        out.append(getattr(child, 'text', '') or '')
+        out.append(getattr(child, 'value', '') or '')
+        out.extend(_widget_texts_recursive(child))
+    return out
+
+
 @pytest.fixture
 def screen():
     s = EditThresholdsScreen(MagicMock())
@@ -276,3 +286,16 @@ class TestImportErrorWrapping:
         # clipping Label.
         assert type(w).__name__ == 'MultilineTextInput'
         assert 'triples' in w.value
+
+
+class TestIvsOnlyTargetSummary:
+    """An imported ivs-only target must be summarized by its spread count,
+    not listed as '(any)'."""
+
+    def test_ivs_only_target_not_labelled_any(self, screen):
+        add_threshold('Annihilape', 'Great', 'Ape Slayer', 0, 0, 0,
+                      ivs=[[0, 0, 0], [1, 1, 1], [2, 2, 2]])
+        screen._show_threshold_list()
+        joined = ' '.join(_widget_texts_recursive(screen.content_box))
+        assert '3 IV spreads' in joined
+        assert '(any)' not in joined

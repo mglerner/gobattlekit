@@ -202,6 +202,9 @@ class EditThresholdsScreen:
                     if t.get('defense', 0): parts.append(f"{t['defense']}D")
                     if t.get('stamina', 0): parts.append(f"{t['stamina']}S")
                     if t.get('onlytop', 0): parts.append(f"top{t['onlytop']}")
+                    if t.get('ivs'):
+                        n = len(t['ivs'])
+                        parts.append(f"{n} IV spread{'s' if n != 1 else ''}")
                     stat_str = ', '.join(parts) if parts else 'any'
                     # Quiet provenance marker — only explicitly 'generated'
                     # entries (e.g. imported SIM pastes) get it, in plain
