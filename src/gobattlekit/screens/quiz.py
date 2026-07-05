@@ -306,6 +306,9 @@ class QuizScreen:
                 self._disable_buttons()
                 self._advance_task = asyncio.create_task(self._advance_question(delay=2.5))
             else:
+                # Streak was just broken; refresh so the 🔥 disappears now,
+                # not only after the final attempt resolves.
+                self.score_label.text = self._score_text()
                 remaining = MAX_ATTEMPTS - self.attempts
                 self.feedback_label.text = (
                     f"❌ Try again! {remaining} attempt{'s' if remaining != 1 else ''} left."
