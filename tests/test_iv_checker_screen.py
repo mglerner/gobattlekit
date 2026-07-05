@@ -158,3 +158,47 @@ class TestIvsOnlyTargetSummary:
         joined = ' '.join(_texts(s.hits_box))
         assert '3 IV spreads' in joined
         assert 'Requires: any' not in joined
+
+
+class TestNarrowPhoneLabels:
+    """Dynamic labels the wrapping checker cannot see must still fit / wrap."""
+
+    def test_qualifying_header_fits_narrow_phone(self):
+        s = _screen()
+        # Empty target: every spread qualifies, so the header renders its
+        # worst-case count (top 100).
+        s._get_thresholds = lambda: {'Azumarill': {'Great': {'Bulk': {}}}}
+        s.league = 'great'
+        s.hits_box = toga.Box()
+        s.source_box = toga.Box()
+        s._targets_without_hits = {'Bulk'}
+        s._target_options_raw = ['Bulk']
+        s._target_index = 0
+
+        s._refresh_hits('Azumarill', [])
+
+        headers = [getattr(c, 'text', '') for c in s.hits_box.children
+                   if getattr(c, 'text', '').startswith('Top')]
+        assert headers, "the qualifying-count header should render"
+        assert all(len(h) <= 40 for h in headers), headers
+
+    def test_run_check_error_uses_wrapping_widget(self, monkeypatch):
+        s = _screen()
+        s.csv_path = '/tmp/some.csv'
+
+        def boom(*a, **k):
+            raise ValueError(
+                "int() argument must be a string, a bytes-like object or a "
+                "real number, not 'NoneType'")
+
+        monkeypatch.setattr(
+            'gobattlekit.screens.iv_checker.check_thresholds', boom)
+
+        s._run_check()  # must not raise
+
+        wrapped = [
+            c for c in s.results_box.children
+            if type(c).__name__ == 'MultilineTextInput'
+            and 'NoneType' in getattr(c, 'value', '')
+        ]
+        assert wrapped, "the CSV error must render through a wrapping widget"
