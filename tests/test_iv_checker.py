@@ -556,6 +556,28 @@ class TestCheckThresholds:
             league='great', max_level=40)
         assert 'Azumarill (Shadow)' not in r_floor
 
+    def test_pre_evo_matches_mid_evolution_target(self, tmp_path):
+        """A pre-evolution must match a MID-evolution target, not only the
+        line's final form. Bundled thresholds ship targets on mid-evos
+        (Sealeo, Dragonair, ...) whose finals have no targets; the old
+        finals-only mapping silently skipped those rows.
+
+        Synthetic 3-stage line Marill -> Azumarill -> Registeel with the
+        target on the middle form (Azumarill); a Marill row must hit it."""
+        path = self._write_csv(tmp_path, 'Marill,,200,8,15,15,20,0,0\n')
+        thresholds = {
+            'Azumarill': {
+                'Great': {
+                    'Bulky': {'attack': 0, 'defense': 0, 'stamina': 0},
+                },
+            },
+        }
+        evo_lines = {'Registeel': ['Marill', 'Azumarill', 'Registeel']}
+        results = check_thresholds(path, thresholds, league='great', max_level=40,
+                                   evolution_lines=evo_lines)
+        assert 'Azumarill' in results
+        assert results['Azumarill'][0]['is_pre_evo'] is True
+
     def test_iv_filter(self, tmp_path):
         path = self._write_csv(tmp_path,
                                'Azumarill,,1400,8,15,15,20,0,0\n'

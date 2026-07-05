@@ -488,15 +488,19 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=51,
     max_cp = LEAGUE_CAPS.get(league, 1500)
     results = {}
 
-    # Multi-valued: a branched pre-evo (Eevee, Tyrogue, Wurmple, ...)
-    # belongs to EVERY line that contains it. The old single-valued map
-    # collapsed it to the last-iterated final (P0 #1, CODE_REVIEW.md).
+    # Map each line member to every STRICTLY-DOWNSTREAM member (not only the
+    # final): bundled thresholds ship targets on mid-evolutions (Sealeo,
+    # Dragonair, ...) whose finals have no targets, so a finals-only map
+    # silently skipped those rows. Multi-valued so a branched pre-evo (Eevee,
+    # Tyrogue, Wurmple, ...) belongs to EVERY line that contains it (P0 #1,
+    # CODE_REVIEW.md). The candidate filter below keeps only members that
+    # actually have targets.
     pre_evo_to_finals = {}
     if evolution_lines:
-        for final, line in evolution_lines.items():
-            for member in line:
-                if member != final:
-                    pre_evo_to_finals.setdefault(member, []).append(final)
+        for line in evolution_lines.values():
+            for i, member in enumerate(line):
+                for downstream in line[i + 1:]:
+                    pre_evo_to_finals.setdefault(member, []).append(downstream)
 
     rank_tables = {}
     league_label = league.capitalize()
