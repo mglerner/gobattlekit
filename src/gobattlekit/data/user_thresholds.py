@@ -5,6 +5,7 @@ Stored as JSON in the cache directory.
 """
 import json
 import logging
+import math
 import os
 from .fetcher import CACHE_DIR
 
@@ -96,11 +97,13 @@ def _validate_spec(spec, where):
     out = {}
     for k in ('attack', 'defense', 'stamina'):
         v = spec.get(k, 0)
-        if isinstance(v, bool) or not isinstance(v, (int, float)) or v < 0:
+        if (isinstance(v, bool) or not isinstance(v, (int, float))
+                or not math.isfinite(v) or v < 0):
             raise ValueError(f"{where}: '{k}' must be a non-negative number.")
         out[k] = int(v) if k == 'stamina' else v
     onlytop = spec.get('onlytop', 0)
-    if isinstance(onlytop, bool) or not isinstance(onlytop, (int, float)) or onlytop < 0:
+    if (isinstance(onlytop, bool) or not isinstance(onlytop, (int, float))
+            or not math.isfinite(onlytop) or onlytop < 0):
         raise ValueError(f"{where}: 'onlytop' must be a non-negative integer.")
     if onlytop:
         out['onlytop'] = int(onlytop)
@@ -232,7 +235,9 @@ def parse_threshold_text(text):
             'stamina': int(float(data['Stamina'])),
             'onlytop': int(float(data['OnlyTop'])),
         }
-    except ValueError:
+    except (ValueError, OverflowError):
+        # OverflowError: int(float('inf')) for a 'Stamina: inf'/'OnlyTop: inf'
+        # paste would otherwise escape and leave Import silently dead.
         raise ValueError("Invalid stat values.")
     if 'Ivs' in data:
         try:
