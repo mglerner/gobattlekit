@@ -466,6 +466,21 @@ class EditThresholdsScreen:
 
         self._set_outer_buttons_enabled(False)
         self._ensure_species_list()
+        if self._all_species is None:
+            # Species list failed to load (e.g. first launch offline).
+            # Render the stored error + a Back button instead of crashing
+            # on list(None); _all_species stays None so the next visit
+            # retries (see _ensure_species_list).
+            self.content_box.add(paragraph_text(
+                f"Could not load species list: {self._species_list_error}",
+                font_size=13,
+            ))
+            self.content_box.add(toga.Button(
+                "← Back to Form",
+                on_press=self._show_add_form,
+                style=btn_nav(height=44)
+            ))
+            return
         self._filtered_species = list(self._all_species)
 
         self.species_search = toga.TextInput(
