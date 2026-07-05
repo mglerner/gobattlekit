@@ -257,3 +257,22 @@ class TestSilentOverwrite:
         screen._form_def = '120'
         screen._save_threshold(None)
         assert 'Fresh' in load_user_thresholds()['Azumarill']['Great']
+
+
+class TestImportErrorWrapping:
+    """Import/validator error text is arbitrary length; it must render
+    through a wrapping widget, not a clipping toga.Label."""
+
+    def test_import_error_uses_wrapping_widget(self, screen):
+        screen._show_import_screen()
+        screen._import_input.value = (
+            '{"Azumarill": {"Great": {"My Target": {"ivs": [[1, 2]]}}}}')
+        screen._do_import(None)
+
+        kids = screen._import_error.children
+        assert kids, "an error should be rendered"
+        w = kids[0]
+        # Routed through paragraph_text (a wrapping MultilineTextInput), not a
+        # clipping Label.
+        assert type(w).__name__ == 'MultilineTextInput'
+        assert 'triples' in w.value
