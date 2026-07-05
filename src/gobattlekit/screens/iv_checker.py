@@ -18,7 +18,9 @@ from ..data.thresholds import (
     drop_generated_targets, has_generated_targets,
 )
 from ..data.preferences import get_pref, set_pref
-from ..data.fetcher import CACHE_DIR, SAVED_CSV, USER_GENERATED_CSV, get_csv_path
+from ..data.fetcher import (
+    CACHE_DIR, SAVED_CSV, USER_GENERATED_CSV, get_csv_path, NoDataError,
+)
 from ..platform import ON_ANDROID, ON_IOS
 from ..theme import (
     CONTAINER, COLOR_ACCENT, COLOR_TEXT_LIGHT, COLOR_YELLOW, COLOR_BG,
@@ -356,7 +358,22 @@ class IVCheckerScreen:
         for child in list(self.results_box.children):
             self.results_box.remove(child)
 
-        pokemon_index = get_pokemon_index()
+        try:
+            pokemon_index = get_pokemon_index()
+        except NoDataError:
+            # Fresh offline install: no cached gamemaster. Show a readable
+            # message + an escape button instead of a blank dead panel.
+            self.results_box.add(paragraph_text(
+                "Could not load Pokémon data. Please connect to "
+                "the internet and try again.",
+                font_size=13, margin_bottom=8,
+            ))
+            self.results_box.add(toga.Button(
+                "← Back to Form",
+                on_press=lambda w: self._show_manual_entry(),
+                style=btn_nav(height=44)
+            ))
+            return
         self._manual_all_species = sorted(pokemon_index.keys())
         self._manual_filtered = list(self._manual_all_species)
 
@@ -437,7 +454,15 @@ class IVCheckerScreen:
         self._manual_sta = sta_iv
         self._manual_cp = cp
 
-        pokemon_index = get_pokemon_index()
+        try:
+            pokemon_index = get_pokemon_index()
+        except NoDataError:
+            # Fresh offline install: 'Check this Pokémon' must not silently
+            # do nothing — surface the error like every other failure here.
+            self._show_manual_entry(
+                error="Could not load Pokémon data. Please connect to "
+                      "the internet and try again.")
+            return
         if species not in pokemon_index:
             self._show_manual_entry(error=f"Could not find base stats for {species}.")
             return
