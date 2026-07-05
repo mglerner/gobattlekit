@@ -698,10 +698,12 @@ class EditThresholdsScreen:
             style=btn_primary(height=48, font_size=16, margin_bottom=8)
         ))
 
-        self._import_error = toga.Label(
-            "",
-            style=Pack(font_size=13, text_align="center", margin_bottom=8,
-                       color=COLOR_YELLOW)
+        # A container, not a Label: import/validator errors are arbitrary
+        # length (e.g. "…must be a list of [atk, def, sta] triples (0-15).")
+        # and toga.Label never wraps on iOS, so we render them through
+        # paragraph_text via _set_import_error.
+        self._import_error = toga.Box(
+            style=Pack(direction=COLUMN, margin_bottom=8)
         )
         self.content_box.add(self._import_error)
 
@@ -722,10 +724,19 @@ class EditThresholdsScreen:
             style=btn_nav(height=44)
         ))
 
+    def _set_import_error(self, message):
+        """Render an import error through a wrapping widget (Labels clip)."""
+        for child in list(self._import_error.children):
+            self._import_error.remove(child)
+        if message:
+            self._import_error.add(paragraph_text(
+                message, font_size=13, color=COLOR_YELLOW
+            ))
+
     def _do_import(self, widget):
         text = self._import_input.value.strip()
         if not text:
-            self._import_error.text = "Please paste a target first."
+            self._set_import_error("Please paste a target first.")
             return
         try:
             # Two paste formats: scanner JSON from pogo-simulator's dive
@@ -743,5 +754,5 @@ class EditThresholdsScreen:
             import_threshold_entries(entries)
             self._show_threshold_list()
         except ValueError as e:
-            self._import_error.text = str(e)
+            self._set_import_error(str(e))
             
