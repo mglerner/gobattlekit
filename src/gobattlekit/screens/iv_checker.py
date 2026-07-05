@@ -427,6 +427,14 @@ class IVCheckerScreen:
         return handler
 
     def _submit_manual_entry(self, widget):
+        # Persist typed values BEFORE the validation gates so an error
+        # redisplays the form with what the user entered instead of resetting
+        # every field (same save-first pattern as the species picker).
+        self._manual_atk = self._manual_atk_input.value.strip() or '0'
+        self._manual_def = self._manual_def_input.value.strip() or '0'
+        self._manual_sta = self._manual_sta_input.value.strip() or '0'
+        self._manual_cp = self._manual_cp_input.value.strip() or ''
+
         species = self._manual_species
         if not species:
             self._show_manual_entry(error="Please select a species.")
@@ -448,11 +456,6 @@ class IVCheckerScreen:
         if cp <= 0:
             self._show_manual_entry(error="Please enter a valid CP.")
             return
-
-        self._manual_atk = atk_iv
-        self._manual_def = def_iv
-        self._manual_sta = sta_iv
-        self._manual_cp = cp
 
         try:
             pokemon_index = get_pokemon_index()
