@@ -520,7 +520,8 @@ class IVCheckerScreen:
             if hasattr(self, 'status_label_file'):
                 self.status_label_file.text = ""
                 self._show_clear_btn(False)
-                self.status_label_stats.text = f"Could not load CSV: {e}"
+                self.status_label_stats.text = "Could not load CSV."
+                self._show_error_panel(f"Could not load CSV: {e}")
             return
         self._run_check()
 
@@ -537,7 +538,8 @@ class IVCheckerScreen:
                     self.load_csv(str(path))
             except Exception as e:
                 self.status_label_file.text = ""
-                self.status_label_stats.text = f"Error opening file: {e}"
+                self.status_label_stats.text = "Could not open file."
+                self._show_error_panel(f"Error opening file: {e}")
 
     def _import_csv_android(self):
         try:
@@ -574,14 +576,29 @@ class IVCheckerScreen:
                 except Exception as e:
                     logger.exception("Android CSV import callback error")
                     self.status_label_file.text = ""
-                    self.status_label_stats.text = f"Error importing: {e}"
+                    self.status_label_stats.text = "Could not import CSV."
+                    self._show_error_panel(f"Error importing: {e}")
 
             self.app._impl.start_activity(intent, on_complete=on_complete)
 
         except Exception as e:
             logger.exception("Android CSV import error")
             self.status_label_file.text = ""
-            self.status_label_stats.text = f"Error importing: {e}"
+            self.status_label_stats.text = "Could not import CSV."
+            self._show_error_panel(f"Error importing: {e}")
+
+    def _show_error_panel(self, message):
+        """Render an arbitrary-length error in the results area.
+
+        Exception text is unbounded and toga.Label never wraps on iOS, so the
+        detail goes through paragraph_text (a wrapping widget); the status
+        line keeps only a short static summary.
+        """
+        for child in list(self.results_box.children):
+            self.results_box.remove(child)
+        self._show_back_btn(False)
+        self.results_box.add(paragraph_text(
+            message, font_size=14, color=COLOR_YELLOW, margin_bottom=8))
 
     def _run_check(self):
         # This replaces the Clear-CSV warning text, so an armed two-tap
@@ -615,11 +632,11 @@ class IVCheckerScreen:
             logger.exception("check_thresholds failed")
             self.status_label_file.text = ""
             self._show_clear_btn(False)
-            self.status_label_stats.text = f"Error reading CSV: {e}"
+            self.status_label_stats.text = "Could not read CSV."
             # Don't leave the previous check's hits on screen next to an
             # error claiming the read failed.
             self.results = {}
-            self._display_species_list()
+            self._show_error_panel(f"Error reading CSV: {e}")
 
     # ------------------------------------------------------------------
     # Species list view
@@ -886,8 +903,11 @@ class IVCheckerScreen:
                     style=Pack(font_size=13, font_weight="bold",
                                margin_bottom=2, color=COLOR_YELLOW)
                 ))
+                # Kept under the ~40-char iPhone SE budget (Labels don't wrap
+                # and the checker can't see f-strings): worst case "Top 100
+                # qualifying IV spreads:" is 30 chars.
                 self.hits_box.add(toga.Label(
-                    f"Here are the top {len(qualifying)} IV combinations that do:",
+                    f"Top {len(qualifying)} qualifying IV spreads:",
                     style=Pack(font_size=13, font_weight="bold",
                                margin_bottom=8, color=COLOR_YELLOW)
                 ))
