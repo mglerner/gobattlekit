@@ -22,14 +22,16 @@ _spec.loader.exec_module(_checker)
 
 
 def test_no_label_clips_on_narrow_phone():
-    screens = sorted((_ROOT / "src/gobattlekit/screens").glob("*.py"))
-    assert screens, "no screen modules found to check"
+    sources = sorted((_ROOT / "src/gobattlekit").rglob("*.py"))
+    assert sources, "no source modules found to check"
 
     offenders = []
-    for path in screens:
-        for lineno, context, width, snippet in _checker.check_file(path):
+    for path in sources:
+        found, _pragmas = _checker.check_file(path)
+        for lineno, context, width, snippet in found:
+            where = "clips" if width is not None else "is unbounded"
             offenders.append(
-                f"{path.name}:{lineno}: {context} {width} chars: {snippet!r}"
+                f"{path.name}:{lineno}: {context} {where} ({width}): {snippet!r}"
             )
 
     assert not offenders, (
