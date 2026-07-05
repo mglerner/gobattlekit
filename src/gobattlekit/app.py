@@ -307,6 +307,10 @@ class GoBattleKit(toga.App):
             from .data.fetcher import SAVED_CSV
             if not self.iv_checker_screen.csv_path and SAVED_CSV.exists():
                 self.iv_checker_screen.load_csv(str(SAVED_CSV))
+            elif self.iv_checker_screen.csv_path:
+                # Re-run check in case a manual entry was added elsewhere
+                # (both checkers merge the shared user_generated.csv).
+                self.iv_checker_screen._run_check()
         else:
             self._show_with_intro(
                 "iv_checker",
