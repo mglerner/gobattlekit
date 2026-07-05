@@ -519,6 +519,12 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=51,
 
         for final_species in candidates:
             if final_species not in pokemon_index:
+                # A threshold species absent from the gamemaster is skipped
+                # silently no more: an upstream pvpoke speciesName rename
+                # would otherwise zero out a species with no visible signal.
+                logger.warning(
+                    "Threshold species %r not found in gamemaster; skipping",
+                    final_species)
                 continue
             if league_label not in thresholds[final_species]:
                 continue

@@ -641,6 +641,25 @@ class TestCheckThresholds:
         results = check_thresholds(path, thresholds, league='great', max_level=40)
         assert 'FakeMonster' not in results
 
+    def test_species_not_in_gamemaster_logs_warning(self, tmp_path, caplog):
+        """A threshold species missing from the gamemaster must be logged by
+        name, not silently skipped — an upstream pvpoke speciesName rename
+        would otherwise zero out a species with no visible signal."""
+        path = self._write_csv(tmp_path, 'FakeMonster,,1400,8,15,15,20,0,0\n')
+        thresholds = {
+            'FakeMonster': {
+                'Great': {
+                    'Any': {'attack': 0, 'defense': 0, 'stamina': 0},
+                },
+            },
+        }
+        with caplog.at_level('WARNING', logger='gobattlekit.data.iv_checker'):
+            results = check_thresholds(path, thresholds, league='great',
+                                       max_level=40)
+        assert 'FakeMonster' not in results
+        assert any('FakeMonster' in r.message and r.levelname == 'WARNING'
+                   for r in caplog.records)
+
     def test_wrong_league_no_match(self, tmp_path):
         path = self._write_csv(tmp_path, 'Azumarill,,1400,8,15,15,20,0,0\n')
         thresholds = {
