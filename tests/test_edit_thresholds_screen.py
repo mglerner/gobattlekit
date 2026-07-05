@@ -191,3 +191,69 @@ class TestFloorValidation:
         screen._save_threshold(None)
         data = load_user_thresholds()
         assert data['Azumarill']['Great']['Bulky']['defense'] == 143.0
+
+
+class TestSilentOverwrite:
+    """Add/duplicate/rename must not silently clobber a different existing
+    target with the same (species, league, name); editing in place is
+    exempt. First collision arms a confirm, a second Save replaces."""
+
+    def test_add_same_name_requires_confirm(self, screen):
+        add_threshold('Azumarill', 'Great', 'Default', 92.0, 0, 0)
+        screen._show_add_form()
+        screen._editing_original = None
+        screen._selected_species = 'Azumarill'
+        screen._selected_league = 'Great'
+        screen._form_name = 'Default'
+        screen._form_def = '135'
+
+        # First save: warned, original untouched.
+        screen._save_threshold(None)
+        data = load_user_thresholds()
+        assert data['Azumarill']['Great']['Default']['attack'] == 92.0
+        assert screen.form_error.text
+
+        # Second save: overwrite confirmed.
+        screen._save_threshold(None)
+        data = load_user_thresholds()
+        entry = data['Azumarill']['Great']['Default']
+        assert entry.get('attack', 0) == 0
+        assert entry['defense'] == 135.0
+
+    def test_edit_in_place_no_confirm(self, screen):
+        add_threshold('Azumarill', 'Great', 'Bulky', 0, 143.0, 138)
+        screen._edit_threshold('Azumarill', 'Great', 'Bulky',
+                               {'attack': 0, 'defense': 143.0, 'stamina': 138})
+        screen._form_def = '150'
+        screen._save_threshold(None)
+        data = load_user_thresholds()
+        assert data['Azumarill']['Great']['Bulky']['defense'] == 150.0
+
+    def test_rename_to_existing_requires_confirm(self, screen):
+        add_threshold('Azumarill', 'Great', 'A', 0, 143.0, 138)
+        add_threshold('Azumarill', 'Great', 'B', 0, 100.0, 120)
+        screen._edit_threshold('Azumarill', 'Great', 'A',
+                               {'attack': 0, 'defense': 143.0, 'stamina': 138})
+        screen._form_name = 'B'
+
+        # First save: warned; both entries intact.
+        screen._save_threshold(None)
+        data = load_user_thresholds()
+        assert 'A' in data['Azumarill']['Great']
+        assert data['Azumarill']['Great']['B']['defense'] == 100.0
+        assert screen.form_error.text
+
+        # Second save: replace confirmed.
+        screen._save_threshold(None)
+        data = load_user_thresholds()
+        assert 'A' not in data['Azumarill']['Great']
+        assert data['Azumarill']['Great']['B']['defense'] == 143.0
+
+    def test_add_new_unique_name_saves_immediately(self, screen):
+        screen._show_add_form()
+        screen._selected_species = 'Azumarill'
+        screen._selected_league = 'Great'
+        screen._form_name = 'Fresh'
+        screen._form_def = '120'
+        screen._save_threshold(None)
+        assert 'Fresh' in load_user_thresholds()['Azumarill']['Great']

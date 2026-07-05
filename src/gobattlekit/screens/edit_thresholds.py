@@ -56,6 +56,7 @@ class EditThresholdsScreen:
         self._editing_original = None
         self._clear_all_pending = False
         self._clear_all_btn = None
+        self._save_overwrite_pending = False
 
     def _reset_clear_all_state(self):
         """Reset the clear-all confirmation state (flag AND button label —
@@ -157,6 +158,7 @@ class EditThresholdsScreen:
 
         self._set_outer_buttons_enabled(True)
         self._reset_clear_all_state()
+        self._save_overwrite_pending = False
 
         self._selected_species = None
         self._selected_league = "Great"
@@ -303,6 +305,9 @@ class EditThresholdsScreen:
             self.content_box.remove(child)
 
         self._set_outer_buttons_enabled(False)
+        # A rebuilt form (fresh add, or the user changed a field) disarms any
+        # pending overwrite confirmation.
+        self._save_overwrite_pending = False
 
         self.content_box.add(toga.Button(
             "Save Target",
@@ -412,6 +417,9 @@ class EditThresholdsScreen:
         def handler(widget):
             self._selected_league = league
             self.league_value_label.text = f"Selected: {self._selected_league}"
+            # Changing the league changes the collision key; disarm so a
+            # pending confirm can't overwrite a different league's target.
+            self._save_overwrite_pending = False
         return handler
 
     # ------------------------------------------------------------------
@@ -582,6 +590,29 @@ class EditThresholdsScreen:
         desc = (self._form_desc or '').strip()
 
         league = self._selected_league
+        league_label = league.capitalize()
+
+        # Don't silently clobber a DIFFERENT existing target that already
+        # owns this (species, league, name) — a duplicate/add prefills the
+        # label 'Default', so a collision is one unnoticed tap away. Editing
+        # a target in place (same key) is exempt. First collision arms a
+        # confirm; a second Save replaces (matches Clear All's idiom).
+        orig_key = None
+        if self._editing_original:
+            o_sp, o_lg, o_nm = self._editing_original
+            orig_key = (o_sp, o_lg.capitalize(), o_nm)
+        new_key = (self._selected_species, league_label, name)
+        existing = load_user_thresholds()
+        collides = (
+            new_key != orig_key
+            and name in existing.get(self._selected_species, {})
+                                .get(league_label, {})
+        )
+        if collides and not self._save_overwrite_pending:
+            self._save_overwrite_pending = True
+            self.form_error.text = "Name exists. Tap Save again to replace."
+            return
+        self._save_overwrite_pending = False
 
         if self._editing_original:
             orig_species, orig_league, orig_name = self._editing_original
