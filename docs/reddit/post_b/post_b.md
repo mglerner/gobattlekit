@@ -80,3 +80,4 @@ I built the guts of all of this myself as a fun hobby project over several years
 - TestFlight: https://testflight.apple.com/join/CpCtGsES
 - App Store: I'll link it in the comments once it's live. Or edit it here if that's a thing.
 - Site the spreads come from: https://mglerner.com/pogo-dives
+- My Reddit post about that site: https://www.reddit.com/r/TheSilphArena/comments/1ugr9qs/i_made_a_website_that_shows_how_all_4096_stack_up/

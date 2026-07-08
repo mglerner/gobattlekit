@@ -7,8 +7,9 @@ replaced with plain insertion cues. The annotated source of truth is still
 
 ## Before you post (60-second checklist)
 
-- GATE: only post once the TestFlight link reads 1.0.0 AND Post A is live in
-  the r/TheSilphArena mod queue. (Owner's call.)
+- GATE: both conditions now MET (2026-07-08) -- TestFlight reads 1.0.0, and
+  Post A is live (r/TheSilphArena, the 4096-stack-up writeup). Clear to post;
+  final go/no-go is still the owner's call.
 - Markdown caveat: the Reddit iOS APP composer pastes links as literal
   `[text](url)`. For correct links, post via Safari -> "Request Desktop
   Website" -> markdown editor, OR finish a desktop-made Draft.
@@ -94,3 +95,4 @@ I built the guts of all of this myself as a fun hobby project over several years
 - TestFlight: https://testflight.apple.com/join/CpCtGsES
 - App Store: I'll link it in the comments once it's live. Or edit it here if that's a thing.
 - Site the spreads come from: https://mglerner.com/pogo-dives
+- My Reddit post about that site: https://www.reddit.com/r/TheSilphArena/comments/1ugr9qs/i_made_a_website_that_shows_how_all_4096_stack_up/
