@@ -47,6 +47,11 @@ uv run pytest -q
    for `_hashlib` and `_ssl` into the support package. These files are needed to
    pass Apple's privacy manifest review (ITMS-91061). They must be copied after
    every `briefcase create iOS` since the build directory is wiped each time.
+   It also flips `TARGETED_DEVICE_FAMILY` from the template default `"1,2"`
+   (iPhone + iPad) to `"1"` (iPhone-only) to match our App Store scope —
+   otherwise Connect demands iPad screenshots and lists the portrait-only UI
+   letterboxed on iPad. All three patches hard-fail if their expected input is
+   missing, so a template change can't silently regress the build.
 
 2. Open `build/gobattlekit/ios/xcode/GoBattleKit.xcodeproj` in Xcode
 3. Set the signing team to **Michael Lerner** (team `MF55GHNQC2`, the paid
