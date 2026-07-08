@@ -40,7 +40,7 @@ mention.
 
 - Post A is LIVE (2026-07-08):
   https://www.reddit.com/r/TheSilphArena/comments/1ugr9qs/i_made_a_website_that_shows_how_all_4096_stack_up/
-  - DONE: added to Post B's Links block (`post_b.md` + `post_b_PHONE.md`).
+  - DONE: added to Post B's Links block (`post_b.md`).
   - OPTIONAL (owner's voice, not AI-filled): add a one-line companion callout
     in the body near the `pogo-dives` mention if you want it more visible than
     the Links block.
