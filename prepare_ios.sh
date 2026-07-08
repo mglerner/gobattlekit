@@ -34,6 +34,27 @@ if [[ "${manifest_count}" -eq 0 ]]; then
 fi
 echo "Privacy manifests present: ${manifest_count}"
 
+# Restrict to iPhone-only. The Briefcase iOS template emits
+# TARGETED_DEVICE_FAMILY = "1,2" (iPhone + iPad); our App Store scope is
+# iPhone-only, and leaving iPad in makes App Store Connect demand iPad
+# screenshots and list the portrait-only UI letterboxed on iPad. Fail hard
+# if the expected value is missing so a template change can't silently ship
+# an iPad-supporting build.
+echo "Restricting to iPhone-only (TARGETED_DEVICE_FAMILY=1)..."
+pbxproj=build/gobattlekit/ios/xcode/GoBattleKit.xcodeproj/project.pbxproj
+if ! grep -q 'TARGETED_DEVICE_FAMILY = "1,2";' "${pbxproj}"; then
+    echo "ERROR: expected TARGETED_DEVICE_FAMILY = \"1,2\" not found in" >&2
+    echo "${pbxproj}; the template may have changed. Aborting so we do not" >&2
+    echo "silently ship an iPad-supporting build. Fix the sed below." >&2
+    exit 1
+fi
+sed -i '' 's/TARGETED_DEVICE_FAMILY = "1,2";/TARGETED_DEVICE_FAMILY = "1";/g' "${pbxproj}"
+if grep -q 'TARGETED_DEVICE_FAMILY = "1,2";' "${pbxproj}"; then
+    echo "ERROR: TARGETED_DEVICE_FAMILY is still \"1,2\" after patch. Aborting." >&2
+    exit 1
+fi
+echo "  iPhone-only set in ${pbxproj}"
+
 echo "Done! Next steps:"
 echo "  1. Open build/gobattlekit/ios/xcode/GoBattleKit.xcodeproj in Xcode"
 echo "  2. Set signing team to Michael Lerner (team MF55GHNQC2, the paid Apple Developer Program account)"
