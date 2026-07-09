@@ -14,7 +14,7 @@ formal_name = "GoBattleKit"
 # build number bumps independently of the marketing `version` above so a
 # second build of the same public version can be re-uploaded (App Store
 # requires a unique CFBundleVersion per upload). Increment it each upload.
-build = 1
+build = 2
 description = "Pokémon GO PvP IV checking and move-count training"
 long_description = """GoBattleKit helps Pokémon GO PvP players check whether their Pokémon hit the IV spreads that matter for ranked leagues. Import a PokeGenie CSV or enter a Pokémon by hand, and the app tells you which battle targets it meets. It also has quizzes for move counts and type matchups so you can practice the timing that decides close fights.
 """
