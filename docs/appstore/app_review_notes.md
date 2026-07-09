@@ -17,7 +17,8 @@ There are two ways to see IV results:
 
 2. CSV import. Real users export a CSV of their Pokémon from a separate app
    called PokeGenie and share it into GoBattleKit. I have attached a small
-   sample CSV (sample_pokegenie.csv). To test it, open the Files app, share the
+   sample as a .zip (App Store Connect does not accept .csv attachments); unzip
+   it to get sample_pokegenie.csv. To test it, open the Files app, share the
    CSV, and choose GoBattleKit. The app reads the file and lists which Pokémon
    meet which targets.
 
