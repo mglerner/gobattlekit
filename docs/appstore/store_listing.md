@@ -36,9 +36,33 @@ Your data stays on your device. The app downloads public game data and rankings 
 
 GoBattleKit is an unofficial fan project. It is not affiliated with, endorsed, sponsored, or approved by Niantic, Nintendo, The Pokémon Company, Game Freak, or PokeGenie. Pokémon and Pokémon GO are trademarks of their respective owners.
 
+## URLs (all verified live / HTTP 200 as of 2026-07-08)
+
+| Field              | Value                                         | Required |
+| ------------------ | --------------------------------------------- | -------- |
+| Support URL        | https://mglerner.com/gobattlekit/support.html | yes      |
+| Marketing URL      | https://mglerner.com/gobattlekit/             | no       |
+| Privacy Policy URL | https://mglerner.com/gobattlekit/privacy.html | yes      |
+
+Pages live in `../../website/` and deploy with `website/publish_website.sh`.
+
+## Which App Store Connect page each field lives on
+
+App Store Connect splits the fields across two pages, which is easy to trip on:
+
+- **App Information** (left sidebar > General): App Name, Subtitle, Privacy
+  Policy URL, and Category. Set Category to **Utilities** (NOT Games — the app
+  is a companion tool, and Games would surface a subcategory picker that does
+  not apply and risks a miscategorization rejection). Secondary category:
+  **Reference** (optional).
+- **Distribution > 1.0 Prepare for Submission** (the version page):
+  Promotional Text, Description, Keywords, Support URL, Marketing URL, Version,
+  Copyright, Screenshots, and the Build selector.
+
 ## Notes for the listing
 
-- Primary Category: Utilities (matches `LSApplicationCategoryType`)
-- A secondary category of Reference or Entertainment is reasonable if you want one
+- Primary Category: Utilities (matches `LSApplicationCategoryType` =
+  `public.app-category.utilities` in `pyproject.toml`)
+- Secondary category: Reference (optional; do NOT use Entertainment or Games)
 - Device family: iPhone only
 - Copyright field: 2026 Michael G. Lerner
