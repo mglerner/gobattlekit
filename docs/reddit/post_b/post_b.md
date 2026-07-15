@@ -84,7 +84,7 @@ Also, while I'm crediting people, someone on the HSH Discord helped a ton along 
 
 ## How to get it
 
-It's live on the App Store now (v1.0, iPhone-only, free, no ads, no accounts). The link is in my first comment below, or you can just search the App Store for "GoBattleKit". There's also a public TestFlight beta (also linked below) if you want new features before they hit the store.
+It's live on the App Store now (v1.0, iPhone-only, free, no ads, no accounts). The link is in my first comment below, or you can just search the App Store for "GoBattleKit".
 
 ## Quick note on AI
 
@@ -95,7 +95,6 @@ I built the guts of all of this myself as a fun hobby project over several years
 Links, as promised:
 
 - App Store: https://apps.apple.com/us/app/gobattlekit/id6760953142
-- TestFlight beta: https://testflight.apple.com/join/CpCtGsES
 - Source code (MIT licensed): https://github.com/mglerner/gobattlekit
 - PvPoke: https://pvpoke.com
 - PvPoke's fast move registration guide: https://pvpoke.com/articles/strategy/guide-to-fast-move-registration/
