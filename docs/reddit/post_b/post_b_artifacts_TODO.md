@@ -5,13 +5,12 @@ The draft is `docs/reddit/post_b/post_b.md`; screenshots go in
 
 ## TODO
 
-### A. App Store status -- RESOLVED: TestFlight only at launch
+### A. App Store status -- RESOLVED: LIVE (2026-07-15)
 
-The build is TestFlight-approved (beta review); the App Store 1.0.0 submission
-is NOT done yet (Michael does it ~2026-06-27, and approval can take a few days
-after submitting). So Post B launches with the TestFlight link + "App Store
-coming." Add the `apps.apple.com` link later (Reddit self-post edit + the Links
-block) once 1.0.0 goes "Ready for Sale."
+The app is approved and listed:
+https://apps.apple.com/us/app/gobattlekit/id6760953142 (shows v1.0).
+The post now leads with the App Store link (in the first comment) and keeps
+TestFlight as the "get betas early" option.
 
 ### B. Capture screenshots (name them exactly) -- DONE
 
@@ -48,14 +47,27 @@ mention.
   `docs/reddit/post_a/post_a.md` (not present in this repo) AND the live Post A
   thread (Reddit lets you edit self-post text).
 
-### E. Posting day
+### E. Posting day -- automod plan (2026-07-15)
 
-- Pick the sub(s): r/pokemongo and/or r/TheSilphArena (JRE double-posts both).
-  For the app on r/pokemongo, lead casual.
+Context: Post A (with links in the body) was held as "potential self
+promotion" for days; the 2026-07-08 mod mail asking for a good time to post
+got no reply. Plan: give automod nothing to match on.
+
+- The post body has ZERO URLs; every link is in a first comment (the
+  "FIRST COMMENT" block in post_b.md). Post the comment immediately after
+  the post goes up.
+- The body's fallback if the comment also gets filtered: "search the App
+  Store for GoBattleKit" (already in the How-to-get-it section).
+- Inline screenshots are Reddit-hosted uploads, not external links -- safe.
+- Bare u/ mentions are fine; do not turn them into reddit.com URLs in the
+  Reddit paste.
 - SET A FLAIR (silent fail without it). Do NOT toggle "Brand affiliate."
 - Inline images via the Markdown-mode round-trip (brief lesson 4).
-- Post midday; stick around for early comments. Expect a possible
-  "awaiting moderator approval" hold -- normal.
+- Post midday; stick around for early comments. If it still lands in the mod
+  queue, it should at least be visible-to-you: check it in a logged-out /
+  incognito window to confirm it's actually public.
+- Pick the sub(s): r/pokemongo and/or r/TheSilphArena (JRE double-posts both).
+  For the app on r/pokemongo, lead casual.
 
 ### F. After it's posted -- GitHub finalization
 
@@ -64,6 +76,7 @@ commit. Keep the Reddit-paste form for any other sub.
 
 ## Known / resolved facts
 
+- App Store (live 2026-07-15): https://apps.apple.com/us/app/gobattlekit/id6760953142
 - TestFlight: https://testflight.apple.com/join/CpCtGsES
 - Three quizzes: move counts, move timing, type effectiveness.
 - Efficient-IV badges confirmed (crown = global Pareto, trophy = best you own),
