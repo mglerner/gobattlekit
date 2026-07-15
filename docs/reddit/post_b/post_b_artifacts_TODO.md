@@ -53,6 +53,14 @@ Context: Post A (with links in the body) was held as "potential self
 promotion" for days; the 2026-07-08 mod mail asking for a good time to post
 got no reply. Plan: give automod nothing to match on.
 
+The sub's written rules (checked 2026-07-15) support the post. Rule 5
+("Self-promotion is not allowed") enumerates its scope: "Promoting
+tournaments, Discord servers, and subreddits, or posting of your friend-code
+is not allowed." A free open-source tool is none of those, and the mods
+approving Post A confirms tools are acceptable. The post also satisfies
+rule 3 (on topic: PvP) and contains no Discord invites, friend codes, or
+tournament promotion -- the HSH mentions are credits only, no links.
+
 - The post body has ZERO URLs; every link is in a first comment (the
   "FIRST COMMENT" block in post_b.md). Post the comment immediately after
   the post goes up.
