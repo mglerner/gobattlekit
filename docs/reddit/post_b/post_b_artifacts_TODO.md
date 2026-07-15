@@ -9,8 +9,8 @@ The draft is `docs/reddit/post_b/post_b.md`; screenshots go in
 
 The app is approved and listed:
 https://apps.apple.com/us/app/gobattlekit/id6760953142 (shows v1.0).
-The post now leads with the App Store link (in the first comment) and keeps
-TestFlight as the "get betas early" option.
+The post links only the App Store (in the first comment); the TestFlight
+link is deliberately NOT in the post (Michael's call, 2026-07-15).
 
 ### B. Capture screenshots (name them exactly) -- DONE
 
@@ -85,7 +85,7 @@ commit. Keep the Reddit-paste form for any other sub.
 ## Known / resolved facts
 
 - App Store (live 2026-07-15): https://apps.apple.com/us/app/gobattlekit/id6760953142
-- TestFlight: https://testflight.apple.com/join/CpCtGsES
+- TestFlight (NOT in the post): https://testflight.apple.com/join/CpCtGsES
 - Three quizzes: move counts, move timing, type effectiveness.
 - Efficient-IV badges confirmed (crown = global Pareto, trophy = best you own),
   credited in Help + About. orgodemir post:
