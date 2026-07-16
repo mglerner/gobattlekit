@@ -35,3 +35,7 @@ tools/threshold_export/out/
 # Point-in-time AI dev-review docs: kept local, not published (internal
 # code-review writeups; superseded by current state).
 /docs/reviews/
+
+# ASC reviewer attachment: sample_pokegenie.csv zipped (App Store Connect
+# rejects .csv attachments). Regenerate: zip sample_pokegenie.zip sample_pokegenie.csv
+/docs/appstore/sample_pokegenie.zip
