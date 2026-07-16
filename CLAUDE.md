@@ -8,10 +8,12 @@ A Pokémon GO PvP companion app built with Python/BeeWare (Briefcase + Toga).
   2027-03-21). NOTE: an old "Apple Development" cert for a stale team
   `6TV57R6ZCC` lingers in the keychain — it is NOT the team, ignore it.
 - Repo: https://github.com/mglerner/gobattlekit
-- Current version: 1.0.0 (first public App Store target)
-- Release status: EmpoleonDynamite (PvPoke author) gave explicit permission
-  (2026-06-23) to release the app + the gopvpsim Python port publicly.
-  Going to the App Store as 1.0.0, iPhone-only.
+- Current version: 1.0.0 — LIVE on the App Store (approved 2026-07-15,
+  iPhone-only): https://apps.apple.com/us/app/gobattlekit/id6760953142
+- Release status: released. EmpoleonDynamite (PvPoke author) gave explicit
+  permission (2026-06-23) to release the app + the gopvpsim Python port
+  publicly. Announced on r/TheSilphArena 2026-07-15
+  (docs/reddit/post_b/post_b.md has the archive + live thread URL).
 - venv: ~/coding/MGLPoGo/gobattlekit/.venv (activate with `source
   .venv/bin/activate`; direnv `.envrc` also auto-activates)
 - Project: ~/coding/MGLPoGo/gobattlekit
@@ -111,16 +113,15 @@ tools/check_label_wrapping.py` to find offenders; it is enforced by
 alternative: `docs/responsive_layout_plan.md` ("Horizontal clipping").
 
 ## Current priorities
-1. TestFlight 1.0.0 build + device verification — run the full
-   `docs/device_test_checklist.md` on a real device (covers the never-verified
-   2026-06-11/12 fixes, the 0.0.29-1.0.0 threshold-pipeline UI, and the new
-   Home/About scroll changes)
-2. App Store submission — collateral is drafted in `docs/appstore/`; human
-   steps remaining: host the privacy policy + marketing page, capture
-   6.9"/6.5" screenshots, fill App Store Connect from the drafts, archive +
-   upload + submit (see Part C of the approved plan / docs/appstore/README.md)
+1. Post-launch: 1.0.0 is live and announced (Reddit post 2026-07-15).
+   Watch the thread + App Store reviews for bug reports; fixes ship as 1.0.x.
+2. Device verification — the full `docs/device_test_checklist.md` was never
+   run on a real device (33 items, 0 checked). It covers the never-verified
+   2026-06-11/12 fixes, the 0.0.29-1.0.0 threshold-pipeline UI, and the
+   Home/About scroll changes. Now post-release, so failures become 1.0.x
+   fixes rather than launch blockers.
 3. Google Play beta testing (blocked on SI5 Android emulator fix; independent
-   of the iOS App Store release)
+   of the iOS release)
 
 Review status: the 2026-06-23 pre-release review
 (`docs/reviews/2026-06-23_prerelease_review.md`) is done; all its code-fixable
