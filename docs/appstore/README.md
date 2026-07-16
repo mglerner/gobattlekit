@@ -43,6 +43,27 @@ How they were captured (repeatable):
 - The IV Checker shot is populated by dropping `sample_pokegenie.csv` into the
   app container at `Documents/gobattlekit_cache/pokegenie_export.csv`.
 
+## EU availability — DSA trader status (fixed 2026-07-16)
+
+Day one after the 1.0.0 launch, Reddit users reported "This app is not
+available in your country or region." Storefront checks confirmed the app was
+live in the US/UK/CA/AU but 404 in DE/FR/NL — i.e. missing from **all EU
+storefronts, and only EU storefronts**.
+
+Cause: the EU **Digital Services Act trader-status declaration** was never
+completed. Since Feb 2025 Apple silently excludes an app from the 27 EU
+storefronts until the developer declares trader or non-trader; App Store
+Connect lets you submit anyway, so the first release skipped it without
+warning.
+
+Fix (done 2026-07-16): declared **non-trader** in App Store Connect > Business
+> legal entity > trader status. Correct for this app: free, no monetization,
+hobby project. The EU listing carries a "developer is not a trader" label and
+no personal contact info is published. If the app ever monetizes (paid, IAP,
+ads), the status must change to **trader**, which requires an Apple-verified
+address/phone/email displayed publicly on the EU App Store. Propagation to EU
+storefronts takes a few hours to a day; no resubmission or review needed.
+
 ## Submission walkthrough
 
 The step-by-step build/upload/submit sequence is Part C of the approved plan
