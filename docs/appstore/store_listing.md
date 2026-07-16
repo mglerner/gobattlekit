@@ -44,6 +44,9 @@ GoBattleKit is an unofficial fan project. It is not affiliated with, endorsed, s
 | Marketing URL      | https://mglerner.com/gobattlekit/             | no       |
 | Privacy Policy URL | https://mglerner.com/gobattlekit/privacy.html | yes      |
 
+The live listing (approved 2026-07-15, verified via the iTunes lookup API):
+https://apps.apple.com/us/app/gobattlekit/id6760953142 (app ID 6760953142)
+
 Pages live in `../../website/` and deploy with `website/publish_website.sh`.
 
 ## Which App Store Connect page each field lives on
