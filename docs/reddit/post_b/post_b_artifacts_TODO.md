@@ -43,11 +43,22 @@ mention.
   - OPTIONAL (owner's voice, not AI-filled): add a one-line companion callout
     in the body near the `pogo-dives` mention if you want it more visible than
     the Links block.
-- After B posts, add B's URL to Post A's Links block: the gopvpsim archive
-  `docs/reddit/post_a/post_a.md` (not present in this repo) AND the live Post A
-  thread (Reddit lets you edit self-post text).
+- After B posts, add B's URL to Post A's Links block:
+  - DONE (2026-07-16): the gopvpsim archive `docs/reddit/post_a/post_a.md`
+    (placeholder line swapped for the live URL).
+  - MICHAEL: edit the live Post A thread's Links block the same way (Reddit
+    lets you edit self-post text). Optional: the "post to come soon" teaser
+    in Post A's Pareto bullet can point at the post now too.
 
-### E. Posting day -- automod plan (2026-07-15)
+### E. Posting day -- DONE (posted 2026-07-15, live)
+
+OUTCOME: posted to r/TheSilphArena 2026-07-15; automod held it as potential
+self-promotion immediately (as predicted); Michael replied in the existing
+modmail thread and it was approved after a short hold -- no momentum-killing
+multi-day queue this time. Live URL:
+https://www.reddit.com/r/TheSilphArena/comments/1uxhljl/i_made_a_free_opensource_ios_app_for_pvp_it/
+
+Original plan, kept for reference:
 
 Context: Post A (with links in the body) was held as "potential self
 promotion" for days; the 2026-07-08 mod mail asking for a good time to post
@@ -77,13 +88,15 @@ tournament promotion -- the HSH mentions are credits only, no links.
 - Pick the sub(s): r/pokemongo and/or r/TheSilphArena (JRE double-posts both).
   For the app on r/pokemongo, lead casual.
 
-### F. After it's posted -- GitHub finalization
+### F. After it's posted -- GitHub finalization -- DONE (2026-07-16)
 
-Link usernames to profiles, swap `**[IMAGE]**` markers to `![](images/...)`,
-commit. Keep the Reddit-paste form for any other sub.
+Usernames linked to profiles, `**[IMAGE]**` markers swapped to
+`![](images/...)`, live URL recorded at the top of `post_b.md`. The
+Reddit-paste form (for any other sub) is preserved at commit ff63bd7.
 
 ## Known / resolved facts
 
+- Post B live thread: https://www.reddit.com/r/TheSilphArena/comments/1uxhljl/i_made_a_free_opensource_ios_app_for_pvp_it/
 - App Store (live 2026-07-15): https://apps.apple.com/us/app/gobattlekit/id6760953142
 - TestFlight (NOT in the post): https://testflight.apple.com/join/CpCtGsES
 - Three quizzes: move counts, move timing, type effectiveness.
