@@ -5,7 +5,8 @@ import re
 from gobattlekit.data.iv_checker import get_pokemon_index, ivs_to_stats
 from gobattlekit.data.search_strings import (
     BAR_BUCKET,
-    _bucket_term,
+    _run_term,
+    _runs,
     _pvpivs_mon,
     build_pvpivs_url,
     build_search_string,
@@ -24,51 +25,91 @@ def test_bar_bucket_boundaries():
     assert len(BAR_BUCKET) == 16
 
 
-def test_bucket_term_run_collapse():
-    assert _bucket_term({0, 1, 2}, 'attack') == '0-2attack'
-    assert _bucket_term({0, 3, 4}, 'hp') == '0hp,3-4hp'
-    assert _bucket_term({2}, 'defense') == '2defense'
+def test_runs_and_run_term():
+    assert _runs({0, 1, 2}) == [(0, 2)]
+    assert _runs({0, 3, 4}) == [(0, 0), (3, 4)]
+    assert _runs({2}) == [(2, 2)]
+    assert _run_term((0, 2), 'attack') == '0-2attack'
+    assert _run_term((4, 4), 'hp') == '4hp'
+
+
+def _pogo_eval(string, a, d, s):
+    """Evaluate a search string against one mon's (atk, def, sta) IVs under
+    Pokemon GO's REAL grammar: '&' (AND) binds tighter than ',' (OR), no
+    parentheses -> the string is an OR of comma-groups, each an AND of
+    &-terms. Non-bar terms (species '+name'/dex, 'shadow') are treated as
+    matching (we test a single same-species mon). Returns (matched, groups)
+    where groups is the list of top-level OR-group term-lists.
+    """
+    buckets = {'attack': BAR_BUCKET[a], 'defense': BAR_BUCKET[d],
+               'hp': BAR_BUCKET[s]}
+    groups = [g.split('&') for g in string.split(',')]
+
+    def term_ok(term):
+        m = re.fullmatch(r'(\d)(?:-(\d))?(attack|defense|hp)', term)
+        if not m:
+            return True  # +name / dex / shadow: same species assumed
+        lo = int(m.group(1))
+        hi = int(m.group(2) or lo)
+        return lo <= buckets[m.group(3)] <= hi
+
+    matched = any(all(term_ok(t) for t in g) for g in groups)
+    return matched, groups
 
 
 class TestBuildSearchString:
-    def test_azumarill_great_recall_and_format(self):
+    def test_azumarill_recall_and_no_species_leak(self):
         # Azumarill: in MINI_GAMEMASTER and has bundled Great targets.
         targets = DEFAULT_THRESHOLDS['Azumarill']['Great']
         result = build_search_string('Azumarill', 'great', targets)
         assert result is not None
         assert result['string'].startswith('+azumarill&')
 
-        # Independent recall check on the EMITTED string, not the bucket
-        # sets: parse each axis term back into allowed-IV sets and verify
-        # every qualifying combo passes. Guards the formatting, which is
-        # what actually ships.
-        allowed = {}
-        for term in result['string'].split('&')[1:]:
-            stat = re.search(r'(attack|defense|hp)', term).group(1)
-            ivs = set()
-            for piece in term.split(','):
-                lo_hi = re.match(r'(\d)(?:-(\d))?', piece)
-                lo = int(lo_hi.group(1))
-                hi = int(lo_hi.group(2) or lo)
-                for bucket in range(lo, hi + 1):
-                    ivs |= {iv for iv in range(16) if BAR_BUCKET[iv] == bucket}
-            allowed[stat] = ivs
+        _, groups = _pogo_eval(result['string'], 0, 0, 0)
+        # SPECIES-LEAK GUARD: under the real comma-lowest grammar, every
+        # top-level OR group MUST carry the species term, or the string
+        # leaks unrelated species (the 2026-07-17 blocker). This fails on
+        # the old '+name&A&B&C,D' rectangle form.
+        for g in groups:
+            assert '+azumarill' in g, result['string']
 
+        # Recall on the EMITTED string, parsed with the real grammar.
         quals = qualifying_set('Azumarill', 'great', targets)
         assert quals, "Azumarill Great targets should have qualifying IVs"
         assert result['qualifying_count'] == len(quals)
         for a, d, s in quals:
-            assert a in allowed['attack']
-            assert d in allowed['defense']
-            assert s in allowed['hp']
+            matched, _ = _pogo_eval(result['string'], a, d, s)
+            assert matched, (a, d, s)
 
-        # matched_count is exactly the rectangle the emitted string
-        # matches — pin it to the independently parsed axis sets so a
-        # _BUCKET_SIZES off-by-one cannot survive (review 2026-07-17).
-        assert result['matched_count'] == (
-            len(allowed['attack']) * len(allowed['defense'])
-            * len(allowed['hp']))
+        # matched_count is the union of the DNF clauses' rectangles = the
+        # full bucket rectangle. Recompute it independently from the axis
+        # sizes so a _BUCKET_SIZES off-by-one cannot survive.
+        sizes = {0: 1, 1: 5, 2: 5, 3: 4, 4: 1}
+        aset, dset, sset = result['buckets']
+        expected = (sum(sizes[b] for b in aset)
+                    * sum(sizes[b] for b in dset)
+                    * sum(sizes[b] for b in sset))
+        assert result['matched_count'] == expected
         assert result['matched_count'] >= result['qualifying_count']
+
+    def test_noncontiguous_axis_distributes_without_leak(self):
+        # Craft a non-contiguous HP axis (buckets 0 and 4, no 1-3) via an
+        # explicit-IV target — the exact shape that broke under the naive
+        # rectangle ('...&0hp,4hp' would parse as '(...&0hp) OR 4hp', the
+        # bare '4hp' matching every 15-HP mon in storage). Assert DNF
+        # distribution: a comma appears AND every OR-group is scoped.
+        targets = {'T': {'ivs': [[15, 15, 0], [15, 15, 15]]}}
+        result = build_search_string('Azumarill', 'great', targets)
+        assert result is not None
+        assert result['buckets'][2] == {0, 4}, "HP axis must be split"
+        assert ',' in result['string'], "should distribute a split axis"
+        _, groups = _pogo_eval(result['string'], 0, 0, 0)
+        for g in groups:
+            assert '+azumarill' in g, result['string']
+        # And the bare-'4hp' leak specifically: no OR-group is a lone stat
+        # term.
+        for g in groups:
+            assert any(t.startswith('+azumarill') for t in g)
 
     # Shadow attack floor only reachable WITH the x1.2 shadow bonus:
     # Azumarill's non-shadow Great-league attack tops out well below 95,
