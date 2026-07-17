@@ -145,6 +145,7 @@ class TestIvsOnlyTargetSummary:
         s.league = 'great'
         s.hits_box = toga.Box()
         s.source_box = toga.Box()
+        s.pogo_box = toga.Box()
         s._targets_without_hits = {'Ape Slayer'}
         s._target_options_raw = ['Ape Slayer']
         s._target_index = 0
@@ -171,6 +172,7 @@ class TestNarrowPhoneLabels:
         s.league = 'great'
         s.hits_box = toga.Box()
         s.source_box = toga.Box()
+        s.pogo_box = toga.Box()
         s._targets_without_hits = {'Bulk'}
         s._target_options_raw = ['Bulk']
         s._target_index = 0
@@ -181,6 +183,67 @@ class TestNarrowPhoneLabels:
                    if getattr(c, 'text', '').startswith('Top')]
         assert headers, "the qualifying-count header should render"
         assert all(len(h) <= 40 for h in headers), headers
+
+
+class TestPogoSearchBlock:
+    """_refresh_pogo_search: string, counts label, and copy wiring."""
+
+    def _screen_for(self, targets):
+        s = _screen()
+        s._get_thresholds = lambda: {'Azumarill': {'Great': targets}}
+        s.league = 'great'
+        s.hits_box = toga.Box()
+        s.source_box = toga.Box()
+        s.pogo_box = toga.Box()
+        s._targets_without_hits = set(targets)
+        s._target_options_raw = list(targets)
+        s._target_index = 0
+        return s
+
+    def test_string_and_counts_render(self, monkeypatch):
+        from gobattlekit.data.search_strings import build_search_string
+        s = self._screen_for({'Bulk': {'defense': 100}})
+
+        s._refresh_hits('Azumarill', [])
+
+        expected = build_search_string(
+            'Azumarill', 'great', {'Bulk': {'defense': 100}})
+        joined = ' '.join(_texts(s.pogo_box))
+        assert expected['string'] in joined
+        assert (f"Matches {expected['matched_count']}/4096 spreads; "
+                f"{expected['qualifying_count']} qualify.") in joined
+        assert 'Candidates only' in joined
+
+    def test_copy_button_copies_the_string(self, monkeypatch):
+        from gobattlekit.data.search_strings import build_search_string
+        copied = []
+        monkeypatch.setattr('gobattlekit.screens.iv_checker.copy_text',
+                            lambda app, text: copied.append(text) or True)
+        s = self._screen_for({'Bulk': {'defense': 100}})
+
+        s._refresh_hits('Azumarill', [])
+
+        buttons = [c for row in s.pogo_box.children
+                   for c in getattr(row, 'children', [])
+                   if getattr(c, 'text', '').startswith('📋')]
+        assert buttons, "copy button should render"
+        buttons[0].on_press(buttons[0])
+        expected = build_search_string(
+            'Azumarill', 'great', {'Bulk': {'defense': 100}})
+        assert copied == [expected['string']]
+        assert buttons[0].text == '✓ Copied'
+
+    def test_all_targets_union_renders(self):
+        # current=None (the 'All targets' cycler position) uses the union.
+        s = self._screen_for({'Bulk': {'defense': 100},
+                              'Atk': {'attack': 80}})
+        s._target_options_raw = [None]
+        s._targets_without_hits = set()
+
+        s._refresh_hits('Azumarill', [])
+
+        joined = ' '.join(_texts(s.pogo_box))
+        assert '+azumarill&' in joined
 
     def test_run_check_error_uses_wrapping_widget(self, monkeypatch):
         s = _screen()
