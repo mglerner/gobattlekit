@@ -83,12 +83,17 @@ def qualifying_set(species, league, targets, max_level=51):
     max_cp = LEAGUE_CAPS.get(league, 1500)
     # repr() keeps the signature hashable even for malformed hand-edited
     # user targets (ivs=5, onlytop=[10], ...) — those must be SKIPPED like
-    # check_thresholds does, not crash the results screen.
+    # check_thresholds does, not crash the results screen. Membership flags
+    # ('ivs' in t / 'onlytop' in t) are part of the key because the compute
+    # loop branches on presence: an absent key applies no filter, while a
+    # present ivs=[]/onlytop=0 filters everything out — different results
+    # that must not share a cache entry.
     sig = tuple(sorted(
         (name,
          repr(t.get('attack', 0)), repr(t.get('defense', 0)),
          repr(t.get('stamina', 0)),
-         repr(t.get('ivs', [])), repr(t.get('onlytop', 0)))
+         'ivs' in t, repr(t.get('ivs')),
+         'onlytop' in t, repr(t.get('onlytop')))
         for name, t in targets.items() if isinstance(t, dict)
     ))
     key = (species, max_level, max_cp, sig)
@@ -141,8 +146,8 @@ def qualifying_set(species, league, targets, max_level=51):
     return quals
 
 
-def _bucket_term(buckets, stat):
-    """'0-2attack' / '0attack,3-4attack' style term for a sorted bucket set."""
+def _runs(buckets):
+    """Contiguous (lo, hi) bucket runs of a sorted bucket set."""
     vals = sorted(buckets)
     runs = []
     start = prev = vals[0]
@@ -153,8 +158,13 @@ def _bucket_term(buckets, stat):
             runs.append((start, prev))
             start = prev = v
     runs.append((start, prev))
-    return ','.join(f'{a}{stat}' if a == b else f'{a}-{b}{stat}'
-                    for a, b in runs)
+    return runs
+
+
+def _run_term(run, stat):
+    """'0-2attack' / '4hp' for one contiguous bucket run."""
+    lo, hi = run
+    return f'{lo}{stat}' if lo == hi else f'{lo}-{hi}{stat}'
 
 
 def build_search_string(species, league, targets, max_level=51):
@@ -168,7 +178,18 @@ def build_search_string(species, league, targets, max_level=51):
       buckets          (atk_set, def_set, sta_set) bar-bucket sets, for tests
 
     Recall is 100% by construction: every qualifying combo's buckets are
-    included per axis. Precision = qualifying/matched; callers must show it.
+    included. Precision = qualifying/matched; callers must show it.
+
+    Pokemon GO's '&' (AND) binds tighter than ',' (OR) and there are no
+    parentheses, so 'A&B,C' means '(A AND B) OR C'. A stat axis whose
+    qualifying buckets are non-contiguous (e.g. HP buckets {1,2,4}) can't
+    be a single term without a comma, and a naive 'name&atk&def&1-2hp,4hp'
+    would parse as '(name & ... & 1-2hp) OR (4hp)' — the trailing group
+    drops the species term and matches EVERY 15-HP mon in storage. So we
+    emit the rectangle in disjunctive normal form: one fully-scoped
+    conjunction per (atk-run x def-run x hp-run), each repeating the
+    species/shadow term, joined by commas (cf. pogocleanup's
+    'shiny&3*,shiny&4*'). Every top-level OR group is species-scoped.
     """
     quals = qualifying_set(species, league, targets, max_level=max_level)
     if not quals:
@@ -190,18 +211,26 @@ def build_search_string(species, league, targets, max_level=51):
             return None
         prefix = str(dex)
 
-    parts = [prefix,
-             _bucket_term(aset, 'attack'),
-             _bucket_term(dset, 'defense'),
-             _bucket_term(sset, 'hp')]
-    if _is_shadow_species(species):
-        parts.append('shadow')
+    suffix = ['shadow'] if _is_shadow_species(species) else []
+    clauses = []
+    for a_run in _runs(aset):
+        for d_run in _runs(dset):
+            for s_run in _runs(sset):
+                clauses.append('&'.join([
+                    prefix,
+                    _run_term(a_run, 'attack'),
+                    _run_term(d_run, 'defense'),
+                    _run_term(s_run, 'hp'),
+                    *suffix,
+                ]))
 
     def _axis_size(bset):
         return sum(_BUCKET_SIZES[b] for b in bset)
 
     return {
-        'string': '&'.join(parts),
+        # DNF clauses partition the rectangle disjointly, so their OR is
+        # exactly the rectangle — matched_count is still its cell count.
+        'string': ','.join(clauses),
         'qualifying_count': len(quals),
         'matched_count': _axis_size(aset) * _axis_size(dset) * _axis_size(sset),
         'buckets': (aset, dset, sset),
