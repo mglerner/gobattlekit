@@ -2,7 +2,7 @@
 [tool.briefcase]
 project_name = "GoBattleKit"
 bundle = "com.mglerner"
-version = "1.0.0"
+version = "1.1.0"
 url = "https://mglerner.com/gobattlekit"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -13,8 +13,11 @@ author_email = "mglerner@protonmail.com"
 formal_name = "GoBattleKit"
 # build number bumps independently of the marketing `version` above so a
 # second build of the same public version can be re-uploaded (App Store
-# requires a unique CFBundleVersion per upload). Increment it each upload.
-build = 2
+# requires a unique CFBundleVersion per upload). Increment it each upload;
+# it may reset to 1 when `version` bumps (uniqueness is per marketing
+# version). Reset to 1 for the 1.1.0 search-string release (1.0.0 build 2
+# is live on the App Store).
+build = 1
 description = "Pokémon GO PvP IV checking and move-count training"
 long_description = """GoBattleKit helps Pokémon GO PvP players check whether their Pokémon hit the IV spreads that matter for ranked leagues. Import a PokeGenie CSV or enter a Pokémon by hand, and the app tells you which battle targets it meets. It also has quizzes for move counts and type matchups so you can practice the timing that decides close fights.
 """
