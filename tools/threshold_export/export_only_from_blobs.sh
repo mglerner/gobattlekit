@@ -6,8 +6,8 @@
 # form (the batch relied on a fresh non-shadow blob being newest; we don't
 # create one, so we must filter).
 set -u
-SIM=/Users/mglerner/coding/MGLPoGo/gopvpsim
-EXPORT_DIR=/Users/mglerner/coding/MGLPoGo/gobattlekit/tools/threshold_export
+SIM=/Users/mglerner/coding/gopvpsim
+EXPORT_DIR=/Users/mglerner/coding/gobattlekit/tools/threshold_export
 PY=$SIM/.venv/bin/python
 OUT=$SIM/userdata/threshold_batch/20260626/export
 mkdir -p "$OUT"

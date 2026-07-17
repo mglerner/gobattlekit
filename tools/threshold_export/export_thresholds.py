@@ -5,7 +5,7 @@ deep-dive replay blob.
 Run with the gopvpsim uv-managed venv interpreter (the gobattlekit venv has
 no numpy); the interpreter is `<sibling_path>/.venv/bin/python`:
 
-    /Users/mglerner/coding/MGLPoGo/gopvpsim/.venv/bin/python export_thresholds.py \
+    /Users/mglerner/coding/gopvpsim/.venv/bin/python export_thresholds.py \
         /path/to/<run>.replay.pkl.gz --out out/
 
 Emits three files into --out:
@@ -71,7 +71,7 @@ FORBIDDEN_TARGET_KEYS = {"onlytop"}
 # Current GL rankings (list order == rank, matched on speciesName). Used only
 # when --curation is given; overridable via --rankings.
 DEFAULT_RANKINGS = Path(
-    "/Users/mglerner/coding/MGLPoGo/pvpoke/src/data/rankings/all/overall/"
+    "/Users/mglerner/coding/pvpoke/src/data/rankings/all/overall/"
     "rankings-1500.json"
 )
 

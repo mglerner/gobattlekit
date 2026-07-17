@@ -39,7 +39,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 DEFAULT_RANKINGS = Path(
-    "/Users/mglerner/coding/MGLPoGo/pvpoke/src/data/rankings/all/overall/"
+    "/Users/mglerner/coding/pvpoke/src/data/rankings/all/overall/"
     "rankings-1500.json"
 )
 DEFAULT_CURATION = HERE / "curation.toml"
