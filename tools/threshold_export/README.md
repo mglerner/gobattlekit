@@ -21,8 +21,8 @@ example paths below use the current location.
 ```sh
 cd tools/threshold_export
 PYENV_VERSION=3.13.12 pyenv exec python export_thresholds.py \
-    /Users/mglerner/coding/MGLPoGo/gopvpsim/userdata/replay/20260612_142213_Tinkaton_great.replay.pkl.gz \
-    --thresholds /Users/mglerner/coding/MGLPoGo/gopvpsim/thresholds/tinkaton.toml \
+    /Users/mglerner/coding/gopvpsim/userdata/replay/20260612_142213_Tinkaton_great.replay.pkl.gz \
+    --thresholds /Users/mglerner/coding/gopvpsim/thresholds/tinkaton.toml \
     --out out
 ```
 

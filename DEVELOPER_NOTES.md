@@ -5,7 +5,7 @@
 `briefcase` is installed once as a uv-managed tool (pipx-style) — no venv to activate:
 ```zsh
 uv tool install briefcase     # one-time; on PATH globally, uv-managed Python
-cd ~/coding/MGLPoGo/gobattlekit
+cd ~/coding/gobattlekit
 ```
 
 ## Quick Testing (run the app)
