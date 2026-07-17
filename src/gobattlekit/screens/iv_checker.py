@@ -18,6 +18,9 @@ from ..data.thresholds import (
     drop_generated_targets, has_generated_targets,
 )
 from ..data.preferences import get_pref, set_pref
+from ..data.search_strings import build_search_string, build_pvpivs_url
+from ..clipboard import copy_text
+from ..links import open_url
 from ..data.fetcher import (
     CACHE_DIR, SAVED_CSV, USER_GENERATED_CSV, get_csv_path, NoDataError,
 )
@@ -856,6 +859,12 @@ class IVCheckerScreen:
                                               margin_bottom=8))
         self.results_box.add(self.source_box)
 
+        # In-game search string + pvpivs.com link for the current target —
+        # also rebuilt by _refresh_hits as the cycler moves.
+        self.pogo_box = toga.Box(style=Pack(direction=COLUMN,
+                                            margin_bottom=8))
+        self.results_box.add(self.pogo_box)
+
         self.hits_box = toga.Box(style=Pack(direction=COLUMN))
         self.results_box.add(self.hits_box)
         self._refresh_hits(species, hits)
@@ -870,6 +879,7 @@ class IVCheckerScreen:
         league_targets = thresholds.get(species, {}).get(league_label, {})
 
         self._refresh_source_label(species, current, thresholds)
+        self._refresh_pogo_search(species, current, league_targets)
 
         # Empty target — show qualifying IV combinations
         if current is not None and current in self._targets_without_hits:
@@ -990,6 +1000,87 @@ class IVCheckerScreen:
                 style=Pack(font_size=12, text_align="center",
                            color=COLOR_TEXT_LIGHT)
             ))
+
+    def _refresh_pogo_search(self, species, current, league_targets):
+        """In-game search block under the provenance line: a bars-only
+        candidate string (copy button + selectable text) and, for a single
+        target, a pre-filled pvpivs.com IV-table link.
+
+        The string is a CANDIDATE filter: the game's appraisal-bar search
+        only resolves IVs into 5 buckets per stat, so it always matches
+        more than qualifies. The matched/qualify counts are shown next to
+        it — never present it as exact.
+        """
+        for child in list(self.pogo_box.children):
+            self.pogo_box.remove(child)
+
+        if current is None:
+            targets = league_targets
+        else:
+            targets = {current: league_targets.get(current, {})}
+
+        result = build_search_string(species, self.league, targets)
+        if result is None:
+            return
+
+        btn_row = toga.Box(style=Pack(direction=ROW, margin_bottom=2))
+        copy_btn = toga.Button(
+            "📋 Copy PoGo search",
+            style=btn_secondary(height=40, font_size=13),
+        )
+        copy_btn.style.flex = 1
+
+        def on_copy(widget):
+            if copy_text(self.app, result['string']):
+                widget.text = "✓ Copied"
+            else:
+                widget.text = "Copy failed — select below"
+
+        copy_btn.on_press = on_copy
+        btn_row.add(copy_btn)
+
+        shadow_hint = False
+        if current is not None:
+            link = build_pvpivs_url(
+                species, self.league, league_targets.get(current, {}))
+            if link:
+                pvpivs_btn = toga.Button(
+                    "🌐 pvpivs.com",
+                    on_press=lambda w: open_url(self.app, link['url']),
+                    style=btn_secondary(height=40, font_size=13),
+                )
+                pvpivs_btn.style.flex = 1
+                pvpivs_btn.style.margin_left = 6
+                btn_row.add(pvpivs_btn)
+                shadow_hint = link['shadow']
+        self.pogo_box.add(btn_row)
+        if shadow_hint:
+            # Their stat filter runs pre-shadow; floors are un-scaled in
+            # the URL, but the displayed stats only match ours once the
+            # Shadow box is ticked there. Added after btn_row so the hint
+            # sits under the pvpivs button it annotates.
+            self.pogo_box.add(toga.Label(
+                "(tick Shadow on pvpivs.com)",  # label-fits: 27 chars
+                style=Pack(font_size=11, text_align="center",
+                           color=COLOR_YELLOW)
+            ))
+
+        # Selectable fallback for the copy button + visible string.
+        self.pogo_box.add(paragraph_text(result['string'], font_size=13))
+
+        matched = result['matched_count']
+        qualifying = result['qualifying_count']
+        self.pogo_box.add(toga.Label(
+            # label-fits: counts are <= 4 digits each, max ~37 chars
+            f"Matches {matched}/4096 spreads; {qualifying} qualify.",
+            style=Pack(font_size=11, text_align="center",
+                       color=COLOR_TEXT_LIGHT)
+        ))
+        self.pogo_box.add(toga.Label(
+            "Candidates only — confirm hits here.",  # label-fits: 36 chars
+            style=Pack(font_size=11, text_align="center", margin_bottom=4,
+                       color=COLOR_TEXT_LIGHT)
+        ))
 
     # ------------------------------------------------------------------
     # Show all results view

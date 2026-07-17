@@ -1,6 +1,6 @@
 """Parity check: every threshold species must resolve against a REAL gamemaster.
 
-The autouse mock_load_gamemaster fixture (conftest.py) serves a 6-mon
+The autouse mock_load_gamemaster fixture (conftest.py) serves a 7-mon
 MINI_GAMEMASTER to the whole suite, so no other test ever verifies that the
 species keys in default_thresholds.toml and SENTIMENTAL_DEFAULT_THRESHOLDS
 still match a real pvpoke gamemaster's speciesName values. The matching

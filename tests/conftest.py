@@ -65,6 +65,15 @@ MINI_GAMEMASTER = {
             'baseStats': {'atk': 100, 'def': 137, 'hp': 225},
             'family': {'id': 'lechonk', 'parent': 'lechonk', 'evolutions': []},
         },
+        {
+            # Punctuated name + dex, for search_strings' dex-number
+            # fallback (only this entry needs 'dex').
+            'speciesId': 'mr_mime',
+            'speciesName': 'Mr. Mime',
+            'dex': 122,
+            'baseStats': {'atk': 192, 'def': 233, 'hp': 120},
+            'family': {'id': 'mr_mime', 'parent': None, 'evolutions': []},
+        },
     ],
     'moves': [
         # Fast moves (energyGain != 0)
@@ -183,11 +192,19 @@ def clear_rank_cache():
     one test would poison every later check for the same species —
     order-dependent failures. Clear them around every test."""
     from gobattlekit.data.iv_checker import _rank_cache, _qualifying_cache
-    _rank_cache.clear()
-    _qualifying_cache.clear()
+    from gobattlekit.data import search_strings
+
+    def _clear():
+        _rank_cache.clear()
+        _qualifying_cache.clear()
+        # Same trap: search_strings' caches key on species name without
+        # base stats, and its dex map is populated once per process.
+        search_strings._qualifying_cache.clear()
+        search_strings._dex_cache.clear()
+
+    _clear()
     yield
-    _rank_cache.clear()
-    _qualifying_cache.clear()
+    _clear()
 
 
 @pytest.fixture(autouse=True)
