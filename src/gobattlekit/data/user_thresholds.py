@@ -128,6 +128,23 @@ def parse_threshold_json(text):
     return entries
 
 
+def format_spec_summary(spec):
+    """Render a target spec as a compact one-line label, e.g. '15A, top20'."""
+    parts = []
+    if spec.get('attack', 0):
+        parts.append(f"{spec['attack']}A")
+    if spec.get('defense', 0):
+        parts.append(f"{spec['defense']}D")
+    if spec.get('stamina', 0):
+        parts.append(f"{spec['stamina']}S")
+    if spec.get('onlytop', 0):
+        parts.append(f"top{spec['onlytop']}")
+    if spec.get('ivs'):
+        n = len(spec['ivs'])
+        parts.append(f"{n} IV spread{'s' if n != 1 else ''}")
+    return ', '.join(parts) if parts else 'any'
+
+
 def format_threshold_text(species, league, name, t):
     """Render a target as the shareable 'GoBattleKit Threshold v1' text."""
     lines = [

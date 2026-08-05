@@ -10,8 +10,8 @@ from toga.style.pack import COLUMN, ROW
 from ..data.user_thresholds import (
     load_user_thresholds, add_threshold, delete_threshold,
     replace_threshold, clear_all_thresholds, parse_threshold_json,
-    parse_threshold_text, format_threshold_text, import_threshold_entries,
-    get_all_species
+    parse_threshold_text, format_threshold_text, format_spec_summary,
+    import_threshold_entries, get_all_species
 )
 from ..data.iv_checker import get_pokemon_index
 from ..theme import (
@@ -197,15 +197,7 @@ class EditThresholdsScreen:
                 ))
                 for name in sorted(thresholds[species][league_label].keys()):
                     t = thresholds[species][league_label][name]
-                    parts = []
-                    if t.get('attack', 0): parts.append(f"{t['attack']}A")
-                    if t.get('defense', 0): parts.append(f"{t['defense']}D")
-                    if t.get('stamina', 0): parts.append(f"{t['stamina']}S")
-                    if t.get('onlytop', 0): parts.append(f"top{t['onlytop']}")
-                    if t.get('ivs'):
-                        n = len(t['ivs'])
-                        parts.append(f"{n} IV spread{'s' if n != 1 else ''}")
-                    stat_str = ', '.join(parts) if parts else 'any'
+                    stat_str = format_spec_summary(t)
                     # Quiet provenance marker — only explicitly 'generated'
                     # entries (e.g. imported SIM pastes) get it, in plain
                     # text, not the loud SIM badge of the default checker.

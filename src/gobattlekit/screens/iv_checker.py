@@ -17,6 +17,7 @@ from ..data.thresholds import (
     DEFAULT_THRESHOLDS, EVOLUTION_LINES, target_class,
     drop_generated_targets, has_generated_targets,
 )
+from ..data.user_thresholds import format_spec_summary
 from ..data.preferences import get_pref, set_pref
 from ..data.search_strings import build_search_string, build_pvpivs_url
 from ..clipboard import copy_text
@@ -918,19 +919,7 @@ class IVCheckerScreen:
         # Empty target — show qualifying IV combinations
         if current is not None and current in self._targets_without_hits:
             target = league_targets.get(current, {})
-            parts = []
-            if target.get('attack', 0):
-                parts.append(f"{target['attack']}A")
-            if target.get('defense', 0):
-                parts.append(f"{target['defense']}D")
-            if target.get('stamina', 0):
-                parts.append(f"{target['stamina']}S")
-            if target.get('onlytop', 0):
-                parts.append(f"top{target['onlytop']}")
-            if target.get('ivs'):
-                n = len(target['ivs'])
-                parts.append(f"{n} IV spread{'s' if n != 1 else ''}")
-            req_str = ', '.join(parts) if parts else 'any'
+            req_str = format_spec_summary(target)
 
             pokemon_index = get_pokemon_index()
             if species in pokemon_index:

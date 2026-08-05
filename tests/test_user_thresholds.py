@@ -12,7 +12,7 @@ from gobattlekit.data.user_thresholds import (
     load_user_thresholds, save_user_thresholds, add_threshold,
     delete_threshold, clear_all_thresholds, replace_threshold,
     prune_propagated_pre_evos, parse_threshold_json, parse_threshold_text,
-    format_threshold_text, import_threshold_entries,
+    format_threshold_text, format_spec_summary, import_threshold_entries,
 )
 
 
@@ -271,6 +271,32 @@ class TestThresholdTextFormat:
         t = {'attack': 5.0, 'defense': 0, 'stamina': 0, 'ivs': [[1, 2, 3]]}
         text = format_threshold_text('Azumarill', 'Great', 'X', t)
         assert 'Attack: 5.0' in text and text.startswith('GoBattleKit Threshold v1')
+
+
+class TestFormatSpecSummary:
+    """The compact one-line label shared by the IV checker and the editor."""
+
+    def test_floors_only(self):
+        assert format_spec_summary(
+            {'attack': 12, 'defense': 110.0, 'stamina': 128}
+        ) == '12A, 110.0D, 128S'
+
+    def test_onlytop(self):
+        assert format_spec_summary(
+            {'attack': 0, 'defense': 0, 'stamina': 0, 'onlytop': 20}
+        ) == 'top20'
+
+    def test_ivs_pluralization(self):
+        assert format_spec_summary({'ivs': [[8, 15, 15]]}) == '1 IV spread'
+        assert format_spec_summary(
+            {'ivs': [[8, 15, 15], [9, 15, 15]]}
+        ) == '2 IV spreads'
+
+    def test_empty_is_any(self):
+        assert format_spec_summary({}) == 'any'
+        assert format_spec_summary(
+            {'attack': 0, 'defense': 0, 'stamina': 0, 'onlytop': 0}
+        ) == 'any'
 
 
 class TestIvsFirstClass:
