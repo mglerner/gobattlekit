@@ -315,6 +315,20 @@ class TestIvsFirstClass:
         assert entry['defense'] == 100.0
         assert entry['ivs'] == [[8, 15, 15]]
 
+    def test_share_text_reimport_keeps_ivs(self):
+        """Share an ivs-bearing target and re-import the text: the spreads
+        survive the store -> share -> import -> store round trip (IV2)."""
+        add_threshold('Azumarill', 'great', 'Spreads', 0, 0, 0,
+                      ivs=[[8, 15, 15], [9, 14, 15]])
+        stored = load_user_thresholds()['Azumarill']['Great']['Spreads']
+        text = format_threshold_text('Azumarill', 'Great', 'Spreads', stored)
+
+        clear_all_thresholds()
+        assert import_threshold_entries([parse_threshold_text(text)]) == 1
+
+        entry = load_user_thresholds()['Azumarill']['Great']['Spreads']
+        assert entry['ivs'] == [[8, 15, 15], [9, 14, 15]]
+
     def test_malformed_stored_target_skipped_not_fatal(self, tmp_path):
         """A string-valued floor in the stored file must not break the
         whole check (IV5)."""

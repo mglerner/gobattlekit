@@ -6,6 +6,7 @@ models the tiny slice of the toga widget API the screen touches (add /
 remove children, .text, .value, .style attribute get/set). It is installed
 only when the real toga is absent, so a machine that has toga still uses it.
 """
+import pathlib
 import sys
 import types
 
@@ -202,6 +203,24 @@ class TestFloorValidation:
         data = load_user_thresholds()
         assert data['Azumarill']['Great']['Bulky']['defense'] == 143.0
 
+    def test_forced_save_failure_surfaces_error(self, screen, monkeypatch):
+        """A failed write must say so, not drop the target silently: the
+        on-disk save returns False and the form shows the error."""
+        def boom(self, *args, **kwargs):
+            raise OSError("disk full")
+
+        monkeypatch.setattr(pathlib.Path, 'write_text', boom)
+
+        screen._show_add_form()
+        screen._selected_species = 'Azumarill'
+        screen._selected_league = 'Great'
+        screen._form_name = 'Bulky'
+        screen._form_def = '143.0'
+        screen._save_threshold(None)
+
+        assert 'Could not save target' in screen.form_error.text
+        assert load_user_thresholds() == {}
+
 
 class TestSilentOverwrite:
     """Add/duplicate/rename must not silently clobber a different existing
@@ -267,6 +286,36 @@ class TestSilentOverwrite:
         screen._form_def = '120'
         screen._save_threshold(None)
         assert 'Fresh' in load_user_thresholds()['Azumarill']['Great']
+
+
+class TestClearAllDisarm:
+    """An armed two-tap Clear All must not survive a trip into the Add
+    Target form, or a single later tap wipes every target (SI4)."""
+
+    def test_add_form_and_cancel_disarms_pending_clear(self, screen):
+        add_threshold('Azumarill', 'Great', 'Bulky', 0, 143.0, 138)
+        btn = screen._clear_all_btn
+        btn.on_press(btn)  # first tap arms
+        assert screen._clear_all_pending is True
+        assert btn.text == "Tap again to confirm"
+
+        screen._add_target_btn.on_press(None)
+        cancel = next(c for c in screen.content_box.children
+                      if getattr(c, 'text', '') == "← Cancel")
+        cancel.on_press(None)  # back to the list
+
+        assert screen._clear_all_pending is False
+        assert btn.text == "Clear All"
+        assert 'Bulky' in load_user_thresholds()['Azumarill']['Great']
+
+    def test_two_consecutive_taps_still_clear(self, screen):
+        add_threshold('Azumarill', 'Great', 'Bulky', 0, 143.0, 138)
+        btn = screen._clear_all_btn
+        btn.on_press(btn)  # arm
+        btn.on_press(btn)  # confirm -> actually clears
+        assert screen._clear_all_pending is False
+        assert btn.text == "Clear All"
+        assert load_user_thresholds() == {}
 
 
 class TestImportErrorWrapping:
