@@ -1,7 +1,10 @@
 # Post B -- artifacts checklist
 
-STATUS (2026-08-05): RESOLVED / archive, except one optional live-thread
-edit in section D. Everything else below is historical record.
+STATUS (2026-08-05): FULLY RESOLVED -- this file is now historical record.
+The last open item (section D's live Post A thread edit) was closed by
+Michael's confirmation on 2026-08-05 that the Reddit work is complete.
+Post B lives at
+https://www.reddit.com/r/TheSilphArena/comments/1uxhljl/i_made_a_free_opensource_ios_app_for_pvp_it/
 
 The draft is `docs/reddit/post_b/post_b.md`; screenshots go in
 `docs/reddit/post_b/images/`. Mirrors the Post A workflow.
@@ -42,11 +45,12 @@ Origin story, humility, the AI note, the Python-on-phone line, who-the-quizzes-
 help, the IV-by-hand-for-years bit, the free/OSS ethos, the optional HSH
 mention.
 
-### D. Cross-links -- one OPTIONAL item left (2026-08-05)
+### D. Cross-links -- DONE (closed 2026-08-05, owner's confirmation)
 
-Remaining: editing the live Post A thread on reddit.com (and the optional
-body callout) -- both off-repo, owner's-voice actions. The repo-side halves
-are DONE (gopvpsim `post_a.md` links the app post, commit 639f479 there).
+The repo-side halves were DONE earlier (gopvpsim `post_a.md` links the app
+post, commit 639f479 there). The off-repo live-thread edits were closed by
+Michael's 2026-08-05 confirmation that the Reddit posting work is complete
+(done or waived -- either way, no longer tracked).
 
 - Post A is LIVE (2026-07-08):
   https://www.reddit.com/r/TheSilphArena/comments/1ugr9qs/i_made_a_website_that_shows_how_all_4096_stack_up/
