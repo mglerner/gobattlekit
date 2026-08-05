@@ -116,16 +116,19 @@ alternative: `docs/responsive_layout_plan.md` ("Horizontal clipping").
 1. Post-launch: 1.0.0 is live and announced (Reddit post 2026-07-15).
    Watch the thread + App Store reviews for bug reports; fixes ship as 1.0.x.
 2. Device verification — the full `docs/device_test_checklist.md` was never
-   run on a real device (33 items, 0 checked). It covers the never-verified
+   run on a real device (33 items; 9 now closed off-device by tests, 24
+   remaining, 8 of those annotated with the tests that pin their logic so
+   only the on-device residual is left). It covers the never-verified
    2026-06-11/12 fixes, the 0.0.29-1.0.0 threshold-pipeline UI, and the
    Home/About scroll changes. Now post-release, so failures become 1.0.x
    fixes rather than launch blockers.
 3. Google Play beta testing (blocked on SI5 Android emulator fix; independent
-   of the iOS release)
+   of the iOS release). The SI5 code fix is drafted (commit 9baad8a, jarray
+   read buffer); end-to-end emulator import verification is still outstanding.
 
 Review status: the 2026-06-23 pre-release review
 (`docs/reviews/2026-06-23_prerelease_review.md`) is done; all its code-fixable
 findings are fixed except the latent evolution gender-orphan (deferred) and
-the Android SI5 leak (Android track). Test suite is 252 passing and isolated.
+the Android SI5 leak (Android track). Test suite is 373 passing and isolated.
 Sessions 1-3 of `CODE_REVIEW.md` complete; Session 4 partly done (IP/trademark
 landed; screenshots + metadata + questionnaires remain).

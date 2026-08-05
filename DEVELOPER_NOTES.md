@@ -24,7 +24,7 @@ This is a Briefcase app, **not** a pip package — its deps live under `[tool.br
 
 Quickest — ephemeral, no venv to manage:
 ```zsh
-uv run --with pytest --with certifi pytest -q     # 241 passed
+uv run --with pytest --with certifi pytest -q     # 373 passed
 ```
 
 Or a persistent dev venv:

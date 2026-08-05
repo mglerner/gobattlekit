@@ -1,5 +1,13 @@
 # Device test checklist — pre-1.0.0 App Store release
 
+Conventions (2026-08-05 evidence pass): a `- [x]` here means the item's success
+criterion is fully covered WITHOUT a device, and the indented `VERIFIED` line
+names the tests + commit that cover it — it does NOT mean anyone ran it on
+hardware. An item whose logic is pinned by tests but whose remaining risk is
+on-device rendering/behavior stays `- [ ]` with an indented `NOTE (2026-08-05)`
+line. Items with neither line are untouched: they still need a human holding a
+phone.
+
 Everything below needs eyes on a real device or emulator before the public
 release. Two groups: the 2026-06-11/12 review fixes (never device-verified;
 source in `docs/reviews/2026-06-11_fable5_deep_codebase_review.md`), and the
@@ -15,6 +23,11 @@ Small-screen layout (1.0.0 scroll changes):
       reachable, and nothing clips at the bottom.
 - [ ] About screen: the new "Legal" disclaimer paragraph wraps fully (no
       clipping), and the PvPoke credit reads "by EmpoleonDynamite".
+      NOTE (2026-08-05): wrap logic verified by
+      tests/test_label_wrapping.py::test_no_label_clips_on_narrow_phone (runs
+      tools/check_label_wrapping.py over every screen, about.py included); the
+      credit string is source-pinned at src/gobattlekit/screens/about.py:92 but
+      no test asserts it. Residual risk is iOS rendering only.
 - [ ] About screen contact: the new "Discord: TitanTrainers15" button (Developer
       section) opens the right Discord profile, and the two Discord buttons
       (contact-the-dev vs XehrFelrose community invite) don't read as confusing.
@@ -26,17 +39,37 @@ Threshold-pipeline UI (0.0.29–1.0.0, never device-verified):
 - [ ] My PvP IV Targets: provenance shows correctly (expert vs generated
       vs user badges), SIM badges render, and per-hit stat-product rank
       appears for all hits (not just onlytop).
+      NOTE (2026-08-05): logic verified by tests/test_provenance.py
+      (TestTargetClass, TestSimFilter, TestMetadataPersistence) and
+      tests/test_bundled_thresholds.py::TestProvenanceHelpers; per-hit rank by
+      tests/test_iv_checker.py::TestCheckThresholds. Residual risk is iOS
+      rendering only.
 - [ ] The expanded species set (~47) loads and the Edit Targets species
       picker is complete.
-- [ ] Add a target, then confirm a forced save failure surfaces the
+      NOTE (2026-08-05): logic verified by
+      tests/test_bundled_thresholds.py::TestLosslessRoundTrip::test_species_count_grew_to_47
+      and tests/test_threshold_species_parity.py (every bundled species
+      resolves against the real gamemaster); residual risk is the on-device
+      picker rendering only.
+- [x] Add a target, then confirm a forced save failure surfaces the
       "Could not save target" error instead of silently dropping it
       (hard to trigger on-device; at minimum confirm a normal add works).
+      VERIFIED (2026-08-05):
+      tests/test_edit_thresholds_screen.py::TestFloorValidation::test_forced_save_failure_surfaces_error
+      patches Path.write_text to raise OSError, driving the real
+      save_json_atomic -> add_threshold -> screen path, and asserts the
+      "Could not save target" error with nothing stored; commit 19b76e2. The
+      item itself concedes this is not triggerable on-device.
 - [ ] Pareto badges: in a species/target with several of your hits, the
       globally-efficient mon(s) show 👑, a best-of-yours-but-not-optimal mon
       shows 🏆, and a mon beaten by one of your own shows no badge. Check
       both the per-target view and "Show All", on IV Checker and My PvP IV
       Targets. Badges are absent when there is only one hit and it is not
       efficient.
+      NOTE (2026-08-05): logic verified by
+      tests/test_iv_checker.py::TestParetoBadges (crown vs trophy vs blank,
+      ties, duplicate IVs, single-hit cases, the worked example); residual risk
+      is iOS rendering only.
 
 Visual / theme:
 - [ ] Force-dark (`UIUserInterfaceStyle=Dark`): set the PHONE to light
@@ -48,6 +81,11 @@ Visual / theme:
       (SQ3).
 - [ ] Long error text: trigger a manual-entry validation error ("Could not
       find a level matching CP...") — must wrap, not clip (SI8).
+      NOTE (2026-08-05): logic verified by
+      tests/test_label_wrapping.py::test_no_label_clips_on_narrow_phone; the
+      message is routed through theme.paragraph_text at
+      src/gobattlekit/screens/iv_checker.py:326. Residual risk is iOS rendering
+      only.
 - [ ] Residual SI8 decision: force an "Error reading CSV" (share a
       garbage .csv) — the status line is still a one-line Label; decide
       whether the truncation is acceptable or the status row should be
@@ -62,25 +100,62 @@ CSV share paths:
 - [ ] Share the same file twice in a row — second share re-imports.
 
 Destructive-action guards:
-- [ ] ✕ (clear CSV): first tap shows the warning in the status line,
+- [x] ✕ (clear CSV): first tap shows the warning in the status line,
       second tap clears; navigating away and back DISARMS it (SI15).
-- [ ] Edit Targets → Clear All: arm it, go into Add Target, cancel, come
+      VERIFIED (2026-08-05): tests/test_iv_checker_screen.py::TestClearCsvDisarm
+      (arm -> in-screen navigation disarms; arm -> re-check disarms; two
+      consecutive taps really delete) plus the same three cases on the user
+      screen in TestUserScreenSharesBasePaths; commits 94ca899, 40f0ecb. The
+      warning itself is a static two-line literal with an explicit newline.
+- [x] Edit Targets → Clear All: arm it, go into Add Target, cancel, come
       back — button must read "Clear All" again and need two taps (SI4).
+      VERIFIED (2026-08-05):
+      tests/test_edit_thresholds_screen.py::TestClearAllDisarm drives the real
+      button handlers - arm, enter Add Target, press Cancel, and the label is
+      back to "Clear All" with nothing deleted; two consecutive taps still
+      clear; commit 19b76e2.
 
 Import from Text (the live gopvpsim contract):
 - [ ] Paste a "Copy for IV scanner" JSON fragment from a dive page —
       imports (multi-target fragments too); check the target appears and
       matches expected mons (IV1).
-- [ ] Paste garbage / a fragment with a typo'd key — clear error message,
+      NOTE (2026-08-05): logic verified by
+      tests/test_user_thresholds.py::TestScannerJsonContract (composite and
+      ivs-bearing cards parse, multi-target fragments merge without clobbering,
+      the import round-trips through check_thresholds); residual risk is the
+      on-device paste/import UI only.
+- [x] Paste garbage / a fragment with a typo'd key — clear error message,
       nothing saved (IV5).
-- [ ] Share an ivs-bearing target → re-import the text — ivs survive the
+      VERIFIED (2026-08-05):
+      tests/test_user_thresholds.py::TestScannerJsonContract::test_rejects_malformed
+      (10 cases incl. non-JSON and a typo'd "atack" key; parse raises before
+      anything reaches the store) and
+      tests/test_edit_thresholds_screen.py::TestImportErrorWrapping::test_import_error_uses_wrapping_widget
+      for the surfaced message; commits 9e42232, 4b45b44.
+- [x] Share an ivs-bearing target → re-import the text — ivs survive the
       round trip (IV2).
+      VERIFIED (2026-08-05):
+      tests/test_user_thresholds.py::TestIvsFirstClass::test_share_text_reimport_keeps_ivs
+      walks the full store -> format_threshold_text -> parse_threshold_text ->
+      import_threshold_entries -> store loop and asserts the ivs list survives;
+      commit 19b76e2.
 
 Matching-semantics spot checks (results CHANGED by the parity work):
-- [ ] A shadow mon you know well: its scaled atk/def now include ×1.2 and
+- [x] A shadow mon you know well: its scaled atk/def now include ×1.2 and
       ×5/6 — sanity-check one result against PvPoke (CP3).
-- [ ] An `onlytop` target: ranks are now PvPoke-style dense unique ranks —
+      VERIFIED (2026-08-05): pure math, no device involved.
+      tests/test_parity_vectors.py::test_parity_vectors checks golden gopvpsim
+      fixtures incl. ninetales_shadow_great_parity.json, and guards that the
+      shadow vector is not reproducible without the shadow multipliers;
+      tests/test_iv_checker.py::TestComputeRankTable::test_shadow_changes_rank_ordering
+      pins the reshuffle. Commits 8da2271, 3d0113d.
+- [x] An `onlytop` target: ranks are now PvPoke-style dense unique ranks —
       spot-check one mon's rank against PvPoke's IV table (CP7).
+      VERIFIED (2026-08-05): pure math, no device involved.
+      tests/test_iv_checker.py::TestComputeRankTable::test_ranks_are_dense_and_unique
+      (ranks are exactly 1..N, no ties) plus the rank assertions in
+      tests/test_parity_vectors.py::test_parity_vectors against the gopvpsim
+      goldens. Commits 8da2271, 3d0113d.
 - [ ] A branched pre-evo (an Eevee with targets on two Eeveelutions) —
       appears under BOTH finals, annotated "(Eevee)" (P0 #1).
 
@@ -96,8 +171,17 @@ Quizzes:
 - [ ] Timing quiz: "Timing doesn't matter" button color matches the
       palette; correct answer highlights on BOTH correct and failed
       questions; failed reveal lingers ~2.5s (SQ4/SQ8).
-- [ ] Rapid double-tap an answer — no double score, no skipped question
+      NOTE (2026-08-05): only partly pinned - the 2.5s failed-reveal delay is a
+      source constant (src/gobattlekit/screens/timing_quiz.py:144) and
+      tests/test_quiz_streak_flame.py covers the wrong-answer path; the button
+      color and the correct-answer highlight have no test at all. Still needs
+      eyes.
+- [x] Rapid double-tap an answer — no double score, no skipped question
       (SQ6).
+      VERIFIED (2026-08-05): tests/test_quiz_double_tap.py fires the real
+      answer handler twice for all three quizzes and asserts the score/streak
+      move once AND that exactly one advance task is scheduled (a second one
+      is what skipped a question); commit 3ca6ac8, guard from 52dba70.
 
 ## Android (emulator session — currently excluded, blockers listed)
 
@@ -106,7 +190,13 @@ Quizzes:
       `InputStream.read()` by copy. Rewrite the read loop with
       `jarray('byte')` and verify a real import end-to-end. Blocks Google
       Play beta.
-- [ ] Inbox polling correctly absent on Android (AP5) — file picker only.
+      NOTE (2026-08-05): read loop rewritten with jarray (commit 9baad8a);
+      end-to-end emulator import verification still required.
+- [x] Inbox polling correctly absent on Android (AP5) — file picker only.
+      VERIFIED (2026-08-05): code inspection IS the verification here -
+      _start_inbox_poll returns before creating the task unless ON_IOS
+      (src/gobattlekit/app.py:139), so no poll task can exist on Android;
+      commit 685d787.
 - [ ] URL-open failure dialog (about/help/credits links on an emulator
       with no browser) shows once, no traceback spam (SQ1).
 - [ ] Known cosmetic: white border in light mode (accepted, dark forced
