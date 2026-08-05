@@ -40,6 +40,8 @@ class IVCheckerScreen:
 
     NO_CSV_MESSAGE = "No Pokémon data loaded."
 
+    SCREEN_TITLE = "IV Checker"
+
     # Which store _get_thresholds_raw reads — drives target_class
     # resolution for specs with no explicit 'class' (data/thresholds.py).
     THRESHOLD_STORE = 'default'
@@ -81,12 +83,54 @@ class IVCheckerScreen:
         else:
             self._display_species_list()
 
+    # ------------------------------------------------------------------
+    # Subclass hooks — the only places the two IV screens differ.
+    # ------------------------------------------------------------------
+
+    def _extra_top_widgets(self):
+        """Widgets added between the import button and the status row."""
+        return []
+
+    def _add_bottom_buttons(self):
+        """Buttons between the back-to-list button and 'Back to Home'."""
+        help_row = toga.Box(style=Pack(direction=ROW))
+        help_row.add(toga.Button(
+            "? Help",
+            on_press=lambda w: self.app.show_help(
+                topic="PvP IV Checker",
+                back_screen=lambda: self.app.show_iv_checker(skip_intro=True),
+                back_label="← PvP IV Checker"
+            ),
+            style=btn_help(flex=1, margin_right=2)
+        ))
+        help_row.add(toga.Button(
+            "IV Credits",
+            on_press=lambda w: self.app.show_iv_credits(
+                back_screen=lambda: self.app.show_iv_checker(skip_intro=True),
+                back_label="← IV Checker"
+            ),
+            style=btn_help(flex=1, margin_left=2)
+        ))
+        self.container.add(help_row)
+
+    def _pre_list_empty_state(self):
+        """Render an alternative species-list body; True when it handled it."""
+        return False
+
+    def _no_targets_message(self):
+        return "No targets defined for this league."
+
+    def _pre_check_empty_state(self):
+        """Render an alternative results body instead of matching; True when
+        it handled it."""
+        return False
+
     def build(self):
         self._clear_csv_pending = False
         self.container = toga.Box(style=CONTAINER)
 
         self.container.add(toga.Label(
-            "IV Checker",
+            self.SCREEN_TITLE,  # label-fits: class constant, <= 17 chars
             style=Pack(font_size=24, font_weight="bold",
                        text_align="center", margin_bottom=10,
                        color=COLOR_ACCENT)
@@ -108,6 +152,9 @@ class IVCheckerScreen:
                 on_press=self._import_csv,
                 style=btn_primary(height=52, font_size=16)
             ))
+
+        for widget in self._extra_top_widgets():
+            self.container.add(widget)
 
         status_row = toga.Box(style=Pack(direction=ROW, margin_bottom=2, height=36))
         self.status_label_file = toga.Label(
@@ -149,25 +196,7 @@ class IVCheckerScreen:
         hide_widget(self.back_btn)
         self.container.add(self.back_btn)
 
-        help_row = toga.Box(style=Pack(direction=ROW))
-        help_row.add(toga.Button(
-            "? Help",
-            on_press=lambda w: self.app.show_help(
-                topic="PvP IV Checker",
-                back_screen=lambda: self.app.show_iv_checker(skip_intro=True),
-                back_label="← PvP IV Checker"
-            ),
-            style=btn_help(flex=1, margin_right=2)
-        ))
-        help_row.add(toga.Button(
-            "IV Credits",
-            on_press=lambda w: self.app.show_iv_credits(
-                back_screen=lambda: self.app.show_iv_checker(skip_intro=True),
-                back_label="← IV Checker"
-            ),
-            style=btn_help(flex=1, margin_left=2)
-        ))
-        self.container.add(help_row)
+        self._add_bottom_buttons()
 
         self.container.add(toga.Button(
             "← Back to Home",
@@ -616,6 +645,8 @@ class IVCheckerScreen:
             self._display_species_list()
             return
         try:
+            if self._pre_check_empty_state():
+                return
             # Always include manual entries alongside the loaded CSV —
             # otherwise a loaded PokeGenie export makes 'Check this
             # Pokémon' a silent no-op (SI1).
@@ -662,6 +693,9 @@ class IVCheckerScreen:
         thresholds = self._get_thresholds()
         league_label = self.league.capitalize()
 
+        if self._pre_list_empty_state():
+            return
+
         all_target_species = sorted([
             s for s in thresholds
             if league_label in thresholds.get(s, {})
@@ -683,7 +717,7 @@ class IVCheckerScreen:
 
         if not all_target_species:
             self.results_box.add(toga.Label(
-                "No targets defined for this league.",
+                self._no_targets_message(),
                 style=Pack(font_size=14, text_align="center", margin_top=20,
                            color=COLOR_TEXT_LIGHT)
             ))

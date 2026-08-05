@@ -16,6 +16,7 @@ install_toga_stub()
 import toga  # noqa: E402
 
 from gobattlekit.screens.iv_checker import IVCheckerScreen  # noqa: E402
+from gobattlekit.screens.user_iv_checker import UserIVCheckerScreen  # noqa: E402
 from gobattlekit.data.fetcher import NoDataError  # noqa: E402
 
 
@@ -265,3 +266,57 @@ class TestPogoSearchBlock:
             and 'NoneType' in getattr(c, 'value', '')
         ]
         assert wrapped, "the CSV error must render through a wrapping widget"
+
+
+class TestUserScreenSharesBasePaths:
+    """UserIVCheckerScreen used to copy build/_display_species_list/_run_check
+    from the base and the copies drifted. It now overrides hooks only, so the
+    base's error panel and Clear-CSV disarms apply there too."""
+
+    def _user_screen(self, with_targets=True):
+        s = UserIVCheckerScreen(MagicMock())
+        if with_targets:
+            s._get_thresholds_raw = lambda: {
+                'Azumarill': {'Great': {'Bulk': {'defense': 100}}}}
+        s.build()
+        return s
+
+    def test_empty_store_shows_getting_started(self):
+        s = self._user_screen(with_targets=False)
+        assert 'Edit My Targets' in ' '.join(_texts(s.results_box))
+
+    def test_run_check_error_uses_wrapping_widget(self, monkeypatch):
+        s = self._user_screen()
+        s.csv_path = '/tmp/some.csv'
+
+        def boom(*a, **k):
+            raise ValueError(
+                "int() argument must be a string, a bytes-like object or a "
+                "real number, not 'NoneType'")
+
+        monkeypatch.setattr(
+            'gobattlekit.screens.iv_checker.check_thresholds', boom)
+
+        s._run_check()  # must not raise
+
+        assert s.status_label_stats.text == "Could not read CSV."
+        wrapped = [
+            c for c in s.results_box.children
+            if type(c).__name__ == 'MultilineTextInput'
+            and 'NoneType' in getattr(c, 'value', '')
+        ]
+        assert wrapped, "the CSV error must render through a wrapping widget"
+
+    def test_run_check_disarms_pending_clear(self):
+        s = self._user_screen()
+        s._clear_csv(None)  # first tap arms
+        assert s._clear_csv_pending is True
+        s._run_check()
+        assert s._clear_csv_pending is False
+
+    def test_navigation_disarms_pending_clear(self):
+        s = self._user_screen()
+        s._clear_csv(None)  # first tap arms
+        assert s._clear_csv_pending is True
+        s._display_species_list()
+        assert s._clear_csv_pending is False

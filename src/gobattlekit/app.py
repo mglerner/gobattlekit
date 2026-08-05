@@ -298,41 +298,40 @@ class GoBattleKit(toga.App):
                 lambda: self.show_type_quiz(skip_intro=True)
             )
 
-    def show_iv_checker(self, skip_intro=False):
-        """Switch to the IV checker screen."""
+    def _show_iv_screen(self, name, skip_intro):
+        """Shared navigation for both IV checker screens.
+
+        They differ only in which screen object they show, and keeping two
+        copies of this let them drift: the default checker lost the re-run
+        branch below (tests/test_default_iv_checker_rerun.py). `name` is
+        both the screen attribute prefix and the intro feature key.
+        """
+        screen = getattr(self, f"{name}_screen")
         if skip_intro:
-            self._active_screen = "iv_checker"
-            self.main_window.content = self.iv_checker_screen.build()
+            self._active_screen = name
+            self.main_window.content = screen.build()
             # Auto-load saved CSV if not already loaded
             from .data.fetcher import SAVED_CSV
-            if not self.iv_checker_screen.csv_path and SAVED_CSV.exists():
-                self.iv_checker_screen.load_csv(str(SAVED_CSV))
-            elif self.iv_checker_screen.csv_path:
-                # Re-run check in case a manual entry was added elsewhere
-                # (both checkers merge the shared user_generated.csv).
-                self.iv_checker_screen._run_check()
+            if not screen.csv_path and SAVED_CSV.exists():
+                screen.load_csv(str(SAVED_CSV))
+            elif screen.csv_path:
+                # Re-run the check in case a manual entry was added (both
+                # checkers merge the shared user_generated.csv) or the
+                # user's thresholds changed.
+                screen._run_check()
         else:
             self._show_with_intro(
-                "iv_checker",
-                lambda: self.show_iv_checker(skip_intro=True)
+                name,
+                lambda: self._show_iv_screen(name, skip_intro=True)
             )
+
+    def show_iv_checker(self, skip_intro=False):
+        """Switch to the IV checker screen."""
+        self._show_iv_screen("iv_checker", skip_intro)
 
     def show_user_iv_checker(self, skip_intro=False):
         """Switch to the user IV checker screen."""
-        if skip_intro:
-            self._active_screen = "user_iv_checker"
-            self.main_window.content = self.user_iv_checker_screen.build()
-            from .data.fetcher import SAVED_CSV
-            if not self.user_iv_checker_screen.csv_path and SAVED_CSV.exists():
-                self.user_iv_checker_screen.load_csv(str(SAVED_CSV))
-            elif self.user_iv_checker_screen.csv_path:
-                # Re-run check in case thresholds changed
-                self.user_iv_checker_screen._run_check()
-        else:
-            self._show_with_intro(
-                "user_iv_checker",
-                lambda: self.show_user_iv_checker(skip_intro=True)
-            )
+        self._show_iv_screen("user_iv_checker", skip_intro)
 
     def show_edit_thresholds(self):
         """Switch to the edit thresholds screen."""
