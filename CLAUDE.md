@@ -130,5 +130,5 @@ Review status: the 2026-06-23 pre-release review
 (`docs/reviews/2026-06-23_prerelease_review.md`) is done; all its code-fixable
 findings are fixed except the latent evolution gender-orphan (deferred) and
 the Android SI5 leak (Android track). Test suite is 373 passing and isolated.
-Sessions 1-3 of `CODE_REVIEW.md` complete; Session 4 partly done (IP/trademark
-landed; screenshots + metadata + questionnaires remain).
+Sessions 1-4 of `CODE_REVIEW.md` complete (Session 4 closed 2026-08-05:
+every item was a prerequisite of the shipped 1.0.0; evidence inline there).

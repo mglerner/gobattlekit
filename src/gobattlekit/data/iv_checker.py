@@ -83,6 +83,11 @@ def _is_shadow_species(species):
     return species.endswith(' (Shadow)')
 
 
+# Malformed targets we've already warned about (by repr). Only grows when a
+# hand-edited file holds a bad target, so it stays tiny.
+_warned_malformed_targets = set()
+
+
 def target_matches(target, stats, iv_tuple, rank):
     """True when one threshold target's filters all pass for one IV spread.
 
@@ -106,7 +111,13 @@ def target_matches(target, stats, iv_tuple, rank):
         if 'onlytop' in target and rank > target['onlytop']:
             return False
     except TypeError:
-        logger.warning("Skipping malformed target %r", target)
+        # Warn once per distinct target: this predicate runs inside the
+        # 16x16x16 scans, so per-call warnings would flood the log (~4096
+        # lines per species) and the I/O itself would jank the UI.
+        key = repr(target)
+        if key not in _warned_malformed_targets:
+            _warned_malformed_targets.add(key)
+            logger.warning("Skipping malformed target %r", target)
         return False
     return True
 

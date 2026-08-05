@@ -1,8 +1,11 @@
 """Tests for gobattlekit.data.iv_checker — stat computation, CP math, CSV parsing, thresholds."""
 import csv
+import logging
 import math
 import pytest
 from unittest.mock import patch
+
+from gobattlekit.data import iv_checker
 
 from gobattlekit.data.iv_checker import (
     CPM,
@@ -896,6 +899,18 @@ class TestTargetMatches:
         """Hand-edited user thresholds reach this predicate; a bad target is
         skipped, never fatal."""
         assert target_matches(bad, self.STATS, (0, 15, 15), 1) is False
+
+    def test_malformed_target_warns_once(self, caplog):
+        """The predicate runs inside 16x16x16 scans — one bad target must
+        log one warning, not ~4096 of them."""
+        iv_checker._warned_malformed_targets.clear()
+        bad = {'attack': 'high'}
+        with caplog.at_level(logging.WARNING, logger=iv_checker.logger.name):
+            for _ in range(5):
+                assert target_matches(bad, self.STATS, (0, 15, 15), 1) is False
+        warnings = [r for r in caplog.records
+                    if 'malformed target' in r.getMessage()]
+        assert len(warnings) == 1
 
 
 # ── cache bounding ───────────────────────────────────────────────
