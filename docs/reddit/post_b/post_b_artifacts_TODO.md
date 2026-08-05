@@ -1,5 +1,8 @@
 # Post B -- artifacts checklist
 
+STATUS (2026-08-05): RESOLVED / archive, except one optional live-thread
+edit in section D. Everything else below is historical record.
+
 The draft is `docs/reddit/post_b/post_b.md`; screenshots go in
 `docs/reddit/post_b/images/`. Mirrors the Post A workflow.
 
@@ -29,13 +32,21 @@ in `images/`:
 Optional extras (add markers if you use them): the move-timing quiz, the
 Help/About orgodemir credit row, a CSV-import result.
 
-### C. Write the [MICHAEL: ...] prose blocks (your voice)
+### C. Write the [MICHAEL: ...] prose blocks (your voice) -- DONE
+
+Verified 2026-08-05: no `[MICHAEL: ...]` placeholders remain in `post_b.md`
+(the only match is the line stating the convention); the body is fully
+written first-person prose, and the post has been live since 2026-07-15.
 
 Origin story, humility, the AI note, the Python-on-phone line, who-the-quizzes-
 help, the IV-by-hand-for-years bit, the free/OSS ethos, the optional HSH
 mention.
 
-### D. Cross-links
+### D. Cross-links -- one OPTIONAL item left (2026-08-05)
+
+Remaining: editing the live Post A thread on reddit.com (and the optional
+body callout) -- both off-repo, owner's-voice actions. The repo-side halves
+are DONE (gopvpsim `post_a.md` links the app post, commit 639f479 there).
 
 - Post A is LIVE (2026-07-08):
   https://www.reddit.com/r/TheSilphArena/comments/1ugr9qs/i_made_a_website_that_shows_how_all_4096_stack_up/

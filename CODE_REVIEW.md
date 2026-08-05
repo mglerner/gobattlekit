@@ -47,18 +47,25 @@ re-test. Android CSV import (file picker) still untested.
 - [x] #12 Paragraph-sizing assumptions — documented in DEVELOPER_NOTES
       ("Wrapping paragraph text") and at the constants in theme.py.
 
-### Session 4 — App Store readiness
-See `docs/reviews/2026-06-23_prerelease_review.md` for the full pre-1.0.0 pass.
-- [~] #6 `pyproject.toml` / Info.plist config — keys set + `build` field + pinned
-      `min_os_version=13.0`; still verify against a real `briefcase create iOS`
-      / Xcode archive
-- [ ] Screenshots for required device sizes (6.9" + 6.5" iPhone)
-- [ ] App Store Connect metadata (description, keywords, support URL, privacy policy URL)
-- [ ] Privacy nutrition labels (answer: Data Not Collected)
-- [ ] Age rating questionnaire
+### Session 4 — App Store readiness  _(complete; closed 2026-08-05 — 1.0.0
+shipped and went live 2026-07-15, which required every item below)_
+See `docs/reviews/2026-06-23_prerelease_review.md` for the full pre-1.0.0 pass
+(local-only/gitignored since e24f8fe; restore with
+`git show e24f8fe^:docs/reviews/<file>` if missing).
+- [x] #6 `pyproject.toml` / Info.plist config — verified by the real 1.0.0
+      archive that passed App Review (59c1dbe, 4282708; live b03009d)
+- [x] Screenshots — `docs/appstore/screenshots/6.9/` has the 5-PNG 1320x2868
+      set (e52634e); as of 2026 ASC requires only the 6.9" set (6.5" optional)
+- [x] App Store Connect metadata — `docs/appstore/store_listing.md` + URLs
+      documented in d521aa0; listing is live (id6760953142)
+- [x] Privacy nutrition labels (Data Not Collected) —
+      `docs/appstore/privacy_and_rating_answers.md`; ASC blocks submission
+      until answered, and the app was approved
+- [x] Age rating questionnaire — same doc; mandatory before submission
 - [x] IP / trademark review — disclaimer added to About + `THIRD_PARTY_NOTICES.md`
       (PvPoke MIT notice retained); confirm the 1024 icon is original art on submit
-- [ ] App Review notes / demo account (sample PokeGenie CSV)
+- [x] App Review notes / demo account — `docs/appstore/app_review_notes.md` +
+      `sample_pokegenie.csv`/`.zip` (bdc3ccd); app passed App Review
 
 ---
 
