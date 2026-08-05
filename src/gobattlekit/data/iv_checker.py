@@ -83,6 +83,34 @@ def _is_shadow_species(species):
     return species.endswith(' (Shadow)')
 
 
+def target_matches(target, stats, iv_tuple, rank):
+    """True when one threshold target's filters all pass for one IV spread.
+
+    The single home for the target predicate — stat floors, an optional
+    explicit 'ivs' list, and an optional 'onlytop' rank cap — shared by
+    qualifying_ivs, check_thresholds and search_strings.qualifying_set.
+    `rank` is the spread's rank in the species/league rank table (callers
+    source it differently) and is read only when the target uses
+    'onlytop'. One malformed target (e.g. a string-valued floor from a
+    hand-edited file) is skipped rather than breaking the whole check.
+    """
+    try:
+        if not (stats['attack'] >= target.get('attack', 0) and
+                stats['defense'] >= target.get('defense', 0) and
+                stats['stamina'] >= target.get('stamina', 0)):
+            return False
+        if 'ivs' in target and not any(
+            tuple(iv) == iv_tuple for iv in target['ivs']
+        ):
+            return False
+        if 'onlytop' in target and rank > target['onlytop']:
+            return False
+    except TypeError:
+        logger.warning("Skipping malformed target %r", target)
+        return False
+    return True
+
+
 def compute_cp(base_atk, base_def, base_sta, atk_iv, def_iv, sta_iv, cpm):
     """CP at a given CPM. Minimum CP is 10; floored int (gopvpsim parity —
     the old raw-float cap comparison excluded a sliver of legal spreads)."""
@@ -95,11 +123,14 @@ def compute_cp(base_atk, base_def, base_sta, atk_iv, def_iv, sta_iv, cpm):
     )
     return max(10, math.floor(raw))
 
-# Module-level cache of (species, max_level, max_cp) -> rank table.
-# Grows unbounded across screen visits but is bounded in practice by
-# (number of target species) × (3 leagues) × (4096 IV combos per entry),
-# which is small enough to ignore. If we ever balloon the target list,
-# revisit with an LRU.
+# Entry cap shared by the two big per-species caches below. Browsing many
+# species in one session used to grow them without limit — measured
+# 2026-08-05, _iv_stats_cache reached 23.2 MB after 47 species in a single
+# league (~0.5 MB/entry). Both evict FIFO by dict insertion order at their
+# store sites.
+_MAX_CACHE_ENTRIES = 16
+
+# Module-level cache of (species, max_level, max_cp, shadow) -> rank table.
 _rank_cache = {}
 
 
@@ -226,6 +257,8 @@ def compute_rank_table(species, base_atk, base_def, base_sta,
     for i, (_sp, _ivsum, a, d, s) in enumerate(combos):
         rank_table[(a, d, s)] = i + 1
 
+    if len(_rank_cache) >= _MAX_CACHE_ENTRIES:
+        _rank_cache.pop(next(iter(_rank_cache)))
     _rank_cache[cache_key] = rank_table
     return rank_table
 
@@ -260,15 +293,7 @@ def qualifying_ivs(species, base_atk, base_def, base_sta, target,
         )
         if stats is None:
             continue
-        if not (stats['attack'] >= target.get('attack', 0) and
-                stats['defense'] >= target.get('defense', 0) and
-                stats['stamina'] >= target.get('stamina', 0)):
-            continue
-        if 'ivs' in target and not any(
-            tuple(iv) == (a, d, s) for iv in target['ivs']
-        ):
-            continue
-        if 'onlytop' in target and rank > target['onlytop']:
+        if not target_matches(target, stats, (a, d, s), rank):
             continue
         qualifying.append((rank, a, d, s, stats))
 
@@ -405,6 +430,8 @@ def all_iv_stats(species, base_atk, base_def, base_sta,
                                         base_sta, max_level, max_cp, shadow)
                 if triple is not None:
                     out.append(triple)
+    if len(_iv_stats_cache) >= _MAX_CACHE_ENTRIES:
+        _iv_stats_cache.pop(next(iter(_iv_stats_cache)))
     _iv_stats_cache[key] = out
     return out
 
@@ -573,24 +600,8 @@ def check_thresholds(csv_path, thresholds, league='great', max_level=51,
 
             matched = []
             for target_name, target in league_targets.items():
-                try:
-                    if not (stats['attack'] >= target.get('attack', 0) and
-                            stats['defense'] >= target.get('defense', 0) and
-                            stats['stamina'] >= target.get('stamina', 0)):
-                        continue
-                    if 'ivs' in target:
-                        if not any(tuple(iv) == iv_tuple for iv in target['ivs']):
-                            continue
-                    if 'onlytop' in target:
-                        if stats['rank'] > target['onlytop']:
-                            continue
-                except TypeError:
-                    # One malformed target (e.g. a string-valued floor from
-                    # a hand-edited file) must not break the whole check.
-                    logger.warning("Skipping malformed target %s/%s/%s",
-                                   final_species, league_label, target_name)
-                    continue
-                matched.append(target_name)
+                if target_matches(target, stats, iv_tuple, stats.get('rank')):
+                    matched.append(target_name)
 
             if matched:
                 if final_species not in results:

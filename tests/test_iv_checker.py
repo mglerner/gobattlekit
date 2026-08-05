@@ -16,8 +16,11 @@ from gobattlekit.data.iv_checker import (
     check_thresholds,
     pareto_badges,
     all_iv_stats,
+    target_matches,
     _scaled_triple,
     _rank_cache,
+    _iv_stats_cache,
+    _MAX_CACHE_ENTRIES,
 )
 
 
@@ -854,3 +857,76 @@ class TestCheckThresholds:
                                    evolution_lines=evo_lines)
         assert 'Marill' in results
         assert 'Azumarill' not in results
+
+
+# ── target_matches ────────────────────────────────────────────────
+
+
+class TestTargetMatches:
+    """The one target predicate shared by qualifying_ivs, check_thresholds
+    and search_strings.qualifying_set."""
+
+    STATS = {'attack': 100.0, 'defense': 120.0, 'stamina': 130}
+
+    def test_floors_pass_and_fail(self):
+        assert target_matches({'attack': 100, 'defense': 120, 'stamina': 130},
+                              self.STATS, (0, 15, 15), 1)
+        assert not target_matches({'attack': 100.1}, self.STATS, (0, 15, 15), 1)
+        assert not target_matches({'stamina': 131}, self.STATS, (0, 15, 15), 1)
+
+    def test_missing_floors_default_to_zero(self):
+        assert target_matches({}, self.STATS, (0, 15, 15), 1)
+
+    def test_ivs_membership(self):
+        target = {'ivs': [[0, 15, 15], [1, 15, 14]]}
+        assert target_matches(target, self.STATS, (1, 15, 14), 4096)
+        assert not target_matches(target, self.STATS, (2, 15, 14), 4096)
+
+    def test_onlytop(self):
+        assert target_matches({'onlytop': 10}, self.STATS, (0, 15, 15), 10)
+        assert not target_matches({'onlytop': 10}, self.STATS, (0, 15, 15), 11)
+
+    @pytest.mark.parametrize('bad', [
+        {'attack': 'high'},
+        {'ivs': 5},
+        {'ivs': [1, 2, 3]},
+        {'onlytop': [10]},
+    ])
+    def test_malformed_target_is_false_not_raise(self, bad):
+        """Hand-edited user thresholds reach this predicate; a bad target is
+        skipped, never fatal."""
+        assert target_matches(bad, self.STATS, (0, 15, 15), 1) is False
+
+
+# ── cache bounding ───────────────────────────────────────────────
+
+
+class TestCacheBounding:
+    """_rank_cache / _iv_stats_cache are FIFO-bounded (a session browsing
+    dozens of species used to grow _iv_stats_cache to 23.2 MB)."""
+
+    # max_level=1 keeps each table cheap while still filling all 4096 combos.
+    ARGS = (112, 152, 225, 1, 1500)
+
+    def setup_method(self):
+        _rank_cache.clear()
+        _iv_stats_cache.clear()
+
+    def test_rank_cache_evicts_oldest(self):
+        for i in range(_MAX_CACHE_ENTRIES + 5):
+            compute_rank_table(f'CacheTest{i}', *self.ARGS)
+            assert len(_rank_cache) <= _MAX_CACHE_ENTRIES
+        assert len(_rank_cache) == _MAX_CACHE_ENTRIES
+        # A key that survived still returns the right table from the cache.
+        last = f'CacheTest{_MAX_CACHE_ENTRIES + 4}'
+        cached = compute_rank_table(last, *self.ARGS)
+        assert cached == compute_rank_table('CacheTestFresh', *self.ARGS)
+
+    def test_iv_stats_cache_evicts_oldest(self):
+        for i in range(_MAX_CACHE_ENTRIES + 5):
+            all_iv_stats(f'CacheTest{i}', *self.ARGS)
+            assert len(_iv_stats_cache) <= _MAX_CACHE_ENTRIES
+        assert len(_iv_stats_cache) == _MAX_CACHE_ENTRIES
+        last = f'CacheTest{_MAX_CACHE_ENTRIES + 4}'
+        cached = all_iv_stats(last, *self.ARGS)
+        assert cached == all_iv_stats('CacheTestFresh', *self.ARGS)

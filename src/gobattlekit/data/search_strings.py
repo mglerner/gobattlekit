@@ -33,6 +33,7 @@ from .iv_checker import (
     compute_rank_table,
     get_pokemon_index,
     ivs_to_stats,
+    target_matches,
 )
 
 # Appraisal-bar buckets: index by IV, value is the in-game search digit.
@@ -123,25 +124,14 @@ def qualifying_set(species, league, targets, max_level=51):
                     max_level=max_level, max_cp=max_cp, shadow=shadow)
                 if stats is None:
                     continue
+                rank = (rank_table.get((a, d, s), 4096)
+                        if rank_table is not None else None)
                 for target in targets.values():
                     if not isinstance(target, dict):
                         continue
-                    try:
-                        if not (stats['attack'] >= target.get('attack', 0) and
-                                stats['defense'] >= target.get('defense', 0) and
-                                stats['stamina'] >= target.get('stamina', 0)):
-                            continue
-                        if 'ivs' in target and not any(
-                                tuple(iv) == (a, d, s)
-                                for iv in target['ivs']):
-                            continue
-                        if 'onlytop' in target and rank_table.get(
-                                (a, d, s), 4096) > target['onlytop']:
-                            continue
-                    except TypeError:
-                        continue
-                    quals.add((a, d, s))
-                    break
+                    if target_matches(target, stats, (a, d, s), rank):
+                        quals.add((a, d, s))
+                        break
     _qualifying_cache[key] = quals
     return quals
 
