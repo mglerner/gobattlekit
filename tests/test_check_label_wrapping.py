@@ -180,7 +180,7 @@ def test_helper_method_all_returns_resolvable_bounds_the_call(tmp_path):
         "class S:\n"
         "    def _score_text(self):\n"
         "        if self.streak:\n"
-        '            return f"Score: {self.score} / {self.total}"\n'
+        '            return f"Score: {self.score} / {self.max_score}"\n'
         '        return f"Score: {self.score}"\n'
         "    def build(self):\n"
         "        return toga.Label(self._score_text())\n"

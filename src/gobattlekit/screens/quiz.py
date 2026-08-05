@@ -6,16 +6,13 @@ import random
 import asyncio
 import toga
 from toga.style import Pack
-from toga.style.pack import COLUMN, ROW
+from toga.style.pack import ROW
 from ..data.gamemaster import get_moves, get_rankings, counters_to_charge, charge_sequence
-from ..platform import ON_ANDROID
-from ..theme import (
-    CONTAINER, COLOR_ACCENT, COLOR_BG, COLOR_TEXT_LIGHT, COLOR_YELLOW,
-    btn_nav, answer_color_gradient
+from ..theme import COLOR_TEXT_LIGHT, answer_color_gradient
+from .quiz_base import (
+    MAX_ATTEMPTS, POINTS, QUESTION_HEIGHT,
+    QuizScreenBase, build_two_column_answers
 )
-
-MAX_ATTEMPTS = 3
-POINTS = {1: 3, 2: 2, 3: 1}
 
 QUESTION_TYPE_FIRST = 'first'
 QUESTION_TYPE_SEQUENCE = 'sequence'
@@ -25,17 +22,16 @@ MAX_SEQUENCE_STREAK = 2
 FIRST_WEIGHT = 0.7
 
 
-class QuizScreen:
+class QuizScreen(QuizScreenBase):
     """Quiz screen for move timing questions."""
 
     def __init__(self, app):
         # No data loads here: screens are constructed during startup(), and
         # a cold/stale cache would put network fetches on the launch path
         # (iOS watchdog risk — AP2/DL4). First build() pays instead.
-        self.app = app
+        super().__init__(app)
         self.fastmoves = None
         self.chargedmoves = None
-        self._advance_task = None
 
     def _ensure_data(self):
         if self.fastmoves is None:
@@ -76,54 +72,7 @@ class QuizScreen:
         self._prev_fast_turns = None
         self._load_question()
 
-        self.container = toga.Box(style=CONTAINER)
-
-        self.score_label = toga.Label(
-            self._score_text(),
-            style=Pack(font_size=14, margin_bottom=10, text_align="center",
-                       color=COLOR_YELLOW)
-        )
-        self.container.add(self.score_label)
-
-        # NOTE: intentionally NOT using theme.paragraph_text here. Question
-        # text needs a fixed height across questions of varying length so
-        # the answer buttons below don't jump around between questions.
-        # See DEVELOPER_NOTES "Wrapping paragraph text".
-        question_height = 160 if ON_ANDROID else 120
-        self.question_label = toga.MultilineTextInput(
-            value="",
-            readonly=True,
-            style=Pack(font_size=18, margin_bottom=20,
-                       margin_left=10, margin_right=10,
-                       height=question_height, flex=1,
-                       color=COLOR_TEXT_LIGHT)
-        )
-        self.container.add(self.question_label)
-        self._set_question_text()
-
-        self.feedback_label = toga.Label(
-            "",
-            style=Pack(font_size=16, margin_bottom=16, text_align="center",
-                       color=COLOR_TEXT_LIGHT)
-        )
-        self.container.add(self.feedback_label)
-
-        self.button_box = toga.Box(style=Pack(direction=COLUMN, flex=1))
-        self._build_answer_buttons()
-        self.container.add(self.button_box)
-
-        self.container.add(toga.Button(
-            "End Quiz",
-            on_press=self._end_quiz,
-            style=btn_nav(height=44)
-        ))
-
-        # Scroll-wrap so the bottom controls stay reachable on small phones;
-        # inert (no scroll) when the content already fits.
-        return toga.ScrollContainer(
-            content=self.container,
-            style=Pack(flex=1, background_color=COLOR_BG)
-        )
+        return self._build_scaffold(QUESTION_HEIGHT, 18)
 
     def _pick_question_type(self):
         """Pick question type with weighted probability and streak limits."""
@@ -211,40 +160,11 @@ class QuizScreen:
                 self.answer_buttons[val] = btn
                 row.add(btn)
         else:
-            left_col = toga.Box(style=Pack(direction=COLUMN, flex=1, margin_right=4))
-            right_col = toga.Box(style=Pack(direction=COLUMN, flex=1, margin_left=4))
-            cols_row = toga.Box(style=Pack(direction=ROW, margin_bottom=4))
-            cols_row.add(left_col)
-            cols_row.add(right_col)
-            self.button_box.add(cols_row)
-
-            total_rows = (len(self.sequence_choices) + 1) // 2
-            for i, choice in enumerate(self.sequence_choices):
-                row_index = i // 2
-                label = ", ".join(str(x) for x in choice)
-                btn = toga.Button(
-                    label,
-                    on_press=self._make_answer_handler(choice),
-                    style=Pack(height=48, font_size=14, margin_bottom=4,
-                               background_color=answer_color_gradient(total_rows, row_index),
-                               color=COLOR_TEXT_LIGHT)
-                )
-                self.answer_buttons[choice] = btn
-                if i % 2 == 0:
-                    left_col.add(btn)
-                else:
-                    right_col.add(btn)
-
-    def _make_answer_handler(self, value):
-        def handler(widget):
-            self._check_answer(value)
-        return handler
-
-    def _highlight_correct_button(self):
-        """Highlight the correct answer button in teal."""
-        correct_btn = self.answer_buttons.get(self.right_answer)
-        if correct_btn:
-            correct_btn.style.background_color = COLOR_ACCENT
+            answers = [(choice, ", ".join(str(x) for x in choice))
+                       for choice in self.sequence_choices]
+            self.answer_buttons = build_two_column_answers(
+                self.button_box, answers, self._make_answer_handler
+            )
 
     def _check_answer(self, chosen):
         if self._question_over:
@@ -266,7 +186,7 @@ class QuizScreen:
             else:
                 self.sequence_correct += 1
                 self.sequence_total += 1
-            self.score_label.text = self._score_text()
+            self._refresh_score()
             energy_per_fast = self.fastmoves[self.fast_id]['energyGain']
             energy_needed = self.chargedmoves[self.charged_id]['energy']
             self._highlight_correct_button()
@@ -286,7 +206,7 @@ class QuizScreen:
                     self.first_charge_total += 1
                 else:
                     self.sequence_total += 1
-                self.score_label.text = self._score_text()
+                self._refresh_score()
                 energy_per_fast = self.fastmoves[self.fast_id]['energyGain']
                 energy_needed = self.chargedmoves[self.charged_id]['energy']
                 if self.question_type == QUESTION_TYPE_SEQUENCE:
@@ -308,7 +228,7 @@ class QuizScreen:
             else:
                 # Streak was just broken; refresh so the 🔥 disappears now,
                 # not only after the final attempt resolves.
-                self.score_label.text = self._score_text()
+                self._refresh_score()
                 remaining = MAX_ATTEMPTS - self.attempts
                 self.feedback_label.text = (
                     f"❌ Try again! {remaining} attempt{'s' if remaining != 1 else ''} left."
@@ -327,37 +247,10 @@ class QuizScreen:
                 f"{self.mon_name} to reach the first 4 {self.charged_name}s?"
             )
 
-    def _disable_buttons(self):
-        for btn in self.answer_buttons.values():
-            btn.enabled = False
-
-    async def _advance_question(self, delay=1.5):
-        await asyncio.sleep(delay)
-        self._load_question()
-        self._set_question_text()
-        self.feedback_label.text = ""
-        self._build_answer_buttons()
-
-    def _score_text(self):
-        if self.streak > 0:
-            return f"Score: {self.score} / {self.max_score} 🔥{self.streak}"
-        return f"Score: {self.score} / {self.max_score}"
-
-    def _cancel_advance_task(self):
-        if self._advance_task and not self._advance_task.done():
-            self._advance_task.cancel()
-        self._advance_task = None
-
-    def _end_quiz(self, widget):
-        self._cancel_advance_task()
-        stats = {
-            'score': self.score,
-            'max_score': self.max_score,
-            'max_streak': self.max_streak,
-            'league': self.league,
+    def _extra_stats(self):
+        return {
             'first_charge_correct': self.first_charge_correct,
             'first_charge_total': self.first_charge_total,
             'sequence_correct': self.sequence_correct,
             'sequence_total': self.sequence_total,
         }
-        self.app.show_quiz_summary(stats)

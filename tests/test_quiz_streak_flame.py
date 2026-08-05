@@ -22,7 +22,7 @@ FLAME = "\U0001F525"
 def test_timing_quiz_flame_clears_on_non_final_wrong():
     s = TimingQuizScreen(MagicMock())
     s.score = 6
-    s.total = 6
+    s.max_score = 6
     s.streak = 3
     s.max_streak = 3
     s.attempts = 0
