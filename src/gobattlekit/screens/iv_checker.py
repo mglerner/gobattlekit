@@ -583,7 +583,7 @@ class IVCheckerScreen:
 
     def _import_csv_android(self):
         try:
-            from java import jclass
+            from java import jarray, jbyte, jclass
             Intent = jclass('android.content.Intent')
             intent = Intent(Intent.ACTION_GET_CONTENT)
             intent.setType("text/comma-separated-values")
@@ -600,10 +600,11 @@ class IVCheckerScreen:
                         try:
                             ByteArrayOutputStream = jclass('java.io.ByteArrayOutputStream')
                             baos = ByteArrayOutputStream()
-                            buf = bytearray(4096)
+                            # SI5: jarray is passed by reference (a plain bytearray is copied and comes back empty); end-to-end emulator verification still pending.
+                            buf = jarray(jbyte)(4096)
                             while True:
                                 n = stream.read(buf)
-                                if n < 0:
+                                if n == -1:
                                     break
                                 baos.write(buf, 0, n)
                             data = bytes(baos.toByteArray())
