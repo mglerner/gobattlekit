@@ -5,9 +5,9 @@ Generates from gamemaster JSON, caches to disk.
 """
 import json
 import logging
-import os
 from pathlib import Path
 from .fetcher import CACHE_DIR
+from .jsonstore import save_json_atomic
 
 logger = logging.getLogger(__name__)
 
@@ -99,14 +99,8 @@ def generate_evolution_lines(gamemaster):
 
 def save_evolution_lines(evolution_lines):
     """Save evolution lines to cache dir atomically (temp + os.replace)."""
-    try:
-        CACHE_DIR.mkdir(exist_ok=True, parents=True)
-        tmp = CACHED_PATH.with_suffix(".json.tmp")
-        tmp.write_text(json.dumps(evolution_lines, indent=2))
-        os.replace(tmp, CACHED_PATH)
+    if save_json_atomic(CACHED_PATH, evolution_lines, indent=2):
         logger.info("Saved %d evolution lines to cache.", len(evolution_lines))
-    except Exception:
-        logger.exception("Could not save evolution lines")
 
 
 def load_evolution_lines():

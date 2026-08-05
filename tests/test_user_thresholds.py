@@ -7,7 +7,7 @@ import json
 
 import pytest
 
-from gobattlekit.data import user_thresholds
+from gobattlekit.data import jsonstore, user_thresholds
 from gobattlekit.data.user_thresholds import (
     load_user_thresholds, save_user_thresholds, add_threshold,
     delete_threshold, clear_all_thresholds, replace_threshold,
@@ -113,7 +113,7 @@ class TestReplaceThreshold:
         # undo() reverts the autouse isolation too and leaks onto the
         # real app cache.
         with pytest.MonkeyPatch.context() as mp:
-            mp.setattr(user_thresholds.os, 'replace', boom)
+            mp.setattr(jsonstore.os, 'replace', boom)
             ok = replace_threshold(
                 'Azumarill', 'great', 'Bulky',
                 'Registeel', 'great', 'Tanky', 0, 0, 0,
@@ -130,7 +130,7 @@ class TestReplaceThreshold:
         def boom(*args, **kwargs):
             raise OSError("disk full")
         with pytest.MonkeyPatch.context() as mp:
-            mp.setattr(user_thresholds.os, 'replace', boom)
+            mp.setattr(jsonstore.os, 'replace', boom)
             assert save_user_thresholds({'A': {}}) is False
         assert save_user_thresholds({'A': {}}) is True
 

@@ -4,67 +4,25 @@ User-defined IV thresholds — load, save, and manage.
 Stored as JSON in the cache directory.
 """
 import json
-import logging
 import math
-import os
 from .fetcher import CACHE_DIR
-
-logger = logging.getLogger(__name__)
+from .jsonstore import load_json_object, save_json_atomic
 
 USER_THRESHOLDS_FILE = CACHE_DIR / 'user_thresholds.json'
 
 
-def _move_corrupt_aside():
-    """Rename the thresholds file aside so the next save_user_thresholds()
-    can't clobber what might still be recoverable."""
-    corrupt_path = USER_THRESHOLDS_FILE.with_suffix(".json.corrupt")
-    try:
-        os.replace(USER_THRESHOLDS_FILE, corrupt_path)
-        logger.warning("User thresholds file was corrupt; moved to %s", corrupt_path)
-    except OSError:
-        logger.exception("Could not move corrupt user thresholds file aside")
-
-
 def load_user_thresholds():
     """Load user thresholds from JSON. Returns empty dict if file doesn't exist."""
-    if not USER_THRESHOLDS_FILE.exists():
-        return {}
-    try:
-        data = json.loads(USER_THRESHOLDS_FILE.read_text())
-    except json.JSONDecodeError:
-        # File is corrupt (partial write from a prior kill, manual edit gone
-        # wrong). Same pattern as preferences.py.
-        _move_corrupt_aside()
-        return {}
-    except OSError:
-        logger.exception("Could not read user thresholds")
-        return {}
-    if not isinstance(data, dict):
-        # Valid JSON but not an object (a list, string, ...). Every mutation
-        # function indexes/.get()s this as species -> leagues and would crash.
-        # Treat it like corruption.
-        logger.warning("User thresholds file held %s, not an object; resetting",
-                       type(data).__name__)
-        _move_corrupt_aside()
-        return {}
-    return data
+    return load_json_object(USER_THRESHOLDS_FILE, "User thresholds")
 
 
 def save_user_thresholds(thresholds):
     """Save user thresholds to JSON atomically (temp + os.replace).
 
-    Returns True on success, False on failure — callers performing
+    Returns True on success, False on failure - callers performing
     destructive sequences must check it before assuming the data landed.
     """
-    try:
-        CACHE_DIR.mkdir(exist_ok=True, parents=True)
-        tmp = USER_THRESHOLDS_FILE.with_suffix(".json.tmp")
-        tmp.write_text(json.dumps(thresholds, indent=2))
-        os.replace(tmp, USER_THRESHOLDS_FILE)
-        return True
-    except Exception:
-        logger.exception("Could not save user thresholds")
-        return False
+    return save_json_atomic(USER_THRESHOLDS_FILE, thresholds, indent=2)
 
 
 VALID_LEAGUES = ('Great', 'Ultra', 'Master')
