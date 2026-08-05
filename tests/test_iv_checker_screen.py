@@ -5,6 +5,7 @@ stub is installed before importing the screen (see tests/_toga_stub.py). The
 app-data isolation and load_gamemaster patch come from conftest.py autouse
 fixtures.
 """
+import threading
 from unittest.mock import MagicMock
 
 import pytest
@@ -266,6 +267,58 @@ class TestPogoSearchBlock:
             and 'NoneType' in getattr(c, 'value', '')
         ]
         assert wrapped, "the CSV error must render through a wrapping widget"
+
+
+class TestSearchStringPrewarm:
+    """The 16x16x16 search-string scan runs off the UI thread; a newer
+    prewarm must abandon the previous one instead of racing it."""
+
+    def test_display_results_prewarms_every_cycler_option(self, monkeypatch):
+        seen = []
+        monkeypatch.setattr(
+            'gobattlekit.screens.iv_checker.build_search_string',
+            lambda species, league, targets: seen.append(frozenset(targets)))
+        s = _screen()
+        s.league = 'great'
+        s.results = {'Azumarill': []}
+        s._get_thresholds = lambda: {'Azumarill': {'Great': {
+            'Bulk': {'defense': 100}, 'Atk': {'attack': 80}}}}
+
+        s._display_species_results('Azumarill')
+
+        s._prewarm_thread.join(timeout=5)
+        assert not s._prewarm_thread.is_alive()
+        assert frozenset({'Bulk'}) in seen
+        assert frozenset({'Atk'}) in seen
+
+    def test_superseded_prewarm_stops_early(self, monkeypatch):
+        started = threading.Event()
+        release = threading.Event()
+        seen = []
+
+        def slow(species, league, targets):
+            seen.append(frozenset(targets))
+            started.set()
+            release.wait(1)
+
+        monkeypatch.setattr(
+            'gobattlekit.screens.iv_checker.build_search_string', slow)
+        s = _screen()
+        s.league = 'great'
+        league_targets = {'A': {}, 'B': {}, 'C': {}}
+        s._target_options_raw = ['A', 'B', 'C']
+
+        s._start_search_prewarm('Azumarill', league_targets)
+        first = s._prewarm_thread
+        assert started.wait(2), "the prewarm thread should start working"
+
+        s._target_options_raw = []  # the superseding view has no work to do
+        s._start_search_prewarm('Azumarill', league_targets)
+        release.set()
+
+        first.join(timeout=2)
+        assert not first.is_alive()
+        assert seen == [frozenset({'A'})], seen
 
 
 class TestUserScreenSharesBasePaths:

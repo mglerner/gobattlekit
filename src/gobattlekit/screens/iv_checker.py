@@ -5,6 +5,7 @@ IV checker screen — import PokeGenie CSV and check against thresholds.
 import logging
 import shutil
 import pathlib
+import threading
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
@@ -58,6 +59,8 @@ class IVCheckerScreen:
         self._manual_sta = '0'
         self._manual_cp = ''
         self._clear_csv_pending = False
+        self._prewarm_id = 0
+        self._prewarm_thread = None
 
     def _get_thresholds_raw(self):
         return DEFAULT_THRESHOLDS
@@ -903,6 +906,42 @@ class IVCheckerScreen:
         self.hits_box = toga.Box(style=Pack(direction=COLUMN))
         self.results_box.add(self.hits_box)
         self._refresh_hits(species, hits)
+        self._start_search_prewarm(species, league_targets)
+
+    def _start_search_prewarm(self, species, league_targets):
+        """Warm the search-string cache for every cycler position off the
+        UI thread.
+
+        build_search_string does a 16x16x16 scan on its first call per
+        (species, league, targets), so the first ◀/▶ tap onto each cycler
+        position froze the UI (~0.1-0.4s on a Mac, worse on a phone).
+        The data layer caches results in plain dicts — concurrent
+        same-key work is harmless, last write wins — so warming them here
+        makes the later UI-thread calls cache hits. The GIL means a busy
+        prewarm degrades rather than removes the freeze; the win is that
+        by the time the user starts cycling the entries are warm.
+
+        The thread only touches the data layer, never a widget.
+        """
+        self._prewarm_id += 1
+        token = self._prewarm_id
+        league = self.league
+        options = list(self._target_options_raw)
+
+        def worker():
+            for option in options:
+                if self._prewarm_id != token:
+                    return  # superseded by a newer species/league view
+                targets = (league_targets if option is None
+                           else {option: league_targets.get(option, {})})
+                try:
+                    build_search_string(species, league, targets)
+                except Exception:
+                    logger.debug("Search-string prewarm failed for %s / %s",
+                                 species, option, exc_info=True)
+
+        self._prewarm_thread = threading.Thread(target=worker, daemon=True)
+        self._prewarm_thread.start()
 
     def _refresh_hits(self, species, all_hits):
         for child in list(self.hits_box.children):
