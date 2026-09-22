@@ -25,23 +25,83 @@ OUT_ROOT=$SIM/userdata/threshold_batch/$STAMP
 mkdir -p "$OUT_ROOT"
 LOG=$OUT_ROOT/batch.log
 
-# Roster order = current GL meta rank (most important first), so a
-# truncated night still covers the core. Aegislash forms last.
+# Roster = the GL dives in gopvpsim's own registry, one entry per species,
+# in registry order (pool rank, most important first).
+#
+# DERIVED, 2026-09-22, from gopvpsim -- do NOT hand-edit species in or out.
+# Regenerate after any gopvpsim pool/registry change with:
+#
+#   cd "$(cat tools/threshold_export/sibling_path)" && .venv/bin/python -c "
+#   import sys; sys.path.insert(0,'scripts')
+#   import dive_registry as dr
+#   gl=[d for d in dr.all_dives() if d['league']=='great']
+#   for flag,name in ((False,'BASE'),(True,'SHADOW')):
+#       seen=[]
+#       for d in gl:
+#           if bool(d.get('shadow'))==flag and d['species'] not in seen:
+#               seen.append(d['species'])
+#       print(name+'_DIVES=('); print('  '+' '.join('\"%s\"'%s for s in seen)); print(')')"
+#
+# Drift this replaced (2026-09-22): the arrays still carried 9 base + 5
+# shadow species the registry dropped (Lickilicky, Seaking, Dragonair,
+# Shelgon, Sliggoo, Stunfisk (Galarian), Seismitoad, Sealeo, Sylveon;
+# shadow Kingdra, Dragonair, Shelgon, Sealeo, Drapion) and were missing
+# 32 base + 10 shadow the registry has -- including Diggersby, shadow
+# Charjabug, the shadow Forretress volt-switch page and Oinkologne
+# (Female). 46 entries -> 74, so the full batch is now ~1.6x the dives
+# it was; use the STOP file if a night has to end early.
+#
+# ONE PAGE PER SPECIES, and the registry does not always agree. These
+# scripts key everything -- the .done marker, the output dir, and the
+# export's blob glob -- on the species name, and deep_dive.py's replay
+# blobs are named by species too, with no moveset in the filename. So a
+# species with more than one registry page cannot be represented here.
+# Only FORRETRESS is in that position: the registry has volt-switch AND
+# bug-bite pages for both the base and the shadow form. This roster runs
+# the VOLT-SWITCH page (see DIVE_EXTRA_ARGS below); the two bug-bite
+# pages, forretress-bug-bite-great-league and
+# forretress-shadow-bug-bite-great-league, are NOT covered by this batch.
 BASE_DIVES=(
-  "Lickilicky" "Altaria" "Empoleon" "Jellicent" "Quagsire"
-  "Corsola (Galarian)" "Tinkaton" "Ninetales" "Seaking" "Azumarill"
-  "Forretress" "Feraligatr" "Guzzlord" "Mantine" "Malamar" "Kingdra"
-  "Corviknight" "Fearow" "Dragonair" "Medicham" "Shelgon" "Sliggoo"
-  "Jumpluff" "Stunfisk (Galarian)" "Seismitoad" "Clodsire" "Furret"
-  "Lapras" "Sealeo" "Spidops" "Florges" "Sylveon"
-  "Aegislash (Shield)" "Aegislash (Blade)"
+  "Melmetal" "Altaria" "Cramorant" "Tinkaton" "Mimikyu" "Corviknight"
+  "Corsola (Galarian)" "Florges" "Ninetales" "Quagsire" "Araquanid"
+  "Clodsire" "Marowak" "Stunfisk" "Vigoroth" "Jellicent" "Empoleon"
+  "Fearow" "Mantine" "Snorlax" "Umbreon" "Feraligatr" "Annihilape"
+  "Azumarill" "Deoxys (Defense)" "Electrode (Hisuian)" "Rillaboom"
+  "Sableye" "Lapras" "Charjabug" "Malamar" "Furret" "Guzzlord"
+  "Carbink" "Dondozo" "Hippowdon" "Mandibuzz" "Morpeko (Full Belly)"
+  "Forretress" "Medicham" "Jumpluff" "Kingdra" "Blastoise" "Diggersby"
+  "Thievul" "Sableye (Mega)" "Malamar (Mega)" "Oinkologne (Female)"
+  "Aegislash (Shield)" "Aegislash (Blade)" "Ninetales (Alolan)"
+  "Spidops" "Toxapex" "Turtonator" "Cradily" "Wartortle" "Bombirdier"
 )
-# Shadow variants that are independently GL-meta-relevant. Sableye and
-# Drapion run shadow-only (base form is not meta).
+# Shadow forms with their own registry page. Sableye now has BOTH forms
+# in the registry (it was shadow-only here); Drapion has neither.
 SHADOW_DIVES=(
-  "Altaria" "Empoleon" "Quagsire" "Ninetales" "Forretress" "Feraligatr"
-  "Kingdra" "Dragonair" "Sableye" "Shelgon" "Sealeo" "Drapion"
+  "Ninetales" "Altaria" "Corviknight" "Quagsire" "Sableye" "Empoleon"
+  "Araquanid" "Vigoroth" "Annihilape" "Snorlax" "Malamar" "Charjabug"
+  "Forretress" "Hydreigon" "Feraligatr" "Hippowdon" "Cradily"
 )
+
+# Moveset pins, copied from the registry entries' own extra_args. Without
+# these the dive runs PvPoke's default moveset and produces a page that is
+# not the registry's page at all -- silently, since the filenames match.
+# Keyed by tag (slug() output, plus _shadow for a shadow form).
+DIVE_EXTRA_ARGS=(
+  "forretress|--fast VOLT_SWITCH --charged SAND_TOMB,ROCK_TOMB"
+  "forretress_shadow|--fast VOLT_SWITCH --charged SAND_TOMB,ROCK_TOMB"
+  "oinkologne_female|--charged BODY_SLAM,TRAILBLAZE"
+  "aegislash_shield|--fast AEGISLASH_CHARGE_PSYCHO_CUT --charged SHADOW_BALL,GYRO_BALL"
+  "aegislash_blade|--fast PSYCHO_CUT --charged SHADOW_BALL,GYRO_BALL"
+  "cradily|--fast ACID --charged GRASS_KNOT,ROCK_TOMB"
+)
+
+# bash 3.2 (macOS /bin/bash) has no associative arrays -- linear scan.
+extra_args_for() {
+  local t=$1 e
+  for e in "${DIVE_EXTRA_ARGS[@]}"; do
+    if [ "${e%%|*}" = "$t" ]; then echo "${e#*|}"; return 0; fi
+  done
+}
 
 slug() { echo "$1" | tr '[:upper:]' '[:lower:]' | tr -d '()' | sed 's/  */_/g'; }
 
@@ -58,6 +118,10 @@ run_dive() {
 
   local flags=()
   [ "$shadow" = yes ] && flags+=(--shadow)
+  # Registry moveset pins, if this page has any. Unquoted on purpose: the
+  # stored value is a flag string that must split into separate argv words.
+  local ea; ea=$(extra_args_for "$tag")
+  [ -n "$ea" ] && flags+=($ea)
 
   say "DIVE $tag starting"
   local t0=$SECONDS

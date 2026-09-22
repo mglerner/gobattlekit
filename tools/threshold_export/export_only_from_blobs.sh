@@ -14,18 +14,32 @@ mkdir -p "$OUT"
 LOG=$SIM/userdata/threshold_batch/20260626/export_only.log
 : > "$LOG"
 
+# Roster: kept byte-identical with run_overnight_batch.sh's arrays -- see the
+# derivation comment there (registry-derived 2026-09-22 from gopvpsim's
+# dive_registry.all_dives(); regenerate both together, never one alone).
+#
+# No DIVE_EXTRA_ARGS here: this pass runs no dives, and deep_dive.py's replay
+# blobs carry no moveset in their filenames, so an export can only ever pick
+# the NEWEST blob for a species. For Forretress -- the one species with more
+# than one GL registry page -- that means whichever of the volt-switch and
+# bug-bite pages was dived last, which this script cannot control or detect.
 BASE_DIVES=(
-  "Lickilicky" "Altaria" "Empoleon" "Jellicent" "Quagsire"
-  "Corsola (Galarian)" "Tinkaton" "Ninetales" "Seaking" "Azumarill"
-  "Forretress" "Feraligatr" "Guzzlord" "Mantine" "Malamar" "Kingdra"
-  "Corviknight" "Fearow" "Dragonair" "Medicham" "Shelgon" "Sliggoo"
-  "Jumpluff" "Stunfisk (Galarian)" "Seismitoad" "Clodsire" "Furret"
-  "Lapras" "Sealeo" "Spidops" "Florges" "Sylveon"
-  "Aegislash (Shield)" "Aegislash (Blade)"
+  "Melmetal" "Altaria" "Cramorant" "Tinkaton" "Mimikyu" "Corviknight"
+  "Corsola (Galarian)" "Florges" "Ninetales" "Quagsire" "Araquanid"
+  "Clodsire" "Marowak" "Stunfisk" "Vigoroth" "Jellicent" "Empoleon"
+  "Fearow" "Mantine" "Snorlax" "Umbreon" "Feraligatr" "Annihilape"
+  "Azumarill" "Deoxys (Defense)" "Electrode (Hisuian)" "Rillaboom"
+  "Sableye" "Lapras" "Charjabug" "Malamar" "Furret" "Guzzlord"
+  "Carbink" "Dondozo" "Hippowdon" "Mandibuzz" "Morpeko (Full Belly)"
+  "Forretress" "Medicham" "Jumpluff" "Kingdra" "Blastoise" "Diggersby"
+  "Thievul" "Sableye (Mega)" "Malamar (Mega)" "Oinkologne (Female)"
+  "Aegislash (Shield)" "Aegislash (Blade)" "Ninetales (Alolan)"
+  "Spidops" "Toxapex" "Turtonator" "Cradily" "Wartortle" "Bombirdier"
 )
 SHADOW_DIVES=(
-  "Altaria" "Empoleon" "Quagsire" "Ninetales" "Forretress" "Feraligatr"
-  "Kingdra" "Dragonair" "Sableye" "Shelgon" "Sealeo" "Drapion"
+  "Ninetales" "Altaria" "Corviknight" "Quagsire" "Sableye" "Empoleon"
+  "Araquanid" "Vigoroth" "Annihilape" "Snorlax" "Malamar" "Charjabug"
+  "Forretress" "Hydreigon" "Feraligatr" "Hippowdon" "Cradily"
 )
 
 slug() { echo "$1" | tr '[:upper:]' '[:lower:]' | tr -d '()' | sed 's/  */_/g'; }
