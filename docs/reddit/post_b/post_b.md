@@ -6,7 +6,7 @@ https://www.reddit.com/r/TheSilphArena/comments/1uxhljl/i_made_a_free_opensource
 
 This is the GitHub-archive form (images rendered, usernames linked). The
 Reddit-paste form (linkless body, bare u/ mentions, `[IMAGE]` markers) is at
-commit ff63bd7 if this gets posted to another sub.
+commit b14e86d if this gets posted to another sub.
 
 Same conventions as Post A:
 - `[MICHAEL: ...]` blocks are prose for Michael to write (do NOT AI-fill).

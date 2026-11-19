@@ -86,7 +86,7 @@ the narrowest phone (iPhone SE, ~320pt). Fix a too-long line by either:
 
 HOW TO FIND THEM — `python tools/check_label_wrapping.py`. This is the
 committed, reproducible version of the old by-hand "AST sweep" (commit
-`303826e`). It is enforced by `tests/test_label_wrapping.py`, so a new
+`6bc442a`). It is enforced by `tests/test_label_wrapping.py`, so a new
 over-long Label fails the suite. The hand sweep regressed twice because it only
 inspected string literals passed *directly* to `toga.Label(...)`; the tool also
 resolves module-level string constants and `widget.text = ...` assignments —
@@ -95,8 +95,8 @@ labels) ship clipped. `MAX_LINE` (40) is a tripwire tuned to the dev's accepted
 hand-wraps, not a pixel-exact width model — still eyeball flagged lines on an SE.
 
 The systematic alternative — `horizontal=False` on every ScrollContainer
-(commit `c1066b8`) — would width-constrain content so nothing scrolls sideways.
-It was REVERTED (`3d8a7e9`) with no recorded reason. If you want to retire the
+(commit `5c02c78`) — would width-constrain content so nothing scrolls sideways.
+It was REVERTED (`de2810e`) with no recorded reason. If you want to retire the
 per-label sweep, re-investigate that revert first; until then, the sweep + test
 is the supported method.
 

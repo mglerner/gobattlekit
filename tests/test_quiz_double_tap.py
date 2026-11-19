@@ -2,7 +2,7 @@
 
 Buttons disable synchronously, but a touch event already queued natively still
 fires, so _check_answer could re-enter after the question resolved: double
-score and a second advance task orphaning the first. commit 52dba70 added the
+score and a second advance task orphaning the first. commit 2c987b1 added the
 _question_over guard; this pins it for all three quizzes (device checklist
 "Rapid double-tap an answer -- no double score, no skipped question").
 """

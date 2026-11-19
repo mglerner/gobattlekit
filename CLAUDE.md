@@ -123,7 +123,7 @@ alternative: `docs/responsive_layout_plan.md` ("Horizontal clipping").
    Home/About scroll changes. Now post-release, so failures become 1.0.x
    fixes rather than launch blockers.
 3. Google Play beta testing (blocked on SI5 Android emulator fix; independent
-   of the iOS release). The SI5 code fix is drafted (commit 9baad8a, jarray
+   of the iOS release). The SI5 code fix is drafted (commit 00713e4, jarray
    read buffer); end-to-end emulator import verification is still outstanding.
 
 Review status: the 2026-06-23 pre-release review

@@ -58,7 +58,7 @@ Threshold-pipeline UI (0.0.29–1.0.0, never device-verified):
       tests/test_edit_thresholds_screen.py::TestFloorValidation::test_forced_save_failure_surfaces_error
       patches Path.write_text to raise OSError, driving the real
       save_json_atomic -> add_threshold -> screen path, and asserts the
-      "Could not save target" error with nothing stored; commit 19b76e2. The
+      "Could not save target" error with nothing stored; commit e1bbd5b. The
       item itself concedes this is not triggerable on-device.
 - [ ] Pareto badges: in a species/target with several of your hits, the
       globally-efficient mon(s) show 👑, a best-of-yours-but-not-optimal mon
@@ -105,7 +105,7 @@ Destructive-action guards:
       VERIFIED (2026-08-05): tests/test_iv_checker_screen.py::TestClearCsvDisarm
       (arm -> in-screen navigation disarms; arm -> re-check disarms; two
       consecutive taps really delete) plus the same three cases on the user
-      screen in TestUserScreenSharesBasePaths; commits 94ca899, 40f0ecb. The
+      screen in TestUserScreenSharesBasePaths; commits f2a180b, fc05f78. The
       warning itself is a static two-line literal with an explicit newline.
 - [x] Edit Targets → Clear All: arm it, go into Add Target, cancel, come
       back — button must read "Clear All" again and need two taps (SI4).
@@ -113,7 +113,7 @@ Destructive-action guards:
       tests/test_edit_thresholds_screen.py::TestClearAllDisarm drives the real
       button handlers - arm, enter Add Target, press Cancel, and the label is
       back to "Clear All" with nothing deleted; two consecutive taps still
-      clear; commit 19b76e2.
+      clear; commit e1bbd5b.
 
 Import from Text (the live gopvpsim contract):
 - [ ] Paste a "Copy for IV scanner" JSON fragment from a dive page —
@@ -131,14 +131,14 @@ Import from Text (the live gopvpsim contract):
       (10 cases incl. non-JSON and a typo'd "atack" key; parse raises before
       anything reaches the store) and
       tests/test_edit_thresholds_screen.py::TestImportErrorWrapping::test_import_error_uses_wrapping_widget
-      for the surfaced message; commits 9e42232, 4b45b44.
+      for the surfaced message; commits ae24a8e, 8b96c98.
 - [x] Share an ivs-bearing target → re-import the text — ivs survive the
       round trip (IV2).
       VERIFIED (2026-08-05):
       tests/test_user_thresholds.py::TestIvsFirstClass::test_share_text_reimport_keeps_ivs
       walks the full store -> format_threshold_text -> parse_threshold_text ->
       import_threshold_entries -> store loop and asserts the ivs list survives;
-      commit 19b76e2.
+      commit e1bbd5b.
 
 Matching-semantics spot checks (results CHANGED by the parity work):
 - [x] A shadow mon you know well: its scaled atk/def now include ×1.2 and
@@ -148,14 +148,14 @@ Matching-semantics spot checks (results CHANGED by the parity work):
       fixtures incl. ninetales_shadow_great_parity.json, and guards that the
       shadow vector is not reproducible without the shadow multipliers;
       tests/test_iv_checker.py::TestComputeRankTable::test_shadow_changes_rank_ordering
-      pins the reshuffle. Commits 8da2271, 3d0113d.
+      pins the reshuffle. Commits 674ef44, 6d9ef44.
 - [x] An `onlytop` target: ranks are now PvPoke-style dense unique ranks —
       spot-check one mon's rank against PvPoke's IV table (CP7).
       VERIFIED (2026-08-05): pure math, no device involved.
       tests/test_iv_checker.py::TestComputeRankTable::test_ranks_are_dense_and_unique
       (ranks are exactly 1..N, no ties) plus the rank assertions in
       tests/test_parity_vectors.py::test_parity_vectors against the gopvpsim
-      goldens. Commits 8da2271, 3d0113d.
+      goldens. Commits 674ef44, 6d9ef44.
 - [ ] A branched pre-evo (an Eevee with targets on two Eeveelutions) —
       appears under BOTH finals, annotated "(Eevee)" (P0 #1).
 
@@ -181,7 +181,7 @@ Quizzes:
       VERIFIED (2026-08-05): tests/test_quiz_double_tap.py fires the real
       answer handler twice for all three quizzes and asserts the score/streak
       move once AND that exactly one advance task is scheduled (a second one
-      is what skipped a question); commit 3ca6ac8, guard from 52dba70.
+      is what skipped a question); commit eea06b9, guard from 2c987b1.
 
 ## Android (emulator session — currently excluded, blockers listed)
 
@@ -190,13 +190,13 @@ Quizzes:
       `InputStream.read()` by copy. Rewrite the read loop with
       `jarray('byte')` and verify a real import end-to-end. Blocks Google
       Play beta.
-      NOTE (2026-08-05): read loop rewritten with jarray (commit 9baad8a);
+      NOTE (2026-08-05): read loop rewritten with jarray (commit 00713e4);
       end-to-end emulator import verification still required.
 - [x] Inbox polling correctly absent on Android (AP5) — file picker only.
       VERIFIED (2026-08-05): code inspection IS the verification here -
       _start_inbox_poll returns before creating the task unless ON_IOS
       (src/gobattlekit/app.py:139), so no poll task can exist on Android;
-      commit 685d787.
+      commit 7686e0b.
 - [ ] URL-open failure dialog (about/help/credits links on an emulator
       with no browser) shows once, no traceback spam (SQ1).
 - [ ] Known cosmetic: white border in light mode (accepted, dark forced

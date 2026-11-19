@@ -107,7 +107,7 @@ tournament promotion -- the HSH mentions are credits only, no links.
 
 Usernames linked to profiles, `**[IMAGE]**` markers swapped to
 `![](images/...)`, live URL recorded at the top of `post_b.md`. The
-Reddit-paste form (for any other sub) is preserved at commit ff63bd7.
+Reddit-paste form (for any other sub) is preserved at commit b14e86d.
 
 ## Known / resolved facts
 

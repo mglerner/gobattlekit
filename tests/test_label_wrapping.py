@@ -2,7 +2,7 @@
 
 Toga Labels do not auto-wrap on iOS — a line wider than the viewport clips (or
 scrolls off the right inside a ScrollContainer). This was fixed by hand twice
-(commits 303826e and the 2026-06-26 pass) and regressed both times because the
+(commits 6bc442a and the 2026-06-26 pass) and regressed both times because the
 check was a one-off AST sweep, never enforced. This test runs the committed
 sweep (tools/check_label_wrapping.py) so a new over-long Label fails here.
 
