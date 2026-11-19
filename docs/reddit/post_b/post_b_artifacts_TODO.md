@@ -48,7 +48,7 @@ mention.
 ### D. Cross-links -- DONE (closed 2026-08-05, owner's confirmation)
 
 The repo-side halves were DONE earlier (gopvpsim `post_a.md` links the app
-post, commit 639f479 there). The off-repo live-thread edits were closed by
+post, commit b377ef4 there). The off-repo live-thread edits were closed by
 Michael's 2026-08-05 confirmation that the Reddit posting work is complete
 (done or waived -- either way, no longer tracked).
 
