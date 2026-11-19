@@ -19,6 +19,8 @@ These tests keep the original intent across that growth:
     them, now that real 'generated' targets are present.
 Representative values from updated / preserved species are pinned directly.
 """
+import hashlib
+import re
 import sys
 import tomllib
 from pathlib import Path
@@ -254,8 +256,39 @@ class TestBundlerRegressionGuards:
         git history, never in shipped (bundled) data.
     """
 
-    # Personal handles that must never appear in shipped thresholds.
-    FORBIDDEN_HANDLES = ('tinkaton_expert', 'tinkaton_expert')
+    # Personal handles that must never appear in shipped thresholds, stored as
+    # (length, sha256 of the lowercased handle) so the names themselves never
+    # appear in source. Matching ignores case and non-alphanumerics, so
+    # "Some_Handle" and "some handle" both hit "somehandle".
+    FORBIDDEN_HANDLE_DIGESTS = (
+        (12, 'b437ed48f82e63455d7d0f1c0cac110ce6dca701afae72cf65bb4899c5bc92df'),
+        (10, '1ea67162825241112dd0ab37a674d360fcc44a87b30cf66aa2cd31a36cd675ff'),
+    )
+
+    @classmethod
+    def _handle_hits(cls, text):
+        """Indices of FORBIDDEN_HANDLE_DIGESTS entries found in ``text``."""
+        flat = re.sub(r'[^a-z0-9]', '', text.lower())
+        hits = []
+        for i, (n, digest) in enumerate(cls.FORBIDDEN_HANDLE_DIGESTS):
+            windows = {flat[j:j + n] for j in range(len(flat) - n + 1)}
+            if any(hashlib.sha256(w.encode()).hexdigest() == digest
+                   for w in windows):
+                hits.append(i)
+        return hits
+
+    def test_handle_scanner_self_test(self):
+        # Positive control: the scanner must find a planted handle. Digest of
+        # a dummy handle, checked through the same code path.
+        dummy = 'zzplantedzz'
+        saved = self.FORBIDDEN_HANDLE_DIGESTS
+        try:
+            type(self).FORBIDDEN_HANDLE_DIGESTS = (
+                (len(dummy), hashlib.sha256(dummy.encode()).hexdigest()),)
+            assert self._handle_hits('x ZZ_planted-ZZ y') == [0]
+            assert self._handle_hits('nothing here') == []
+        finally:
+            type(self).FORBIDDEN_HANDLE_DIGESTS = saved
 
     def test_no_junk_double_quoted_species_keys(self):
         for species in DEFAULT_THRESHOLDS:
@@ -272,11 +305,10 @@ class TestBundlerRegressionGuards:
                     yield from strings(v)
             elif isinstance(obj, str):
                 yield obj
-        blob = '\n'.join(strings(DEFAULT_THRESHOLDS)).lower()
-        for h in self.FORBIDDEN_HANDLES:
-            assert h not in blob, f'private handle {h!r} present in bundled thresholds'
+        blob = '\n'.join(strings(DEFAULT_THRESHOLDS))
+        hits = self._handle_hits(blob)
+        assert not hits, f'private handle(s) #{hits} present in bundled thresholds'
 
     def test_no_private_handles_in_bundled_file_text(self):
-        text = BUNDLED_THRESHOLDS_PATH.read_text().lower()
-        for h in self.FORBIDDEN_HANDLES:
-            assert h not in text, f'private handle {h!r} present in {BUNDLED_THRESHOLDS_PATH}'
+        hits = self._handle_hits(BUNDLED_THRESHOLDS_PATH.read_text())
+        assert not hits, f'private handle(s) #{hits} present in {BUNDLED_THRESHOLDS_PATH}'
